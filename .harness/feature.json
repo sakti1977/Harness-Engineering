@@ -1,0 +1,20 @@
+{
+  "id": "sample-booking",
+  "outcome": "Reject a conflicting appointment and create no appointment row",
+  "state": "active",
+  "expected_surface": [
+    "src/booking.py",
+    "tests/test_booking.py"
+  ],
+  "exclusions": [
+    "timezone refactor",
+    "route renaming",
+    "database cleanup"
+  ],
+  "verification": "python -m pytest tests/test_booking.py -q",
+  "claims": [
+    "conflicting booking returns 409",
+    "conflicting booking creates no persistent row",
+    "non-conflicting booking succeeds"
+  ]
+}
