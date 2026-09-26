@@ -49,4 +49,4 @@ if failed:
     print("HARNESS BLOCKED")
     sys.exit(1)
 
-print("HARNESS READY")
+print("Harness artifact checks passed.")
