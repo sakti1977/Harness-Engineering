@@ -1,0 +1,15 @@
+name: Adoption problem
+description: Report a blocked or confusing first run.
+body:
+  - type: textarea
+    attributes:
+      label: Goal and environment
+      description: Python/OS versions, repository revision and what you wanted to do.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction and expected result
+      description: Exact commands and sanitized output. Do not include secrets.
+    validations:
+      required: true

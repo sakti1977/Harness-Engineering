@@ -1,0 +1,9 @@
+name: Source or evidence correction
+description: Improve the accuracy of a concept or example.
+body:
+  - type: textarea
+    attributes:
+      label: Claim and supporting evidence
+      description: Link the note, identify the disputed claim and provide a primary source or reproduction.
+    validations:
+      required: true

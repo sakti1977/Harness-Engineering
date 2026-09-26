@@ -1,68 +1,62 @@
 # Harness Engineering
 
-A practical reference repository for building reliable AI coding-agent environments.
+A practical kit for improving the environment around an AI coding agent: context, permissions, execution, verification and durable state.
 
-> **Capability is what the model can do. Reliability is what the system lets it finish.**
+**Start with a real failure. Add a small control. Verify that it catches the failure.**
 
-## The five-layer model
+## Try the failure-to-fix demonstration
 
-| Layer | Question | Main artifact |
-|---|---|---|
-| **Reach** | Can the agent find what matters? | Copilot instructions + focused docs |
-| **Power** | What may it read, write, and execute? | Authority Policy |
-| **Ground** | Is the environment real and ready? | Readiness Contract |
-| **Verdict** | What evidence proves the behavior? | Claim-to-Proof Matrix |
-| **Carry** | What survives when the session ends? | Cold-session checkpoint |
+Requires Python 3.10+. No model key, dependency installation or external service.
 
-## Repository structure
-
-```text
-.github/
-  copilot-instructions.md
-
-docs/
-  authority.md
-  scope-contract.md
-  proof-matrix.md
-  readiness.md
-
-.harness/
-  checkpoint.md
-  feature.json
-
-scripts/
-  harness_check.py
+```sh
+git clone https://github.com/sakti1977/Harness-Engineering.git
+cd Harness-Engineering
+python3 -m examples.booking.demo
 ```
 
-## Run the sample harness check
+You will see a helper test pass on a broken booking application, two outcome checks catch duplicate bookings, and all six checks pass on the fixed version. The middle failures are intentional; `LAB PASSED` means the runner observed the expected failures and the successful fix.
 
-```bash
-python scripts/harness_check.py
+This is a local SQLite example, including concurrent connections. It does not demonstrate a deployed HTTP API or production readiness. [Read the lab](docs/handbook/11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md).
+
+## Choose your route
+
+- **Learn:** [Learning path](docs/handbook/00%20-%20Start%20Here/Learning%20Path.md) and [complete handbook](docs/handbook/00%20-%20Start%20Here/Harness%20Engineering%20-%20MOC.md).
+- **Adopt:** [project assessment](docs/handbook/11%20-%20Practical%20Implementations/Project%20Harness%20Assessment.md), [adoption guide](docs/adoption.md) and [filled templates](templates/core/README.md).
+- **Evaluate:** [agent evaluation suite](docs/handbook/10%20-%20Harness%20Testing/Agent%20Evaluation%20Suite.md), [experiment template](docs/handbook/Templates/Experiment%20Template.md) and [source register](docs/handbook/00%20-%20Start%20Here/Source%20Register.md).
+- **Use Obsidian:** open `vault/` as a vault. No community plugin is required. GitHub-friendly navigation is generated from those same notes.
+
+## Check this starter or inspect your project
+
+```sh
+python3 scripts/harness_check.py
+python3 scripts/harness_check.py --root /path/to/project --format json
+python3 scripts/harness_check.py --adapter copilot
 ```
 
-The checker validates the presence and basic shape of the harness-control artifacts. It deliberately does **not** call an AI model: harness controls should be testable deterministically.
+The checker is read-only: it checks six core artifacts, nonempty files and the feature ledger’s structure, types, states and relative paths. The optional Copilot check adds its instruction file. It **never executes** a project's verification string. It does not verify readiness, enforce permissions, inspect code changes or establish task completion. [Checker contract](docs/checker.md).
 
-## How to use this in a real project
+## What is included
 
-Start by copying `.github/copilot-instructions.md`. Then customize the project-specific documentation and harness artifacts rather than turning the root instruction file into an encyclopedia.
+- Tool-neutral artifact validation with actionable failures and JSON output.
+- A versioned feature schema and negative regression fixtures.
+- A model-free booking demonstration with persisted-state and concurrency assertions.
+- A source-backed learning vault, repository pattern atlas and reusable note templates.
+- GitHub Actions checks, documentation export and link checks.
 
-A useful adoption order is:
+The Reach / Power / Ground / Verdict / Carry vocabulary is this project's organizing synthesis, not an industry standard. [Source history](docs/handbook/00%20-%20Start%20Here/Source%20Coverage%20Index.md) distinguishes inherited teaching material from newly cited primary sources.
 
-1. Recovery Audit
-2. Readiness gate
-3. Scope Contract
-4. Authority Policy
-5. Claim-to-Proof Matrix
-6. Cold-session checkpoint
-7. Harness-control tests
-8. Safe edit contract
-9. Durable journal/resume
-10. Release evidence
+## Development checks
 
-Grow the harness from observed failures. When an agent makes a repeatable mistake, ask which harness control should make that class of mistake harder, visible, or impossible next time.
+```sh
+python3 -m unittest discover -s tests -v
+python3 -m unittest examples.booking.test_booking -v
+python3 -m examples.booking.demo
+python3 scripts/export_handbook.py --check
+python3 scripts/check_docs.py
+```
 
-## Design principle
+See [contributing](CONTRIBUTING.md), [security scope](SECURITY.md), [roadmap](docs/roadmap.md) and [verification record](docs/verification.md). Live-model benchmarks, automatic installation, production sandboxing and tested multi-vendor runtime adapters remain future work.
 
-Prompt engineering tells the model what you want.
+## Reuse
 
-**Harness Engineering determines what happens when the model acts.**
+Code and original documentation are licensed under [MIT](LICENSE). Linked external sources retain their own terms. If the kit helps, share a reproducible case study or a source correction; independent results are especially useful.
