@@ -27,4 +27,7 @@ Prefer “both requests returned 201 and two rows persisted” over “almost do
 
 ## Practical extension
 
+The repository makes this executable. `python3 scripts/harness_handoff.py --write` drafts the checkpoint from the observed repository (uncommitted files recorded without a ceremonial commit; claims verified only with current evidence), `--check` is the handoff gate at the end of a session, and `--resume` answers the eight recovery questions at the start of the next and fails on a stale or incomplete checkpoint. See `docs/handoff.md` and the Resume Protocol in `AGENTS.md`.
+
+
 Check stored revision and unresolved effects against current state before acting. See [[Memory Scope and Retention]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

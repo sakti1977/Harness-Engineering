@@ -18,6 +18,9 @@ Audit Root (entry), Route (owner), Check (verification), Remove (stale guidance)
 A new session guesses an endpoint while the canonical booking rule is elsewhere.
 
 ## Implementation and verification notes
+
+Run it against the handoff: in a session with no history, `python3 scripts/harness_handoff.py --resume` must answer eight questions with a file or command for each before any edit. Then change the repository after writing the checkpoint and confirm it reports `CHECKPOINT_STALE`.
+
 Observe what it reads *before* editing; repair navigation rather than only adding prompt length.
 
 ## Connected concepts

@@ -22,6 +22,8 @@ jobs:
             exit 1
           fi
           tail -n 3 unittest.txt
+      - name: Harness tests (every gate against its defect and clean fixtures)
+        run: python harness-tests/run.py
       - run: python -m unittest examples.astro.test_astro -v
       - run: python -m examples.astro.demo
       - run: python -m examples.astro.sweep --free-runs 0

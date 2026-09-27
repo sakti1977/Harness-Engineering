@@ -14,6 +14,8 @@
 - Feature transition policy with planner, worker and verifier roles, an independence rule for `passing`, a hash-chained append-only audit log, and automatic staleness when verified code or claims change.
 - Jyotish Coach lab modelled on real incidents (sync badge, age behind UTC) plus a stale-coaching race, with written verification routes, an interleaving sweep, route-aware failure messages and a fidelity ablation.
 - Proof-matrix coverage: every claim needs a producer tested at its required boundary before verification can be requested, with a proof-gap audit guide.
+- Session handoff: a checkpoint written from the observed repository, a handoff gate for the end of a session and a Resume Protocol that treats stale checkpoints as failed checks.
+- Harness tests: every gate runs against a defect fixture and a clean fixture on each change and weekly; uncovered failure codes fail the build.
 
 ## Next acceptance gates
 
