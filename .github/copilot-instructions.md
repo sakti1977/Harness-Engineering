@@ -25,6 +25,8 @@ If a necessary dependency is outside the expected surface, explain why before ch
 ## Power — use the least authority necessary
 Do not read or expose secrets, print environment variables, modify policy to grant yourself access, reset shared/destructive environments without explicit approval, publish/send external messages without approval, rewrite Git history, or work around a denial.
 
+The full policy is in `docs/authority.md`: allowed reads, writes and exact commands, protected files, and actions that need approval. Where it and this file disagree, the stricter rule wins. When blocked, report the refusal code, the exact action, and the one grant that would allow it; then wait.
+
 ## Editing — protect concurrent work
 Prefer small exact edits over whole-file replacement. Confirm expected source text still exists and is unique. If missing or ambiguous, stop, re-read, and reassess.
 
