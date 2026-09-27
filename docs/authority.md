@@ -4,7 +4,7 @@
 
 This file has three parts:
 
-1. **The policy** for this starter's booking example, with guidance under each section.
+1. **The policy** for this starter's Jyotish Coach example, with guidance under each section.
 2. **Where each rule is enforced.** An instruction file alone enforces nothing.
 3. **A blank, commented template** to copy into your own project.
 
@@ -23,7 +23,7 @@ This file has three parts:
 
 ## Write
 
-- allowed: `examples/booking/booking.py`, `examples/booking/test_booking.py`, `.harness/checkpoint.md`
+- allowed: `examples/astro/astro.py`, `examples/astro/test_astro.py`, `.harness/checkpoint.md`
 - denied:
   - ledger: `.harness/feature.json`, `.harness/feature-log.jsonl` (state changes only through `scripts/harness_transition.py`)
   - evidence: `.harness/evidence.json` (written by the verifier or CI, not the worker)
@@ -39,8 +39,9 @@ This file has three parts:
 ## Commands
 
 - allowed (exact strings):
-  - `python3 -m unittest examples.booking.test_booking -v`
-  - `python3 -m examples.booking.demo`
+  - `python3 -m unittest examples.astro.test_astro -v`
+  - `python3 -m examples.astro.demo`
+  - `python3 -m examples.astro.sweep`
   - `python3 scripts/harness_check.py --session`
   - `git status`, `git diff`, `git log --oneline -20`
 - denied by default: everything else, including `pip install`, `curl`, `rm -rf`, `git push`, `git reset --hard` and database reset scripts
@@ -51,7 +52,7 @@ This file has three parts:
 
 ## Secrets
 
-- injected as: none needed for this starter. For a service, for example: `TEST_DATABASE_URL`, `PAYMENTS_SANDBOX_KEY`
+- injected as: none needed for this starter. For the real app, for example: `EPHEMERIS_SHARED_SECRET`, `ANTHROPIC_API_KEY` (sandbox or test values only)
 - never printed: every injected variable, plus anything matching `*_TOKEN`, `*_KEY`, `*_SECRET`, `*PASSWORD*`
 - redact on: trace, checkpoint, failure packet, exit report (write `[REDACTED:VARIABLE_NAME]`)
 
@@ -63,14 +64,14 @@ This file has three parts:
 
 | Action | Example in this project | Why it needs a human |
 | --- | --- | --- |
-| Schema change | Adding a column to `appointments` | Hard to reverse; affects other features |
+| Schema change | Adding a column to `coaching` or a new Supabase migration | Hard to reverse; affects other features |
 | Destructive store operation | Deleting rows, dropping tables, resetting a database | Data loss if the target is wrong |
 | History rewrite | `git rebase`, `git push --force`, amending shared commits | Erases other people's work and the audit trail |
 | Dependency install | `pip install freezegun` | Supply-chain risk; changes the environment for everyone |
 | Publish | Tagging a release, deploying, publishing a package | Visible outside the team |
-| Outbound message to a person | Email, Slack, issue or pull request comments | Speaks for the team |
+| Outbound message to a person | Push notifications to users, email, issue or pull request comments | Speaks for the product or the team |
 
-> **Guidance.** An approval request names one action, one resource and the reason, then waits. "Can I clean up the database?" is not approvable; "Delete the 3 rows with `status='test'` from `appointments` in the local SQLite fixture, to reset the concurrency test" is.
+> **Guidance.** An approval request names one action, one resource and the reason, then waits. "Can I clean up the database?" is not approvable; "Delete the 2 coaching rows for `user-1` in the local lab database, to rerun the stale-coaching route" is.
 
 ## Grants
 
@@ -84,8 +85,8 @@ Example record:
 G-1 | 2026-09-27 14:05 IST | approved by: sakti
 action:   pip install freezegun==1.5.1
 resource: local virtual environment only
-session:  BOOK-1, session 4
-reason:   freeze time in the booking-window test
+session:  ASTRO-1, session 4
+reason:   freeze the clock in the birthday-eve age test
 expires:  end of session
 ```
 
@@ -103,7 +104,7 @@ When the agent declines or is blocked, it reports one of these codes, the exact 
 
 ```text
 COMMAND_NOT_ALLOWED: pip install freezegun==1.5.1
-Needed for: freezing time in test_booking_window
+Needed for: freezing the clock in test_age_correct_behind_and_ahead_of_utc
 Grant requested: one install into the local venv, this session only
 ```
 

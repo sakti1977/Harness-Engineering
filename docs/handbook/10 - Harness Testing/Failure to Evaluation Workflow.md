@@ -18,7 +18,7 @@ Capture the first divergence and minimal initial state. Remove sensitive data, c
 
 ## Worked example
 
-A helper-level check missed a persistent double booking. The regression checks the response and row count, then proves the assertion detects the intentionally broken implementation.
+A response-only check missed a profile that was never stored. The regression checks the response and reads the profile back, then proves the assertion detects the intentionally broken implementation.
 
 ## Try it and check the result
 

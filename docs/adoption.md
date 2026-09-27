@@ -8,4 +8,4 @@
 6. Reproduce the failure in disposable data, add the control, and show both the rejected defect and the accepted valid case.
 7. Record the revision, command, outcome, limitations and next action in a checkpoint.
 
-Start with the [booking lab](../examples/booking/README.md) if you need an example. Prompt/instruction adapters are guidance, not permission enforcement. The Copilot option validates file presence only; it does not establish product behavior.
+Start with the [Jyotish Coach lab](../examples/astro/README.md) if you need an example, and write a [verification route](verify.md) for each claim that crosses a storage, time-zone or timing boundary. Prompt/instruction adapters are guidance, not permission enforcement. The Copilot option validates file presence only; it does not establish product behavior.

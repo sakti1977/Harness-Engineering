@@ -14,7 +14,7 @@ Allowed states: `planned`, `active`, `blocked`, `ready_for_verification`, `passi
 
 ## Proof matrix
 
-The first table in `docs/proof-matrix.md` with the columns Claim, Required boundary, Evidence producer and Tested boundary is read as the proof plan. Every claim in the feature ledger needs a row with an evidence producer, and the tested boundaries (`unit`, `entry`, `persistence`, `concurrency`, `external`, `ui`) must include every required one. Findings are advisory (INFO) while the feature is planned, active or blocked, and fail once it is `ready_for_verification` or `passing`. The checker trusts the boundary columns as written; it does not read the tests. See [proof gaps and acceptance claims](proof-gaps.md).
+The first table in `docs/proof-matrix.md` with the columns Claim, Required boundary, Evidence producer and Tested boundary is read as the proof plan. Every claim in the feature ledger needs a row with an evidence producer, and the tested boundaries (`unit`, `entry`, `persistence`, `concurrency`, `environment`, `external`, `ui`) must include every required one. Findings are advisory (INFO) while the feature is planned, active or blocked, and fail once it is `ready_for_verification` or `passing`. The checker trusts the boundary columns as written; it does not read the tests. See [proof gaps and acceptance claims](proof-gaps.md).
 
 ## Session mode
 

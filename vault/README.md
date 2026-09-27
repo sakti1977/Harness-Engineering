@@ -10,7 +10,7 @@ Python 3.10+ is enough for the included local lab:
 
 ```sh
 cd Labs
-python3 -m examples.booking.demo
+python3 -m examples.astro.demo
 ```
 
 No model credentials or package installation are required. The deliberately broken variant must fail two outcome checks before the fixed variant passes. See [[Vault Update Record]] for verification and limitations.

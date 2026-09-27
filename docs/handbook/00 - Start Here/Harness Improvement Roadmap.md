@@ -25,7 +25,7 @@ Connect every important recommendation to a failure, explanation, control, test 
 
 ## Usable starter implemented
 
-- [x] Provide the model-free booking failure/fix demonstration with persistence and concurrency checks.
+- [x] Provide a model-free failure/fix demonstration with persistence and concurrency checks (now the Jyotish Coach lab, with time-zone claims, verification routes, an interleaving sweep and a fidelity ablation).
 - [x] Supply filled core templates and reviewed local verification commands.
 - [x] Allow read-only artifact inspection of a selected project with explained findings.
 - [x] Make core checks tool-neutral; offer an optional Copilot instruction-file presence check.

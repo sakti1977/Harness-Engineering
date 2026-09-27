@@ -28,11 +28,11 @@ class SessionChecks(unittest.TestCase):
         for name in checker.CORE_FILES:
             self.put(name, (ROOT / name).read_text())
         self.feature = json.loads((ROOT / ".harness/feature.json").read_text())
-        self.feature["excluded_paths"] = ["examples/booking/migrations/"]
+        self.feature["excluded_paths"] = ["examples/astro/migrations/"]
         self.save_feature()
-        self.put("examples/booking/booking.py", "print('v1')\n")
-        self.put("examples/booking/test_booking.py", "# tests\n")
-        self.put("examples/booking/migrations/001.sql", "-- schema\n")
+        self.put("examples/astro/astro.py", "print('v1')\n")
+        self.put("examples/astro/test_astro.py", "# tests\n")
+        self.put("examples/astro/migrations/001.sql", "-- schema\n")
         self.put("src/billing.py", "# unrelated\n")
         self.git("init", "-q", "-b", "main")
         self.git("add", "-A")
@@ -76,7 +76,7 @@ class SessionChecks(unittest.TestCase):
         self.assertEqual(result["scope"], "session-scope-and-evidence")
 
     def test_edit_inside_surface_passes(self):
-        self.put("examples/booking/booking.py", "print('v2')\n")
+        self.put("examples/astro/astro.py", "print('v2')\n")
         self.assertTrue(self.check()["ok"])
 
     def test_edit_outside_surface_fails_and_names_the_file(self):
@@ -99,9 +99,9 @@ class SessionChecks(unittest.TestCase):
         self.assertIn("SCOPE_OUTSIDE_SURFACE", self.codes(self.check(), ok=False))
 
     def test_excluded_path_fails_even_inside_a_directory_surface(self):
-        self.save_feature(expected_surface=["examples/booking/"])
+        self.save_feature(expected_surface=["examples/astro/"])
         self.commit_all()
-        self.put("examples/booking/migrations/002.sql", "DROP TABLE appointments;\n")
+        self.put("examples/astro/migrations/002.sql", "DROP TABLE coaching;\n")
         result = self.check()
         self.assertEqual(self.codes(result, ok=False), ["SCOPE_EXCLUDED"])
 
@@ -111,12 +111,12 @@ class SessionChecks(unittest.TestCase):
         self.assertTrue(self.check()["ok"])
 
     def test_glob_and_directory_surface_patterns(self):
-        for pattern in ("examples/booking", "examples/booking/", "examples/*/booking.py", "examples/booking/*.py"):
+        for pattern in ("examples/astro", "examples/astro/", "examples/*/astro.py", "examples/astro/*.py"):
             with self.subTest(pattern=pattern):
                 self.save_feature(expected_surface=[pattern])
-                self.put("examples/booking/booking.py", "print('v3')\n")
+                self.put("examples/astro/astro.py", "print('v3')\n")
                 self.assertTrue(self.check()["ok"], pattern)
-        self.save_feature(expected_surface=["examples/book"])
+        self.save_feature(expected_surface=["examples/ast"])
         self.assertIn("SCOPE_OUTSIDE_SURFACE", self.codes(self.check(), ok=False))
 
     def test_paths_with_spaces(self):
@@ -174,12 +174,12 @@ class SessionChecks(unittest.TestCase):
         self.save_feature(state="ready_for_verification")
         self.commit_all()
         old = self.git("rev-parse", "HEAD")
-        self.put("examples/booking/booking.py", "print('changed after tests')\n")
+        self.put("examples/astro/astro.py", "print('changed after tests')\n")
         self.commit_all()
         self.record(revision=old)
         result = self.check()
         self.assertFalse(result["ok"])
-        self.assertIn("project files changed since: examples/booking/booking.py", json.dumps(result))
+        self.assertIn("project files changed since: examples/astro/astro.py", json.dumps(result))
 
     def test_abbreviated_revision_is_accepted_but_not_too_short(self):
         self.save_feature(state="ready_for_verification")
@@ -194,7 +194,7 @@ class SessionChecks(unittest.TestCase):
         self.save_feature(state="ready_for_verification")
         self.commit_all()
         self.record()
-        self.put("examples/booking/booking.py", "print('edited after evidence')\n")
+        self.put("examples/astro/astro.py", "print('edited after evidence')\n")
         result = self.check()
         self.assertFalse(result["ok"])
         self.assertIn("uncommitted work", json.dumps(result))

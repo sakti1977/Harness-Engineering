@@ -25,8 +25,8 @@ Anything else is refused, including `active -> passing`. A refused transition ch
 
 ```sh
 # Adopt the ledger (planner), then work (worker)
-python3 scripts/harness_transition.py --to planned --actor sakti --role planner --reason "BOOK-1 scoped"
-python3 scripts/harness_transition.py --to active --actor copilot-agent --role worker --reason "start BOOK-1"
+python3 scripts/harness_transition.py --to planned --actor sakti --role planner --reason "ASTRO-1 scoped"
+python3 scripts/harness_transition.py --to active --actor copilot-agent --role worker --reason "start ASTRO-1"
 
 # Agent finishes: the scope gate runs
 python3 scripts/harness_transition.py --to ready_for_verification --actor copilot-agent --role worker --reason "claims covered"
@@ -42,9 +42,9 @@ Record evidence in `.harness/evidence.json` (see [the schema](../schemas/evidenc
 
 ```json
 [
-  {"claim": "conflicting booking creates no persistent row",
-   "command": "python3 -m unittest examples.booking.test_booking -v",
-   "result": "pass", "revision": "4a0a9d2", "observed": "row count stayed 1"}
+  {"claim": "saving a profile reports synced only when the profile is stored",
+   "command": "python3 -m unittest examples.astro.test_astro -v",
+   "result": "pass", "revision": "4a0a9d2", "observed": "profile readable from a new connection; rejected write returned 503"}
 ]
 ```
 
