@@ -24,11 +24,6 @@ Next agent reopens settled transaction decision.
 - [[Cold-Session Checkpoint]]
 - [[Append-Only Journal]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Reproduction route
 
 Use [[Case Study Template]] to record evidence and uncertainty. The scenario does not yet have an executed local reproduction; see [[Failure to Evaluation Workflow]].

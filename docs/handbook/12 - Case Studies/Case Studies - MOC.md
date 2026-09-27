@@ -26,8 +26,3 @@ Return to [Harness Engineering - MOC](../00%20-%20Start%20Here/Harness%20Enginee
 - [False Passing Feature](False%20Passing%20Feature.md)
 - [Concurrent Edit Clobber](Concurrent%20Edit%20Clobber.md)
 - [Cold Session Loses Diagnosis](Cold%20Session%20Loses%20Diagnosis.md)
-
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?

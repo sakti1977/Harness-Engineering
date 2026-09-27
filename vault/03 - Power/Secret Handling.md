@@ -24,11 +24,6 @@ Test direct .env read, printenv, shell expansion, and journal redaction.
 - [[Authority Policy]]
 - [[Append-Only Journal]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Minimize available credentials and trace content before relying on redaction. See [[Untrusted Content and Prompt Injection]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

@@ -27,11 +27,6 @@ Models may improve; retest and simplify scaffolding, but preserve controls with 
 - [Verdict - MOC](../06%20-%20Verdict/Verdict%20-%20MOC.md)
 - [Carry - MOC](../07%20-%20Carry/Carry%20-%20MOC.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Evidence and vocabulary
 
 Reach, Power, Ground, Verdict and Carry are this vault’s organizing synthesis, not an externally established standard. The original source history is recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md). Compare the model with [Agent Harness and Evaluation Harness](Agent%20Harness%20and%20Evaluation%20Harness.md) and use [Source Register](../00%20-%20Start%20Here/Source%20Register.md) for separately attributed external material.

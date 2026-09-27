@@ -24,11 +24,6 @@ Observed failure → smallest fixture → owning control → cost measurement �
 - [[Five Layers of a Harness]]
 - [[Harness-Control Tests]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Start with one observed failure, then run the model-free booking lab before expanding controls. See [[Project Harness Assessment]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

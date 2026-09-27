@@ -26,11 +26,6 @@ Return to [[Harness Engineering - MOC]].
 - [[Three Tools and One Permit]]
 - [[Safe Exact-Anchor Editing]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Further study
 
 - [[Untrusted Content and Prompt Injection]]

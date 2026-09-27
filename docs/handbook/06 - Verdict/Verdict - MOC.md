@@ -28,11 +28,6 @@ Return to [Harness Engineering - MOC](../00%20-%20Start%20Here/Harness%20Enginee
 - [Harness-Control Tests](../10%20-%20Harness%20Testing/Harness-Control%20Tests.md)
 - [Release Evidence](../10%20-%20Harness%20Testing/Release%20Evidence.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Further study
 
 - [Traces Metrics and Privacy](Traces%20Metrics%20and%20Privacy.md)

@@ -24,11 +24,6 @@ During active run allow safe status/help/cancel; refuse new/policy/context chang
 - [Agent Loop and Provider Seam](../08%20-%20Agent%20Runtime/Agent%20Loop%20and%20Provider%20Seam.md)
 - [Append-Only Journal](../07%20-%20Carry/Append-Only%20Journal.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 A cancellation acknowledgment does not undo effects already committed. See [Budgets and Termination](../08%20-%20Agent%20Runtime/Budgets%20and%20Termination.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).

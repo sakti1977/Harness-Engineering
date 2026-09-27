@@ -25,11 +25,6 @@ Return to [Harness Engineering - MOC](../00%20-%20Start%20Here/Harness%20Enginee
 - [Readiness Contract](Readiness%20Contract.md)
 - [Verification Routes and Test Fidelity](../06%20-%20Verdict/Verification%20Routes%20and%20Test%20Fidelity.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Further study
 
 - [Reproducible Evaluation Environment](Reproducible%20Evaluation%20Environment.md)

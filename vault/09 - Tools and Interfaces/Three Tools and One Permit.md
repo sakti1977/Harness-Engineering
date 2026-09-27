@@ -24,11 +24,6 @@ Bound read/output/time; denial is normal observable result, distinct from runtim
 - [[Authority Policy]]
 - [[Tool Extension Contract]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Validate structure, domain meaning and authorization separately. See [[Typed Outputs and Semantic Validation]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

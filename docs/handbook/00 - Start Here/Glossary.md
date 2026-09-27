@@ -35,11 +35,6 @@ See individual notes for contracts and failure cases.
 - [Claim-to-Proof Matrix](../06%20-%20Verdict/Claim-to-Proof%20Matrix.md)
 - [Resume Replay and Fork](../07%20-%20Carry/Resume%20Replay%20and%20Fork.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Evaluation and operation terms
 
 - **Agent harness:** the runtime around the model: context, actions, policy, state and budgets.

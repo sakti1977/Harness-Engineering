@@ -23,8 +23,3 @@ Atomic rename prevents partial bytes, not stale semantics. Serialize local mutat
 ## Connected concepts
 - [Authority Policy](../03%20-%20Power/Authority%20Policy.md)
 - [Harness-Control Tests](../10%20-%20Harness%20Testing/Harness-Control%20Tests.md)
-
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?

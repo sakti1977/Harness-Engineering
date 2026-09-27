@@ -28,6 +28,14 @@ Choose a route by what you need to do. The milestones below are observable outco
 3. Use [[Agent Evaluation Suite]], [[Grader Reliability]] and [[Experiment Template]]. **Milestone:** specify a reproducible comparison before paying for live runs.
 4. Study [[Harness Ablation Experiments]] and [[Repository Pattern Atlas]]. **Milestone:** justify keeping or removing one mechanism from evidence, including cost and regressions.
 
+## Three questions for every note
+
+Ask these of any concept note before moving on:
+
+- What specific failure would this concept prevent or reveal?
+- Which artifact owns the rule, and how could we test that the rule works?
+- What would a cold session need to recover this decision?
+
 ## Maintain the knowledge base
 
 Use [[Knowledge Base Maintenance]] and [[Templates - MOC]]. A new topic should have a concrete failure, primary source, exercise and limitations. See [[Harness Improvement Roadmap]] for pending product work and [[Vault Update Record]] for completed local evidence.

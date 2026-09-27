@@ -24,11 +24,6 @@ Next session trusts false CLIN-511 passing state.
 - [Feature Ledger as a Gate](../06%20-%20Verdict/Feature%20Ledger%20as%20a%20Gate.md)
 - [Claim-to-Proof Matrix](../06%20-%20Verdict/Claim-to-Proof%20Matrix.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Reproduction route
 
 Use [Case Study Template](../Templates/Case%20Study%20Template.md) to record evidence and uncertainty. The executable synthetic counterpart is [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md).

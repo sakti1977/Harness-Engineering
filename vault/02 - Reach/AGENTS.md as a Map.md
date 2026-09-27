@@ -23,8 +23,3 @@ Keep root short: system boundary, essential commands, global constraints, routes
 ## Connected concepts
 - [[Recovery Audit]]
 - [[Claim-to-Proof Matrix]]
-
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?

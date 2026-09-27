@@ -25,11 +25,6 @@ Prefer “both requests returned 201 and two rows persisted” over “almost do
 - [Resume Replay and Fork](Resume%20Replay%20and%20Fork.md)
 - [Recovery Audit](../02%20-%20Reach/Recovery%20Audit.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Check stored revision and unresolved effects against current state before acting. See [Memory Scope and Retention](Memory%20Scope%20and%20Retention.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).

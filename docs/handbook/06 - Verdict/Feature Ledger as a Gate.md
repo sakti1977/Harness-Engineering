@@ -25,11 +25,6 @@ Test no-evidence passing, duplicate IDs, missing dependencies, unauthorized plan
 - [Scope Contract](../05%20-%20Scope/Scope%20Contract.md)
 - [Harness-Control Tests](../10%20-%20Harness%20Testing/Harness-Control%20Tests.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 The starter validator accepts planned, active, blocked and ready_for_verification. It deliberately rejects self-attested passing; it does not yet implement an independently evidenced completion transition. See [Project Harness Assessment](../11%20-%20Practical%20Implementations/Project%20Harness%20Assessment.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).

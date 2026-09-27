@@ -24,8 +24,3 @@ Ask whether a fresh agent can locate the behavior owner and reproduce the failur
 - [Five Layers of a Harness](Five%20Layers%20of%20a%20Harness.md)
 - [Wrenfold Booking Failures](../12%20-%20Case%20Studies/Wrenfold%20Booking%20Failures.md)
 - [Claim-to-Proof Matrix](../06%20-%20Verdict/Claim-to-Proof%20Matrix.md)
-
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
