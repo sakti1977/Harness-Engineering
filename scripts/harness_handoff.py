@@ -71,7 +71,9 @@ def observe(root):
     latest = {}
     for entry in evidence or []:
         latest[entry["claim"]] = entry
-    return {"feature": feature, "head": head, "dirty": dirty_files(root), "proven": proven,
+    inside_kit = (root / "scripts/harness_handoff.py").is_file()
+    command = "python3 scripts/harness_handoff.py" if inside_kit else "python3 $HARNESS_KIT/scripts/harness_handoff.py --root ."
+    return {"command": command, "feature": feature, "head": head, "dirty": dirty_files(root), "proven": proven,
             "unproven": unproven, "evidence": latest}
 
 
@@ -110,13 +112,13 @@ def render(observed, kept, now=None):
     defaults = {"Suspected causes (not verified)": "None recorded.",
                 "Blockers and commands still to run": "None recorded.",
                 "Decisions to preserve": "None recorded.",
-                "First command for the next session": f"`python3 scripts/harness_handoff.py --resume`, then `{feature['verification']}`",
+                "First command for the next session": f"`{observed['command']} --resume`, then `{feature['verification']}`",
                 "Next bounded edit": PLACEHOLDER,
                 "Grants used this session": "None."}
     body = [
         "# Checkpoint",
         "",
-        "Written from the observed repository by `python3 scripts/harness_handoff.py --write`. "
+        f"Written from the observed repository by `{observed['command']} --write`. "
         "Check it with `--check` before ending a session and `--resume` before starting one. "
         "Facts below are observed; anything under Suspected causes is not.",
         "",

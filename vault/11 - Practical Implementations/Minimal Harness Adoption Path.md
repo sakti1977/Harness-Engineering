@@ -26,4 +26,4 @@ Observed failure → smallest fixture → owning control → cost measurement �
 
 ## Practical extension
 
-Start with one observed failure, then run the model-free Jyotish Coach lab before expanding controls. See [[Project Harness Assessment]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].
+Start with one observed failure, then run the model-free Jyotish Coach lab before expanding controls. In the repository, `python3 scripts/harness_adopt.py --root <project>` previews the starter files and `--apply` creates them without overwriting anything; see `docs/adoption.md`. See [[Project Harness Assessment]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].
