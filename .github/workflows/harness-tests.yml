@@ -1,0 +1,24 @@
+name: Harness tests (scheduled)
+# Fixtures drift when the repository they describe moves underneath them, and git or
+# Python on the runner can change without any commit here. Run the harness tests weekly
+# as well as on every change (see checks.yml), so a stale fixture cannot hide as green.
+on:
+  schedule:
+    - cron: '17 3 * * 1'   # Mondays 03:17 UTC (08:47 IST)
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  harness-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python harness-tests/run.py
+      - run: python -m unittest tests.test_harness_tests -v

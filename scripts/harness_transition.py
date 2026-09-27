@@ -68,17 +68,23 @@ def transition(root, target, actor, role, reason, now=None):
     root = root.resolve()
     feature_path = root / FEATURE_FILE
     try:
-        feature = json.loads(check.read_artifact(root, FEATURE_FILE))
+        text = check.read_artifact(root, FEATURE_FILE)
     except (OSError, ValueError, RuntimeError) as error:
-        return False, [f"Cannot read {FEATURE_FILE}: {error}"]
+        return False, [f"ARTIFACT_INVALID: cannot read {FEATURE_FILE}: {error}"]
+    try:
+        feature = json.loads(text)
+    except ValueError:
+        return False, [f"FEATURE_JSON_INVALID: {FEATURE_FILE} is not valid JSON."]
+    if not isinstance(feature, dict):
+        return False, [f"FEATURE_JSON_INVALID: {FEATURE_FILE} must be a JSON object."]
     schema = json.loads((check.ROOT / "schemas/feature.schema.json").read_text())
     errors = check.schema_errors(feature, schema)
     if errors:
-        return False, ["Fix the feature ledger first:"] + errors
+        return False, ["FEATURE_SCHEMA: fix the feature ledger first:"] + errors
 
     lines, entries, errors = check.read_log(root)
     if errors:
-        return False, ["The transition log is invalid:"] + errors
+        return False, ["LOG_INVALID: the transition log is invalid:"] + errors
     lines, entries = lines or [], entries or []
     if entries:
         replay_findings, state = check.replay(lines, entries, feature)
@@ -91,7 +97,7 @@ def transition(root, target, actor, role, reason, now=None):
     else:
         current = "none"
         if feature["state"] not in ("planned", "active") or target != feature["state"]:
-            return False, ["No transition log yet. Adopt the ledger first with "
+            return False, ["LOG_GENESIS_REQUIRED: no transition log yet. Adopt the ledger first with "
                            f"--to {feature['state'] if feature['state'] in ('planned', 'active') else 'planned'} "
                            "--role planner (genesis entry)."]
 
@@ -109,7 +115,7 @@ def transition(root, target, actor, role, reason, now=None):
     try:
         revision = check.git(root, "rev-parse", "HEAD").strip()
     except (OSError, RuntimeError) as error:
-        return False, [f"A git repository with a commit is required: {error}"]
+        return False, [f"SESSION_GIT_UNAVAILABLE: a git repository with a commit is required: {error}"]
     entry = {"seq": len(entries) + 1,
              "at": (now or datetime.now(timezone.utc)).strftime("%Y-%m-%dT%H:%M:%SZ"),
              "feature": feature["id"], "from": current, "to": target, "actor": actor,

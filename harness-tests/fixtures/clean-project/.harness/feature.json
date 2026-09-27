@@ -1,0 +1,13 @@
+{
+  "id": "profile-sync",
+  "outcome": "A saved profile is really stored and invalid birth details are refused",
+  "state": "active",
+  "expected_surface": ["src/profile.py", "tests/test_profile.py"],
+  "excluded_paths": ["src/payments/"],
+  "exclusions": ["voluntary contribution (UPI) flow"],
+  "verification": "python3 -m unittest tests.test_profile -v",
+  "claims": [
+    "saving a profile reports synced only when the profile is stored",
+    "invalid birth details are rejected and store nothing"
+  ]
+}

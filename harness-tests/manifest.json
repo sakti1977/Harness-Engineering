@@ -1,0 +1,482 @@
+{
+  "about": "One entry per gate behaviour. 'expect' is the exact sorted list of failure codes the gate must return; [] means it must pass. See harness-tests/README.md.",
+  "entries": [
+    {
+      "id": "clean-artifacts",
+      "gate": "artifacts",
+      "defect": "none",
+      "expect": []
+    },
+    {
+      "id": "clean-artifacts-after-verified-passing",
+      "gate": "artifacts",
+      "defect": "verified_passing",
+      "expect": []
+    },
+    {
+      "id": "clean-session",
+      "gate": "session",
+      "defect": "none",
+      "expect": []
+    },
+    {
+      "id": "clean-session-in-scope-change",
+      "gate": "session",
+      "defect": "activated_with_in_scope_change",
+      "expect": []
+    },
+    {
+      "id": "clean-transition-genesis",
+      "gate": "transition",
+      "defect": "none",
+      "expect": [],
+      "transition": {
+        "to": "active",
+        "role": "planner",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "clean-transition-request-verification",
+      "gate": "transition",
+      "defect": "activated_with_in_scope_change",
+      "expect": [],
+      "transition": {
+        "to": "ready_for_verification",
+        "role": "worker",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "clean-transition-independent-approval",
+      "gate": "transition",
+      "defect": "ready_with_evidence",
+      "expect": [],
+      "transition": {
+        "to": "passing",
+        "role": "verifier",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "artifact-missing",
+      "gate": "artifacts",
+      "defect": "missing_artifact",
+      "expect": [
+        "ARTIFACT_INVALID"
+      ]
+    },
+    {
+      "id": "ledger-not-json",
+      "gate": "artifacts",
+      "defect": "ledger_not_json",
+      "expect": [
+        "FEATURE_JSON_INVALID"
+      ]
+    },
+    {
+      "id": "ledger-bad-state",
+      "gate": "artifacts",
+      "defect": "ledger_bad_state",
+      "expect": [
+        "FEATURE_SCHEMA"
+      ]
+    },
+    {
+      "id": "self-attested-passing",
+      "gate": "artifacts",
+      "defect": "self_attested_passing",
+      "expect": [
+        "PASSING_WITHOUT_LOG"
+      ]
+    },
+    {
+      "id": "proof-no-table",
+      "gate": "artifacts",
+      "defect": "proof_no_table",
+      "expect": [
+        "PROOF_MATRIX_NO_TABLE"
+      ]
+    },
+    {
+      "id": "proof-claim-missing",
+      "gate": "artifacts",
+      "defect": "proof_claim_missing",
+      "expect": [
+        "PROOF_CLAIM_MISSING"
+      ]
+    },
+    {
+      "id": "proof-unknown-claim",
+      "gate": "artifacts",
+      "defect": "proof_unknown_claim",
+      "expect": [
+        "PROOF_UNKNOWN_CLAIM"
+      ]
+    },
+    {
+      "id": "proof-producer-missing",
+      "gate": "artifacts",
+      "defect": "proof_producer_missing",
+      "expect": [
+        "PROOF_PRODUCER_MISSING"
+      ]
+    },
+    {
+      "id": "proof-boundary-unknown",
+      "gate": "artifacts",
+      "defect": "proof_boundary_unknown",
+      "expect": [
+        "PROOF_BOUNDARY_UNKNOWN"
+      ]
+    },
+    {
+      "id": "proof-boundary-gap",
+      "gate": "artifacts",
+      "defect": "proof_boundary_gap",
+      "expect": [
+        "PROOF_BOUNDARY_GAP"
+      ]
+    },
+    {
+      "id": "log-not-json",
+      "gate": "artifacts",
+      "defect": "log_not_json",
+      "expect": [
+        "LOG_INVALID"
+      ]
+    },
+    {
+      "id": "log-entry-edited",
+      "gate": "artifacts",
+      "defect": "log_entry_edited",
+      "expect": [
+        "LOG_CHAIN_BROKEN"
+      ]
+    },
+    {
+      "id": "log-feature-renamed",
+      "gate": "artifacts",
+      "defect": "log_feature_renamed",
+      "expect": [
+        "LOG_FEATURE_MISMATCH"
+      ]
+    },
+    {
+      "id": "forged-skip-to-passing",
+      "gate": "artifacts",
+      "defect": "forged_skip_to_passing",
+      "expect": [
+        "TRANSITION_NOT_ALLOWED"
+      ]
+    },
+    {
+      "id": "forged-wrong-role",
+      "gate": "artifacts",
+      "defect": "forged_wrong_role",
+      "expect": [
+        "TRANSITION_ROLE_DENIED"
+      ]
+    },
+    {
+      "id": "forged-self-approval",
+      "gate": "artifacts",
+      "defect": "forged_self_approval",
+      "expect": [
+        "TRANSITION_NOT_INDEPENDENT"
+      ]
+    },
+    {
+      "id": "state-hand-edited",
+      "gate": "artifacts",
+      "defect": "state_hand_edited",
+      "expect": [
+        "STATE_MISMATCH"
+      ]
+    },
+    {
+      "id": "committed-log-rewritten",
+      "gate": "artifacts",
+      "defect": "committed_log_rewritten",
+      "expect": [
+        "LOG_REWRITTEN"
+      ]
+    },
+    {
+      "id": "passing-then-code-changed",
+      "gate": "artifacts",
+      "defect": "passing_then_code_changed",
+      "expect": [
+        "PASSING_STALE"
+      ]
+    },
+    {
+      "id": "passing-then-claims-changed",
+      "gate": "artifacts",
+      "defect": "passing_then_claims_changed",
+      "expect": [
+        "PASSING_STALE"
+      ]
+    },
+    {
+      "id": "passing-revision-unknown",
+      "gate": "artifacts",
+      "defect": "passing_revision_unknown",
+      "expect": [
+        "PASSING_UNVERIFIABLE"
+      ]
+    },
+    {
+      "id": "session-edit-outside-surface",
+      "gate": "session",
+      "defect": "edit_outside_surface",
+      "expect": [
+        "SCOPE_OUTSIDE_SURFACE"
+      ]
+    },
+    {
+      "id": "session-edit-excluded-path",
+      "gate": "session",
+      "defect": "edit_excluded_path",
+      "expect": [
+        "SCOPE_EXCLUDED"
+      ]
+    },
+    {
+      "id": "session-no-git",
+      "gate": "session",
+      "defect": "no_git",
+      "expect": [
+        "SESSION_GIT_UNAVAILABLE"
+      ]
+    },
+    {
+      "id": "session-ledger-path-traversal",
+      "gate": "session",
+      "defect": "ledger_path_traversal",
+      "expect": [
+        "FEATURE_SCHEMA",
+        "SESSION_SKIPPED"
+      ]
+    },
+    {
+      "id": "session-evidence-not-a-list",
+      "gate": "session",
+      "defect": "evidence_not_a_list",
+      "expect": [
+        "EVIDENCE_INVALID"
+      ]
+    },
+    {
+      "id": "session-evidence-reworded-claim",
+      "gate": "session",
+      "defect": "evidence_reworded_claim",
+      "expect": [
+        "EVIDENCE_UNKNOWN_CLAIM"
+      ]
+    },
+    {
+      "id": "session-ready-without-evidence",
+      "gate": "session",
+      "defect": "ready_without_evidence",
+      "expect": [
+        "CLAIM_UNPROVEN"
+      ]
+    },
+    {
+      "id": "transition-skip-to-passing",
+      "gate": "transition",
+      "defect": "activated",
+      "expect": [
+        "TRANSITION_NOT_ALLOWED"
+      ],
+      "transition": {
+        "to": "passing",
+        "role": "verifier",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "transition-worker-approves",
+      "gate": "transition",
+      "defect": "ready_with_evidence",
+      "expect": [
+        "TRANSITION_ROLE_DENIED"
+      ],
+      "transition": {
+        "to": "passing",
+        "role": "worker",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "transition-self-approval",
+      "gate": "transition",
+      "defect": "ready_with_evidence",
+      "expect": [
+        "TRANSITION_NOT_INDEPENDENT"
+      ],
+      "transition": {
+        "to": "passing",
+        "role": "verifier",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "transition-out-of-scope",
+      "gate": "transition",
+      "defect": "ready_after_out_of_scope_commit",
+      "expect": [
+        "SCOPE_OUTSIDE_SURFACE"
+      ],
+      "transition": {
+        "to": "ready_for_verification",
+        "role": "worker",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "transition-proof-gap",
+      "gate": "transition",
+      "defect": "proof_gap_before_activation",
+      "expect": [
+        "PROOF_BOUNDARY_GAP"
+      ],
+      "transition": {
+        "to": "ready_for_verification",
+        "role": "worker",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "transition-no-evidence",
+      "gate": "transition",
+      "defect": "ready_no_evidence",
+      "expect": [
+        "CLAIM_UNPROVEN"
+      ],
+      "transition": {
+        "to": "passing",
+        "role": "verifier",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "transition-stale-evidence",
+      "gate": "transition",
+      "defect": "ready_stale_evidence",
+      "expect": [
+        "CLAIM_UNPROVEN"
+      ],
+      "transition": {
+        "to": "passing",
+        "role": "verifier",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "transition-state-hand-edited",
+      "gate": "transition",
+      "defect": "state_hand_edited",
+      "expect": [
+        "STATE_MISMATCH"
+      ],
+      "transition": {
+        "to": "passing",
+        "role": "verifier",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "transition-genesis-required",
+      "gate": "transition",
+      "defect": "none",
+      "expect": [
+        "LOG_GENESIS_REQUIRED"
+      ],
+      "transition": {
+        "to": "ready_for_verification",
+        "role": "worker",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "transition-no-git",
+      "gate": "transition",
+      "defect": "no_git",
+      "expect": [
+        "SESSION_GIT_UNAVAILABLE"
+      ],
+      "transition": {
+        "to": "active",
+        "role": "planner",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "transition-log-not-json",
+      "gate": "transition",
+      "defect": "log_not_json",
+      "expect": [
+        "LOG_INVALID"
+      ],
+      "transition": {
+        "to": "blocked",
+        "role": "worker",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "transition-log-edited",
+      "gate": "transition",
+      "defect": "log_entry_edited",
+      "expect": [
+        "LOG_CHAIN_BROKEN"
+      ],
+      "transition": {
+        "to": "active",
+        "role": "worker",
+        "actor": "copilot-agent"
+      }
+    },
+    {
+      "id": "transition-ledger-not-json",
+      "gate": "transition",
+      "defect": "ledger_not_json",
+      "expect": [
+        "FEATURE_JSON_INVALID"
+      ],
+      "transition": {
+        "to": "active",
+        "role": "planner",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "transition-ledger-missing",
+      "gate": "transition",
+      "defect": "missing_ledger",
+      "expect": [
+        "ARTIFACT_INVALID"
+      ],
+      "transition": {
+        "to": "active",
+        "role": "planner",
+        "actor": "sakti"
+      }
+    },
+    {
+      "id": "transition-ledger-bad-state",
+      "gate": "transition",
+      "defect": "ledger_bad_state",
+      "expect": [
+        "FEATURE_SCHEMA"
+      ],
+      "transition": {
+        "to": "active",
+        "role": "planner",
+        "actor": "sakti"
+      }
+    }
+  ]
+}

@@ -123,7 +123,7 @@ class TransitionGate(unittest.TestCase):
         self.assertIn("PASSING_WITHOUT_LOG", self.codes())
 
     def test_genesis_must_match_current_state(self):
-        self.refused("active", "No transition log yet")
+        self.refused("active", "LOG_GENESIS_REQUIRED")
 
     def test_skipping_states_is_refused(self):
         self.ok("planned", actor="sakti", role="planner")

@@ -80,6 +80,14 @@ status < 500 and no state check                FALSE PASS
 
 Find the gaps in your own checks with the [proof gaps guide](docs/proof-gaps.md).
 
+## Test the harness itself
+
+Every gate here is code, and code can be wrong. [`harness-tests/`](harness-tests/README.md) runs each gate against a named defect (a forged log entry, a self-approval, a helper-only proof row, an edit outside scope) and against clean work, and compares the exact failure codes. It runs on every change and weekly, and it fails when a gate emits a code that no defect fixture covers: a new gate ships with a defect fixture and a clean fixture, or it does not ship.
+
+```sh
+python3 harness-tests/run.py
+```
+
 ## Make "done" a gate, not a memo
 
 An agent that can write `passing` into a feature list will. The next session then trusts it. The ledger here only changes state through a transition policy, and every change lands in a hash-chained audit log that the checker replays.
@@ -124,6 +132,7 @@ Check a live session against its contract at any time with `python3 scripts/harn
 | `examples/astro/` | The Jyotish Coach failure-to-fix lab, sweep and ablation |
 | `examples/gate/` | The transition-gate demo |
 | `scripts/` | The checker, transition command, handbook exporter and doc checks |
+| `harness-tests/` | Defect and clean fixtures that test every gate, with a coverage rule |
 | `templates/core/` | Filled starter artifacts to copy into your project |
 | `vault/` | The handbook source, written as an Obsidian vault (edit here) |
 | `docs/handbook/` | The same handbook generated from `vault/` with GitHub-friendly links (do not edit) |
@@ -132,6 +141,7 @@ Check a live session against its contract at any time with `python3 scripts/harn
 
 ```sh
 python3 -m unittest discover -s tests -v
+python3 harness-tests/run.py
 python3 -m unittest examples.astro.test_astro -v
 python3 -m examples.astro.demo
 python3 -m examples.astro.sweep
