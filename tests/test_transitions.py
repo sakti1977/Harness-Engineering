@@ -21,8 +21,13 @@ def load(name):
 
 checker = load("harness_check")
 mover = load("harness_transition")
+# Background auto-maintenance after commits can outlive a test and race its temp-dir cleanup.
+NO_BACKGROUND_GIT = {"GIT_CONFIG_COUNT": "3", "GIT_CONFIG_KEY_0": "gc.auto", "GIT_CONFIG_VALUE_0": "0",
+                     "GIT_CONFIG_KEY_1": "maintenance.auto", "GIT_CONFIG_VALUE_1": "false",
+                     "GIT_CONFIG_KEY_2": "gc.autoDetach", "GIT_CONFIG_VALUE_2": "false"}
 GIT_ENV = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@example.com",
-               GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@example.com")
+               GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@example.com",
+               **NO_BACKGROUND_GIT)
 LOG = ".harness/feature-log.jsonl"
 
 
