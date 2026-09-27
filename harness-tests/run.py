@@ -27,7 +27,7 @@ CODE = re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b")
 # Codes that report success or information, and environment variable names, are not gates.
 NOT_FAILURES = {"ARTIFACT_PRESENT", "CLAIM_PENDING", "CLAIM_PROVEN", "EXCLUSIONS_REMINDER",
                 "LOG_VERIFIED", "PROOF_COVERED", "SESSION_CHANGES"}
-GATES = ("artifacts", "session", "transition")
+GATES = ("artifacts", "session", "transition", "handoff", "resume")
 GIT_ENV = dict(os.environ, GIT_AUTHOR_NAME="harness", GIT_AUTHOR_EMAIL="harness@example.com",
                GIT_COMMITTER_NAME="harness", GIT_COMMITTER_EMAIL="harness@example.com",
                GIT_CONFIG_COUNT="3", GIT_CONFIG_KEY_0="gc.auto", GIT_CONFIG_VALUE_0="0",
@@ -44,6 +44,7 @@ def load(name, path):
 
 check = load("harness_check", ROOT / "scripts/harness_check.py")
 mover = load("harness_transition", ROOT / "scripts/harness_transition.py")
+handoff = load("harness_handoff", ROOT / "scripts/harness_handoff.py")
 defects = load("harness_defects", HERE / "defects.py")
 
 
@@ -51,6 +52,7 @@ class Scratch:
     """A disposable git-backed copy of a fixture, with helpers the defects use."""
 
     check = check
+    handoff = handoff
 
     def __init__(self, root):
         self.root = root
@@ -98,6 +100,10 @@ def receipt(gate, root, entry):
         args = entry["transition"]
         ok, messages = mover.transition(root, args["to"], args["actor"], args["role"], "harness test")
         return [] if ok else sorted({code for message in messages for code in CODE.findall(message)})
+    if gate == "handoff":
+        return sorted({f["code"] for f in handoff.handoff_findings(root)})
+    if gate == "resume":
+        return sorted({f["code"] for f in handoff.resume_findings(root)[0]})
     raise ValueError(f"unknown gate {gate!r}")
 
 
@@ -114,7 +120,7 @@ def run_entry(entry):
 
 def gate_codes():
     """Every failure code the gates can emit, read from their source."""
-    source = "".join((ROOT / f"scripts/{name}.py").read_text() for name in ("harness_check", "harness_transition"))
+    source = "".join((ROOT / f"scripts/{name}.py").read_text() for name in ("harness_check", "harness_transition", "harness_handoff"))
     literals = set(re.findall(r'"([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)', source))
     return {code for code in literals if code not in NOT_FAILURES and not code.startswith("GIT_")}
 
@@ -149,6 +155,12 @@ def drift_problems():
                 problems.append(f"FIXTURE_DRIFT {fixture.name}: {error}")
         except (OSError, ValueError) as error:
             problems.append(f"FIXTURE_DRIFT {fixture.name}: feature ledger unreadable ({error})")
+        checkpoint = fixture / ".harness/checkpoint.md"
+        if checkpoint.is_file():
+            sections = handoff.parse(checkpoint.read_text())[1]
+            for name in handoff.SECTIONS:
+                if name not in sections:
+                    problems.append(f"FIXTURE_DRIFT {fixture.name}: checkpoint lacks '## {name}'")
         matrix = fixture / "docs/proof-matrix.md"
         if matrix.is_file() and check.proof_table(matrix.read_text()) is None:
             problems.append(f"FIXTURE_DRIFT {fixture.name}: proof matrix lacks the columns {check.PROOF_COLUMNS}")

@@ -269,3 +269,73 @@ def ready_stale_evidence(s):
 
 def missing_ledger(s):
     s.delete(".harness/feature.json")
+
+
+# handoff and resume -----------------------------------------------------------------------
+NEXT_EDIT = "Add the read-back assertion to test_synced_only_when_stored in tests/test_profile.py."
+
+
+def write_checkpoint(s):
+    s.handoff.write(s.root)
+    s.write(".harness/checkpoint.md", s.read(".harness/checkpoint.md").replace(
+        "## Next bounded edit\n\nTODO", f"## Next bounded edit\n\n{NEXT_EDIT}"))
+
+
+def checkpoint_with_dirty_work(s):
+    s.write("src/profile.py", s.read("src/profile.py") + "\n# work in progress\n")
+    write_checkpoint(s)
+
+
+def checkpoint_with_evidence(s):
+    s.write("src/profile.py", s.read("src/profile.py") + "\n# finished\n")
+    s.commit()
+    record_evidence(s)
+    s.commit()
+    write_checkpoint(s)
+
+
+def checkpoint_over_accidental_edit(s):
+    s.write("src/other.py", "def unrelated():\n    return 'accidentally edited'\n")
+    write_checkpoint(s)
+
+
+def checkpoint_next_edit_left_blank(s):
+    s.handoff.write(s.root)
+
+
+def checkpoint_overclaims(s):
+    write_checkpoint(s)
+    text = s.read(".harness/checkpoint.md").replace(
+        "Nothing has current evidence.", f"- {CLAIMS_ROW_1}: `python3 -m unittest` passed (from memory)")
+    s.write(".harness/checkpoint.md", text)
+
+
+def checkpoint_hides_unverified(s):
+    write_checkpoint(s)
+    s.write(".harness/checkpoint.md", s.read(".harness/checkpoint.md").replace(f"- {CLAIMS_ROW_1}\n", ""))
+
+
+def commit_after_checkpoint(s):
+    checkpoint_with_dirty_work(s)
+    s.commit()
+
+
+def edit_after_checkpoint(s):
+    checkpoint_with_dirty_work(s)
+    s.write("src/other.py", "def unrelated():\n    return 'changed after the handoff'\n")
+
+
+def state_changed_after_checkpoint(s):
+    activate(s)
+    write_checkpoint(s)
+    s.move("blocked", "worker", "copilot-agent", "waiting on review")
+
+
+def evidence_outdated_after_checkpoint(s):
+    checkpoint_with_evidence(s)
+    s.write("src/profile.py", s.read("src/profile.py") + "\n# changed after the handoff\n")
+    s.commit()
+
+
+def checkpoint_deleted(s):
+    s.delete(".harness/checkpoint.md")

@@ -477,6 +477,114 @@
         "role": "planner",
         "actor": "sakti"
       }
+    },
+    {
+      "id": "clean-handoff-dirty-work-recorded",
+      "gate": "handoff",
+      "defect": "checkpoint_with_dirty_work",
+      "expect": []
+    },
+    {
+      "id": "clean-handoff-with-evidence",
+      "gate": "handoff",
+      "defect": "checkpoint_with_evidence",
+      "expect": []
+    },
+    {
+      "id": "clean-resume",
+      "gate": "resume",
+      "defect": "checkpoint_with_dirty_work",
+      "expect": []
+    },
+    {
+      "id": "clean-resume-with-evidence",
+      "gate": "resume",
+      "defect": "checkpoint_with_evidence",
+      "expect": []
+    },
+    {
+      "id": "handoff-accidental-edit",
+      "gate": "handoff",
+      "defect": "checkpoint_over_accidental_edit",
+      "expect": [
+        "SCOPE_OUTSIDE_SURFACE"
+      ]
+    },
+    {
+      "id": "handoff-next-edit-blank",
+      "gate": "handoff",
+      "defect": "checkpoint_next_edit_left_blank",
+      "expect": [
+        "CHECKPOINT_MISSING_FIELD"
+      ]
+    },
+    {
+      "id": "handoff-overclaim",
+      "gate": "handoff",
+      "defect": "checkpoint_overclaims",
+      "expect": [
+        "CHECKPOINT_OVERCLAIM"
+      ]
+    },
+    {
+      "id": "handoff-hides-unverified",
+      "gate": "handoff",
+      "defect": "checkpoint_hides_unverified",
+      "expect": [
+        "CHECKPOINT_UNDECLARED_UNVERIFIED"
+      ]
+    },
+    {
+      "id": "handoff-no-checkpoint",
+      "gate": "handoff",
+      "defect": "checkpoint_deleted",
+      "expect": [
+        "HANDOFF_UNREADABLE"
+      ]
+    },
+    {
+      "id": "resume-after-commit",
+      "gate": "resume",
+      "defect": "commit_after_checkpoint",
+      "expect": [
+        "CHECKPOINT_STALE"
+      ]
+    },
+    {
+      "id": "resume-after-edit",
+      "gate": "resume",
+      "defect": "edit_after_checkpoint",
+      "expect": [
+        "CHECKPOINT_STALE"
+      ]
+    },
+    {
+      "id": "resume-after-state-change",
+      "gate": "resume",
+      "defect": "state_changed_after_checkpoint",
+      "expect": [
+        "CHECKPOINT_STALE"
+      ]
+    },
+    {
+      "id": "resume-evidence-outdated",
+      "gate": "resume",
+      "defect": "evidence_outdated_after_checkpoint",
+      "expect": [
+        "CHECKPOINT_OVERCLAIM",
+        "CHECKPOINT_STALE",
+        "CHECKPOINT_UNDECLARED_UNVERIFIED"
+      ]
+    },
+    {
+      "id": "resume-template-never-written",
+      "gate": "resume",
+      "defect": "none",
+      "expect": [
+        "CHECKPOINT_MISSING_FIELD",
+        "CHECKPOINT_STALE",
+        "CHECKPOINT_UNDECLARED_UNVERIFIED"
+      ]
     }
   ]
 }

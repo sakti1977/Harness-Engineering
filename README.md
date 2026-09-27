@@ -43,7 +43,7 @@ I lead engineering teams building US healthcare software, and I use coding agent
 | **Power** | What may it run, edit or touch, and what is off limits? | [Authority policy](docs/authority.md), [scope contract](docs/scope-contract.md) |
 | **Ground** | Does it work in an environment that is ready and reproducible? | [Readiness contract](docs/readiness.md) |
 | **Verdict** | What evidence proves each claim, beyond "tests pass"? | [Proof matrix](docs/proof-matrix.md), [verification routes](docs/verify.md), [proof gaps guide](docs/proof-gaps.md), [feature ledger](.harness/feature.json) |
-| **Carry** | Can a fresh session pick up where the last one stopped? | [Checkpoint](.harness/checkpoint.md) |
+| **Carry** | Can a fresh session pick up where the last one stopped? | [Checkpoint](.harness/checkpoint.md), [handoff gate and Resume Protocol](docs/handoff.md), [agent instructions](AGENTS.md) |
 
 Reach, Power, Ground, Verdict and Carry are this project's organizing synthesis, not an industry standard. [Source history](docs/handbook/00%20-%20Start%20Here/Source%20Coverage%20Index.md) separates inherited teaching material from newly cited primary sources.
 
@@ -79,6 +79,10 @@ status < 500 and no state check                FALSE PASS
 ```
 
 Find the gaps in your own checks with the [proof gaps guide](docs/proof-gaps.md).
+
+## Hand off honestly
+
+Sessions end with work in progress. `python3 scripts/harness_handoff.py --write` records the repository as it is (uncommitted files included, no ceremonial commit), lists only claims with current evidence as verified, and keeps suspicions apart from facts. `--check` is the last action of a session; `--resume` is the first, and it treats a checkpoint that no longer matches the repository as a failed check instead of following it. [Handoff gate and Resume Protocol](docs/handoff.md).
 
 ## Test the harness itself
 
@@ -131,7 +135,7 @@ Check a live session against its contract at any time with `python3 scripts/harn
 | --- | --- |
 | `examples/astro/` | The Jyotish Coach failure-to-fix lab, sweep and ablation |
 | `examples/gate/` | The transition-gate demo |
-| `scripts/` | The checker, transition command, handbook exporter and doc checks |
+| `scripts/` | The checker, transition, handoff and handbook commands, and doc checks |
 | `harness-tests/` | Defect and clean fixtures that test every gate, with a coverage rule |
 | `templates/core/` | Filled starter artifacts to copy into your project |
 | `vault/` | The handbook source, written as an Obsidian vault (edit here) |
