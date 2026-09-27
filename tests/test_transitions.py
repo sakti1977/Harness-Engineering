@@ -145,6 +145,24 @@ class TransitionGate(unittest.TestCase):
         self.commit()
         self.refused("ready_for_verification", "src/billing.py")
 
+    def test_verification_request_needs_a_complete_proof_matrix(self):
+        self.ok("planned", actor="sakti", role="planner")
+        self.ok("active")
+        matrix = (self.root / "docs/proof-matrix.md").read_text()
+        claim = "concurrent requests for the same slot have one winner"
+        # Weaken only the Tested boundary column (the last occurrence on the row).
+        gapped = "\n".join("entry |".join(line.rsplit("entry, persistence, concurrency |", 1))
+                           if line.startswith(f"| {claim}") else line for line in matrix.splitlines())
+        self.put("docs/proof-matrix.md", gapped)
+        self.save_scope_and_commit()
+        self.refused("ready_for_verification", "PROOF_BOUNDARY_GAP")
+
+    def save_scope_and_commit(self):
+        feature = json.loads((self.root / ".harness/feature.json").read_text())
+        feature["expected_surface"] = feature["expected_surface"] + ["docs/proof-matrix.md"]
+        self.put(".harness/feature.json", json.dumps(feature, indent=2))
+        self.commit()
+
     def test_evidence_gate_requires_every_claim(self):
         self.to_ready()
         self.refused("passing", "CLAIM_UNPROVEN", actor="sakti", role="verifier")

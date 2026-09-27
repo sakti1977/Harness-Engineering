@@ -14,7 +14,7 @@ python3 -m examples.gate.demo      # watch an agent's shortcuts get refused
 | `planned` | `active` | planner, worker | Records the revision where work starts |
 | `active` | `blocked` | planner, worker | Reason names the blocker |
 | `blocked` | `active` | planner, worker | Reason names what unblocked it |
-| `active` | `ready_for_verification` | worker | **Scope:** no file changed since work started is outside `expected_surface` or inside `excluded_paths` |
+| `active` | `ready_for_verification` | worker | **Scope:** no file changed since work started is outside `expected_surface` or inside `excluded_paths`. **Proof plan:** every claim has a [proof-matrix](proof-matrix.md) row with a producer and no boundary gap |
 | `ready_for_verification` | `active` | worker, verifier | Reason, e.g. the check that failed |
 | `ready_for_verification` | `passing` | verifier | **Independence:** not the actor who requested verification. **Evidence:** every claim has passing evidence, no project file changed since it was recorded, clean working tree |
 | `passing` | `active` | planner, verifier | Reopens stale or regressed work |

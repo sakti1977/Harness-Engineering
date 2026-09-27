@@ -6,7 +6,8 @@ Each accepted transition appends one hash-chained line to
 
 Gates (never executes project commands; reads git and recorded evidence only):
   active -> ready_for_verification   no changed file outside expected_surface or
-                                     inside excluded_paths since work started
+                                     inside excluded_paths since work started; every
+                                     claim has a proof-matrix row with no boundary gap
   ready_for_verification -> passing  a verifier who did not request verification;
                                      every claim has passing evidence at HEAD; clean tree
 """
@@ -44,6 +45,11 @@ def gate_failures(root, feature, entries, rule, target, actor):
         for f in check.session_findings(root, feature, base):
             if f["code"] in ("SCOPE_OUTSIDE_SURFACE", "SCOPE_EXCLUDED", "SESSION_GIT_UNAVAILABLE"):
                 problems.append(f"{f['code']} {f.get('path', '')}: {f['detail']}".strip())
+        # Asking for verification means saying how each claim will be proven.
+        strict = dict(feature, state="ready_for_verification")
+        for f in check.proof_findings(root, strict):
+            if not f["ok"]:
+                problems.append(f"{f['code']}: {f['detail']}")
     if gate == "evidence":
         pending = dict(feature, state="ready_for_verification")
         for f in check.session_findings(root, pending, None):

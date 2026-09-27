@@ -20,6 +20,11 @@ CORE_FILES = (
 )
 EVIDENCE_FILE = ".harness/evidence.json"
 LOG_FILE = ".harness/feature-log.jsonl"
+PROOF_FILE = "docs/proof-matrix.md"
+# Where a check observes behavior. A claim's required boundaries must all be tested.
+BOUNDARIES = {"unit", "entry", "persistence", "concurrency", "external", "ui"}
+PROOF_COLUMNS = ("claim", "required boundary", "evidence producer", "tested boundary")
+STRICT_PROOF_STATES = {"ready_for_verification", "passing"}
 
 # Transition policy: (from, to) -> roles allowed, gate to pass, independence rule.
 # "none" is the genesis state before the log exists.
@@ -126,6 +131,7 @@ def inspect(root, adapter=None, session=False, base=None):
                 errors += path_errors("excluded_paths", data.get("excluded_paths"))
             findings.append({"code": "FEATURE_SCHEMA", "ok": not errors, "errors": errors})
             if not errors:
+                findings.extend(proof_findings(root, data))
                 findings.extend(log_findings(root, data, base))
             if session:
                 if errors:
@@ -256,6 +262,80 @@ def session_findings(root, feature, base=None):
             continue
         findings.append({"code": "CLAIM_UNPROVEN" if ready else "CLAIM_PENDING", "ok": not ready,
                          "detail": claim, "errors": [problem]})
+    return findings
+
+
+def proof_table(text):
+    """Return rows (dicts keyed by lower-case header) of the first table with the proof columns."""
+    lines = [line.strip() for line in text.splitlines()]
+    for i, line in enumerate(lines):
+        if not line.startswith("|") or i + 1 >= len(lines):
+            continue
+        header = [cell.strip().lower() for cell in line.strip("|").split("|")]
+        if not all(column in header for column in PROOF_COLUMNS):
+            continue
+        rows = []
+        for row in lines[i + 2:]:
+            if not row.startswith("|"):
+                break
+            cells = [cell.strip() for cell in row.strip("|").split("|")]
+            rows.append(dict(zip(header, cells + [""] * (len(header) - len(cells)))))
+        return rows
+    return None
+
+
+def boundary_set(cell):
+    return {token.strip(" `*").lower() for token in cell.replace(";", ",").split(",") if token.strip(" `*")}
+
+
+def proof_findings(root, feature):
+    """Every claim needs a proof-matrix row whose tested boundaries cover the required ones.
+
+    Strict (failing) once the feature asks for verification; advisory before that.
+    """
+    strict = feature["state"] in STRICT_PROOF_STATES
+    try:
+        rows = proof_table(read_artifact(root, PROOF_FILE))
+    except (OSError, ValueError, RuntimeError):
+        return []  # the artifact check already reports a missing or unreadable file
+
+    def gap(code, detail, path=PROOF_FILE):
+        return {"code": code, "ok": not strict, "path": path, "detail": detail,
+                **({} if strict else {"severity": "info"})}
+
+    if rows is None:
+        return [gap("PROOF_MATRIX_NO_TABLE",
+                    "Add a table with columns: Claim | Observation required | Required boundary | "
+                    "Evidence producer | Tested boundary | Gap. See docs/proof-gaps.md.")]
+    findings, by_claim = [], {}
+    for row in rows:
+        claim = row.get("claim", "").strip()
+        if claim:
+            by_claim[claim.strip("`* ")] = row
+    for claim in by_claim:
+        if claim not in feature["claims"]:
+            findings.append(gap("PROOF_UNKNOWN_CLAIM", f"{claim!r} is not a claim in feature.json (stale or reworded row)."))
+    for claim in feature["claims"]:
+        row = by_claim.get(claim)
+        if row is None:
+            findings.append(gap("PROOF_CLAIM_MISSING", f"No proof-matrix row for: {claim}"))
+            continue
+        producer = row.get("evidence producer", "").strip(" `*")
+        required, tested = boundary_set(row.get("required boundary", "")), boundary_set(row.get("tested boundary", ""))
+        unknown = sorted((required | tested) - BOUNDARIES)
+        if producer.lower() in ("", "-", "tbd", "todo", "none", "n/a"):
+            findings.append(gap("PROOF_PRODUCER_MISSING", f"No evidence producer for: {claim}"))
+        elif unknown:
+            findings.append(gap("PROOF_BOUNDARY_UNKNOWN", f"{claim}: unknown boundary {', '.join(unknown)}; "
+                                f"use {', '.join(sorted(BOUNDARIES))}."))
+        elif not required:
+            findings.append(gap("PROOF_BOUNDARY_GAP", f"{claim}: state the required boundary."))
+        elif required - tested:
+            findings.append(gap("PROOF_BOUNDARY_GAP", f"{claim}: needs {', '.join(sorted(required))} "
+                                f"but {producer} only observes {', '.join(sorted(tested)) or 'nothing'}; "
+                                f"missing {', '.join(sorted(required - tested))}."))
+        else:
+            findings.append({"code": "PROOF_COVERED", "ok": True, "detail": claim})
     return findings
 
 
@@ -394,12 +474,12 @@ def main(argv=None):
     else:
         for item in result["findings"]:
             label = "PASS" if item["ok"] else "FAIL"
-            if item["code"] in ("CLAIM_PENDING", "EXCLUSIONS_REMINDER", "SESSION_CHANGES"):
+            if item.get("severity") == "info" or item["code"] in ("CLAIM_PENDING", "EXCLUSIONS_REMINDER", "SESSION_CHANGES"):
                 label = "INFO"
             print(f"{label} {item['code']} {item.get('path', '')}".rstrip())
             for error in item.get("errors", []):
                 print(f"  {error}")
-            if "detail" in item:
+            if "detail" in item and (not item["ok"] or label == "INFO" or args.session):
                 print(f"  {item['detail']}")
         if args.session:
             print(summary(result))

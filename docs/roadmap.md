@@ -12,6 +12,7 @@
 
 - Session mode: changed files against `expected_surface` and `excluded_paths`, claims against recorded evidence.
 - Feature transition policy with planner, worker and verifier roles, an independence rule for `passing`, a hash-chained append-only audit log, and automatic staleness when verified code or claims change.
+- Proof-matrix coverage: every claim needs a producer tested at its required boundary before verification can be requested, with a proof-gap audit guide.
 
 ## Next acceptance gates
 
