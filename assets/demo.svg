@@ -1,18 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="860" height="416" viewBox="0 0 860 416" role="img" aria-label="Condensed output of the booking demo: a weak test passes on broken code, two outcome checks fail, all six pass on the fixed version, LAB PASSED">
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="456" viewBox="0 0 860 456" role="img" aria-label="Condensed output of the Jyotish Coach lab: three weak checks pass on the broken app, three outcome checks fail, all pass on the fixed app, LAB PASSED">
 <style>text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;white-space:pre}.l{opacity:0;animation:s .25s ease-out forwards}@keyframes s{to{opacity:1}}@media (prefers-reduced-motion:reduce){.l{animation:none;opacity:1}}</style>
-<rect width="860" height="416" rx="10" fill="#0d1117"/>
+<rect width="860" height="456" rx="10" fill="#0d1117"/>
 <rect width="860" height="34" rx="10" fill="#161b22"/><rect y="24" width="860" height="10" fill="#161b22"/>
 <circle cx="20" cy="17" r="6" fill="#f85149"/><circle cx="40" cy="17" r="6" fill="#d29922"/><circle cx="60" cy="17" r="6" fill="#3fb950"/>
-<text x="430.0" y="22" fill="#8b949e" text-anchor="middle" style="font-size:12px">Harness Engineering: failure-to-fix demo (condensed output)</text>
-<text class="l" x="20" y="62" style="animation-delay:0.20s"><tspan fill="#8b949e">$ </tspan><tspan fill="#e6edf3">python3 -m examples.booking.demo</tspan></text>
-<text class="l" x="20" y="106" style="animation-delay:1.10s"><tspan fill="#d29922">1. Weak helper check on broken application</tspan></text>
-<text class="l" x="20" y="128" style="animation-delay:1.45s"><tspan fill="#8b949e">   test_helper_detects_occupied_slot ............ </tspan><tspan fill="#3fb950">ok</tspan></text>
-<text class="l" x="20" y="150" style="animation-delay:2.35s"><tspan fill="#8b949e">   # the kind of test an agent writes: green, yet double booking is still possible</tspan></text>
-<text class="l" x="20" y="194" style="animation-delay:2.70s"><tspan fill="#d29922">2. Outcome checks on broken application</tspan></text>
-<text class="l" x="20" y="216" style="animation-delay:3.05s"><tspan fill="#8b949e">   test_conflicting_booking_changes_no_rows ..... </tspan><tspan fill="#f85149">FAIL</tspan></text>
-<text class="l" x="20" y="238" style="animation-delay:3.40s"><tspan fill="#8b949e">   test_concurrent_same_slot_has_one_winner ..... </tspan><tspan fill="#f85149">FAIL</tspan></text>
-<text class="l" x="20" y="260" style="animation-delay:3.75s"><tspan fill="#f85149">   AssertionError: (201, 2) != (409, 1)</tspan><tspan fill="#8b949e">   # two rows for one slot</tspan></text>
-<text class="l" x="20" y="304" style="animation-delay:4.65s"><tspan fill="#d29922">3. Outcome checks on fixed application</tspan></text>
-<text class="l" x="20" y="326" style="animation-delay:5.00s"><tspan fill="#8b949e">   Ran 6 tests ................................... </tspan><tspan fill="#3fb950">OK</tspan></text>
-<text class="l" x="20" y="370" style="animation-delay:5.90s"><tspan fill="#3fb950">LAB PASSED</tspan><tspan fill="#e6edf3">: the stronger checks detect the seeded defect and accept the fix.</tspan></text>
+<text x="430.0" y="22" fill="#8b949e" text-anchor="middle" style="font-size:12px">Harness Engineering: Jyotish Coach lab (condensed output)</text>
+<text class="l" x="20" y="62" style="animation-delay:0.20s"><tspan fill="#8b949e">$ </tspan><tspan fill="#e6edf3">python3 -m examples.astro.demo</tspan></text>
+<text class="l" x="20" y="106" style="animation-delay:1.10s"><tspan fill="#d29922">1. Weak checks on the broken app</tspan></text>
+<text class="l" x="20" y="128" style="animation-delay:1.45s"><tspan fill="#8b949e">   test_save_reports_synced ............................ </tspan><tspan fill="#3fb950">ok</tspan></text>
+<text class="l" x="20" y="150" style="animation-delay:1.80s"><tspan fill="#8b949e">   test_age_in_ist ..................................... </tspan><tspan fill="#3fb950">ok</tspan></text>
+<text class="l" x="20" y="172" style="animation-delay:2.15s"><tspan fill="#8b949e">   test_coaching_is_generated .......................... </tspan><tspan fill="#3fb950">ok</tspan></text>
+<text class="l" x="20" y="216" style="animation-delay:3.05s"><tspan fill="#d29922">2. Outcome checks on the broken app</tspan></text>
+<text class="l" x="20" y="238" style="animation-delay:3.40s"><tspan fill="#8b949e">   test_synced_only_when_stored ........................ </tspan><tspan fill="#f85149">FAIL</tspan></text>
+<text class="l" x="20" y="260" style="animation-delay:3.75s"><tspan fill="#8b949e">   test_age_correct_behind_and_ahead_of_utc ............ </tspan><tspan fill="#f85149">FAIL</tspan></text>
+<text class="l" x="20" y="282" style="animation-delay:4.10s"><tspan fill="#8b949e">   test_coaching_not_stored_against_superseded_chart ... </tspan><tspan fill="#f85149">FAIL</tspan></text>
+<text class="l" x="20" y="304" style="animation-delay:4.45s"><tspan fill="#f85149">   OBSERVED  status 200, synced True, stored profile: None</tspan></text>
+<text class="l" x="20" y="348" style="animation-delay:5.35s"><tspan fill="#d29922">3. Outcome checks on the fixed app</tspan></text>
+<text class="l" x="20" y="370" style="animation-delay:5.70s"><tspan fill="#8b949e">   Ran 4 tests ......................................... </tspan><tspan fill="#3fb950">OK</tspan></text>
+<text class="l" x="20" y="414" style="animation-delay:6.60s"><tspan fill="#3fb950">LAB PASSED</tspan><tspan fill="#e6edf3">: the outcome checks catch all three defects and accept the fix.</tspan></text>
 </svg>

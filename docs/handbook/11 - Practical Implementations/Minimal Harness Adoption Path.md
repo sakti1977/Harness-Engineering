@@ -15,7 +15,7 @@ Overbuilding a harness before observing failures creates maintenance burden.
 Start with one observable outcome, scope, real proof route, restricted execution, receipts. Add ledger for multiple features, journal for long runs, compaction for context, safe edit for concurrency, release gate for shipping.
 
 ## Example / failure mode
-Start by proving clinic double-booking, not by implementing a full agent framework.
+Start by proving one claim at its real boundary (for example, that a saved profile is actually stored), not by implementing a full agent framework.
 
 ## Implementation and verification notes
 Observed failure → smallest fixture → owning control → cost measurement → retest after model change.
@@ -26,4 +26,4 @@ Observed failure → smallest fixture → owning control → cost measurement �
 
 ## Practical extension
 
-Start with one observed failure, then run the model-free booking lab before expanding controls. See [Project Harness Assessment](Project%20Harness%20Assessment.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).
+Start with one observed failure, then run the model-free Jyotish Coach lab before expanding controls. See [Project Harness Assessment](Project%20Harness%20Assessment.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).

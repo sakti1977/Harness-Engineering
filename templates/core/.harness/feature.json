@@ -1,21 +1,21 @@
 {
-  "id": "sample-booking",
-  "outcome": "Reject a conflicting appointment and create no appointment row",
+  "id": "jyotish-profile-coaching",
+  "outcome": "A saved birth profile is really stored, ages are right in every time zone, and coaching is never stored against a superseded chart",
   "state": "active",
   "expected_surface": [
-    "examples/booking/booking.py",
-    "examples/booking/test_booking.py"
+    "examples/astro/astro.py",
+    "examples/astro/test_astro.py"
   ],
   "exclusions": [
-    "timezone refactor",
-    "route renaming",
-    "database cleanup"
+    "ephemeris accuracy",
+    "coaching prompt wording",
+    "voluntary contribution (UPI) flow"
   ],
-  "verification": "python3 -m unittest examples.booking.test_booking -v",
+  "verification": "python3 -m unittest examples.astro.test_astro -v",
   "claims": [
-    "conflicting booking returns status value 409",
-    "conflicting booking creates no persistent row",
-    "non-conflicting booking succeeds",
-    "concurrent requests for the same slot have one winner"
+    "saving a profile reports synced only when the profile is stored",
+    "age is correct for users behind and ahead of UTC",
+    "coaching started before a birth-time correction is not stored against the old chart",
+    "invalid birth details are rejected and store nothing"
   ]
 }

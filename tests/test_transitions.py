@@ -21,8 +21,13 @@ def load(name):
 
 checker = load("harness_check")
 mover = load("harness_transition")
+# Background auto-maintenance after commits can outlive a test and race its temp-dir cleanup.
+NO_BACKGROUND_GIT = {"GIT_CONFIG_COUNT": "3", "GIT_CONFIG_KEY_0": "gc.auto", "GIT_CONFIG_VALUE_0": "0",
+                     "GIT_CONFIG_KEY_1": "maintenance.auto", "GIT_CONFIG_VALUE_1": "false",
+                     "GIT_CONFIG_KEY_2": "gc.autoDetach", "GIT_CONFIG_VALUE_2": "false"}
 GIT_ENV = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@example.com",
-               GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@example.com")
+               GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@example.com",
+               **NO_BACKGROUND_GIT)
 LOG = ".harness/feature-log.jsonl"
 
 
@@ -38,7 +43,7 @@ class TransitionGate(unittest.TestCase):
         feature["state"] = "planned"
         self.put(".harness/feature.json", json.dumps(feature, indent=2))
         self.claims = feature["claims"]
-        self.put("examples/booking/booking.py", "v1\n")
+        self.put("examples/astro/astro.py", "v1\n")
         self.put("src/billing.py", "unrelated\n")
         self.git("init", "-q", "-b", "main")
         self.commit()
@@ -90,7 +95,7 @@ class TransitionGate(unittest.TestCase):
     def to_ready(self):
         self.ok("planned", actor="sakti", role="planner")
         self.ok("active")
-        self.put("examples/booking/booking.py", "v2 with transaction\n")
+        self.put("examples/astro/astro.py", "v2 with transaction\n")
         self.commit()
         self.ok("ready_for_verification")
 
@@ -149,7 +154,7 @@ class TransitionGate(unittest.TestCase):
         self.ok("planned", actor="sakti", role="planner")
         self.ok("active")
         matrix = (self.root / "docs/proof-matrix.md").read_text()
-        claim = "concurrent requests for the same slot have one winner"
+        claim = "coaching started before a birth-time correction is not stored against the old chart"
         # Weaken only the Tested boundary column (the last occurrence on the row).
         gapped = "\n".join("entry |".join(line.rsplit("entry, persistence, concurrency |", 1))
                            if line.startswith(f"| {claim}") else line for line in matrix.splitlines())
@@ -174,7 +179,7 @@ class TransitionGate(unittest.TestCase):
         self.to_ready()
         self.record_evidence()
         self.commit()
-        self.put("examples/booking/booking.py", "edited after evidence\n")
+        self.put("examples/astro/astro.py", "edited after evidence\n")
         self.refused("passing", "uncommitted work", actor="sakti", role="verifier")
 
     def test_verifier_can_send_work_back(self):
@@ -201,7 +206,7 @@ class TransitionGate(unittest.TestCase):
         self.ok("planned", actor="sakti", role="planner")
         self.ok("active")
         lines = (self.root / LOG).read_text().splitlines()
-        forged = {"seq": len(lines) + 1, "at": "2026-01-01T00:00:00Z", "feature": "sample-booking",
+        forged = {"seq": len(lines) + 1, "at": "2026-01-01T00:00:00Z", "feature": "jyotish-profile-coaching",
                   "from": "active", "to": "passing", "actor": "copilot-agent", "role": "verifier",
                   "revision": self.git("rev-parse", "HEAD"), "reason": "trust me",
                   "prev": checker.line_hash(lines[-1]), "claims": self.claims}
@@ -230,7 +235,7 @@ class TransitionGate(unittest.TestCase):
         self.record_evidence()
         self.commit()
         self.ok("passing", actor="sakti", role="verifier")
-        self.put("examples/booking/booking.py", "a later session changed this\n")
+        self.put("examples/astro/astro.py", "a later session changed this\n")
         self.commit()
         self.assertIn("PASSING_STALE", self.codes())
         self.ok("active", actor="sakti", role="verifier", reason="changed after verification")
@@ -242,7 +247,7 @@ class TransitionGate(unittest.TestCase):
         self.commit()
         self.ok("passing", actor="sakti", role="verifier")
         feature = json.loads((self.root / ".harness/feature.json").read_text())
-        feature["claims"].append("cancelled bookings free the slot")
+        feature["claims"].append("every remedy includes a behavioural practice")
         self.put(".harness/feature.json", json.dumps(feature, indent=2))
         self.assertIn("PASSING_STALE", self.codes())
 

@@ -1,7 +1,7 @@
 ---
 type: verification-record
 status: locally-verified
-reviewed: 2026-09-26
+reviewed: 2026-09-27
 ---
 
 # Vault Update Record
@@ -31,3 +31,7 @@ The public repository contains the checker/tests/example and maintains this lear
 ## Next work
 
 External pilot feedback, independently produced evidence receipts, a second stack, tested runtime adapters and live-agent experiments remain on [Harness Improvement Roadmap](Harness%20Improvement%20Roadmap.md). See [Source Register](Source%20Register.md) for the evidence conventions.
+
+## Update 2026-09-27
+
+The booking lab is replaced by the Jyotish Coach lab in [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md), modelled on incidents recorded in [Jyotish Coach Sync and Age Incidents](../12%20-%20Case%20Studies/Jyotish%20Coach%20Sync%20and%20Age%20Incidents.md). The repository adds written verification routes (`docs/verify.md`), an interleaving sweep, route-aware failure messages and a fidelity ablation. Executed locally on Python 3.10, 3.12 and 3.13: the lab demo, sweep, ablation and 70 repository tests passed; the threaded stale-coaching check was repeated 30 times per variant without an unexpected result. Other inherited clinic scenarios in this vault remain instructional examples.

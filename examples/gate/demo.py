@@ -16,8 +16,13 @@ spec = importlib.util.spec_from_file_location("harness_transition", ROOT / "scri
 mover = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mover)
 check = mover.check
+# Background auto-maintenance after commits can outlive a test and race its temp-dir cleanup.
+NO_BACKGROUND_GIT = {"GIT_CONFIG_COUNT": "3", "GIT_CONFIG_KEY_0": "gc.auto", "GIT_CONFIG_VALUE_0": "0",
+                     "GIT_CONFIG_KEY_1": "maintenance.auto", "GIT_CONFIG_VALUE_1": "false",
+                     "GIT_CONFIG_KEY_2": "gc.autoDetach", "GIT_CONFIG_VALUE_2": "false"}
 ENV = dict(os.environ, GIT_AUTHOR_NAME="demo", GIT_AUTHOR_EMAIL="demo@example.com",
-           GIT_COMMITTER_NAME="demo", GIT_COMMITTER_EMAIL="demo@example.com")
+           GIT_COMMITTER_NAME="demo", GIT_COMMITTER_EMAIL="demo@example.com",
+           **NO_BACKGROUND_GIT)
 
 
 def main():
@@ -43,8 +48,8 @@ def main():
             put(name, (ROOT / name).read_text())
         feature = json.loads((ROOT / ".harness/feature.json").read_text())
         put(".harness/feature.json", json.dumps(dict(feature, state="planned"), indent=2))
-        put("examples/booking/booking.py", "# broken: no transaction\n")
-        put("src/billing.py", "# unrelated module\n")
+        put("examples/astro/astro.py", "# broken: coaching write ignores chart_version\n")
+        put("app/support/upi.py", "# voluntary contributions: never touches coaching\n")
         git("init", "-q", "-b", "main")
         commit()
 
@@ -63,12 +68,12 @@ def main():
         step("Planner adopts the ledger", "planned", "sakti", "planner", True)
         step("Agent starts work", "active", "copilot-agent", "worker", True)
         step("Agent marks its own work passing", "passing", "copilot-agent", "worker", False)
-        put("examples/booking/booking.py", "# fixed: insert inside a transaction\n")
-        put("src/billing.py", "# agent 'tidied' an unrelated module\n")
+        put("examples/astro/astro.py", "# fixed: conditional write on chart_version\n")
+        put("app/support/upi.py", "# agent 'tidied' the contributions module\n")
         commit()
         step("Agent asks for verification", "ready_for_verification", "copilot-agent", "worker", False)
         git("revert", "--no-edit", "HEAD")
-        put("examples/booking/booking.py", "# fixed: insert inside a transaction\n")
+        put("examples/astro/astro.py", "# fixed: conditional write on chart_version\n")
         commit()
         step("Agent asks again, scope clean", "ready_for_verification", "copilot-agent", "worker", True)
         step("Verifier approves with no evidence", "passing", "sakti", "verifier", False)
@@ -80,7 +85,7 @@ def main():
         step("Same agent approves its own request", "passing", "copilot-agent", "verifier", False)
         step("Independent verifier approves with evidence", "passing", "sakti", "verifier", True)
 
-        put("examples/booking/booking.py", "# a later session edits the verified code\n")
+        put("examples/astro/astro.py", "# a later session edits the verified code\n")
         commit()
         stale = [f for f in check.inspect(root)["findings"] if f["code"] == "PASSING_STALE"]
         print(("STALE    " if stale else "MISSED   ") + "Next session changes verified code: passing is flagged stale")

@@ -21,6 +21,7 @@ A plausible edit and a green test are not enough.
 Return to [Harness Engineering - MOC](../00%20-%20Start%20Here/Harness%20Engineering%20-%20MOC.md).
 
 ## Connected concepts
+- [Jyotish Coach Sync and Age Incidents](Jyotish%20Coach%20Sync%20and%20Age%20Incidents.md) (observed incidents, reproduced in the lab)
 - [Wrenfold Booking Failures](Wrenfold%20Booking%20Failures.md)
 - [Destructive Database Reset](Destructive%20Database%20Reset.md)
 - [False Passing Feature](False%20Passing%20Feature.md)

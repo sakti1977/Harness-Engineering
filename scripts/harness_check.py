@@ -22,7 +22,7 @@ EVIDENCE_FILE = ".harness/evidence.json"
 LOG_FILE = ".harness/feature-log.jsonl"
 PROOF_FILE = "docs/proof-matrix.md"
 # Where a check observes behavior. A claim's required boundaries must all be tested.
-BOUNDARIES = {"unit", "entry", "persistence", "concurrency", "external", "ui"}
+BOUNDARIES = {"unit", "entry", "persistence", "concurrency", "environment", "external", "ui"}
 PROOF_COLUMNS = ("claim", "required boundary", "evidence producer", "tested boundary")
 STRICT_PROOF_STATES = {"ready_for_verification", "passing"}
 

@@ -4,7 +4,7 @@
 
 - Accurate checker scope, strict feature validation, negative tests and JSON findings.
 - Optional vendor instruction check; core validation is tool-neutral.
-- Runnable synthetic booking lab, including persisted state and concurrent requests.
+- Runnable synthetic lab, including persisted state and concurrent requests (since replaced by the Jyotish Coach lab).
 - MIT code/documentation license, contribution guidance, issue forms and CI configuration.
 - Expanded Obsidian learning content and generated GitHub navigation from the same source.
 
@@ -12,6 +12,7 @@
 
 - Session mode: changed files against `expected_surface` and `excluded_paths`, claims against recorded evidence.
 - Feature transition policy with planner, worker and verifier roles, an independence rule for `passing`, a hash-chained append-only audit log, and automatic staleness when verified code or claims change.
+- Jyotish Coach lab modelled on real incidents (sync badge, age behind UTC) plus a stale-coaching race, with written verification routes, an interleaving sweep, route-aware failure messages and a fidelity ablation.
 - Proof-matrix coverage: every claim needs a producer tested at its required boundary before verification can be requested, with a proof-gap audit guide.
 
 ## Next acceptance gates

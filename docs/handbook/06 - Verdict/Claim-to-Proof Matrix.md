@@ -15,7 +15,7 @@ A helper test may pass while the real route never invokes the helper.
 Map each acceptance claim to observation, evidence producer, and gap. Outcome evidence supports claim; diagnostic evidence explains; contradiction vetoes passing. Require current proof for all claims.
 
 ## Example / failure mode
-Conflicting booking returns 409 AND persists no row; unit-only validator test cannot establish either at HTTP+DB boundary.
+Saving a profile returns synced AND the profile is stored; a response-only check cannot establish the second, which is how a "Synced" badge can sit on top of rejected writes.
 
 ## Implementation and verification notes
 Changing claim, observation, producer, route, or revision invalidates affected verdict. Worker submits evidence, not terminal state.

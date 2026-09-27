@@ -1,5 +1,22 @@
 # Local verification record
 
+## 2026-09-27: Jyotish Coach lab
+
+Host: Linux. Interpreters: Python 3.10, 3.12 and 3.13 (default 3.11.15). No model calls, paid APIs or third-party packages.
+
+- `python3 -m unittest discover -s tests -v`: 70 tests passed on each interpreter (checker, session, transitions, proof matrix, lab tools, documentation tools).
+- `python3 -m unittest examples.astro.test_astro -v`: all 7 lab checks passed on the fixed app.
+- `python3 -m examples.astro.demo`: three weak checks green on the broken app; exactly the three intended outcome claims failed; all outcome checks green on the fixed app; `LAB PASSED`.
+- `python3 -m examples.astro.sweep`: the broken app stored stale coaching at 11 of 13 injection points (not at the first or last); the fixed app at none; `SWEEP PASSED`.
+- `python3 -m examples.astro.ablation`: the faithful route and two single-check weakenings discriminate; sequential runs are always red until the expectation is edited, which then false-passes, as do per-actor stores and weakening both checks; `ABLATION PASSED`.
+- `python3 -m examples.gate.demo`: `GATE DEMO PASSED`.
+- The threaded stale-coaching test was repeated 30 times on each variant with no unexpected result.
+- Handbook export and documentation checks: 95 files verified, 0 issues.
+
+The lab replaces the earlier booking example. The record below is the original release's verification and is kept unchanged.
+
+## 2026-09-26: first release
+
 Date: 2026-09-26. Host: Linux. Interpreter: Python 3.12.3. No model calls, paid APIs or third-party Python packages were used.
 
 ## Results

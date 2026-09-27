@@ -9,4 +9,4 @@ These are copies of this repository's small teaching contracts, not universal po
 - [Feature ledger](.harness/feature.json)
 - [Checkpoint](.harness/checkpoint.md)
 
-The feature's verification command targets this starter's booking example. Replace it for your own project; the checker does not execute it. For learning templates see [the template index](../../docs/handbook/Templates/Templates%20-%20MOC.md).
+The feature's verification command targets this starter's Jyotish Coach example. Replace it for your own project; the checker does not execute it. For learning templates see [the template index](../../docs/handbook/Templates/Templates%20-%20MOC.md).

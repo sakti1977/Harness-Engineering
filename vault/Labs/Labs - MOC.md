@@ -2,7 +2,7 @@
 
 ## Executable now
 
-[[First Executable Harness Lab]] — helper-level false confidence, persisted duplicates and concurrent requests. Python standard library only; supplied code is under `Labs/examples/booking/`.
+[[First Executable Harness Lab]]: response-only, single-time-zone and sequential checks that stay green on a broken astrology coaching app, with an interleaving sweep and a fidelity ablation. Python standard library only; supplied code is under `Labs/examples/astro/`.
 
 ## Designed exercises, not executed runtime claims
 
@@ -12,4 +12,4 @@
 - [[Memory Scope and Retention]] — cross-thread isolation and expiry.
 - [[Harness Ablation Experiments]] — one changed mechanism and held-out tasks.
 
-Use [[Experiment Template]] to record results. Only the booking demonstration and repository checks have local execution evidence in this release; see [[Vault Update Record]].
+Use [[Experiment Template]] to record results. Only the Jyotish Coach lab and repository checks have local execution evidence in this release; see [[Vault Update Record]].
