@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harness feature transition log v1 (one object per line)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "seq",
+    "at",
+    "feature",
+    "from",
+    "to",
+    "actor",
+    "role",
+    "revision",
+    "reason",
+    "prev"
+  ],
+  "properties": {
+    "seq": {
+      "type": "integer"
+    },
+    "at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "feature": {
+      "type": "string",
+      "minLength": 1
+    },
+    "from": {
+      "type": "string",
+      "enum": [
+        "none",
+        "planned",
+        "active",
+        "blocked",
+        "ready_for_verification",
+        "passing"
+      ]
+    },
+    "to": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "active",
+        "blocked",
+        "ready_for_verification",
+        "passing"
+      ]
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "planner",
+        "worker",
+        "verifier"
+      ]
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prev": {
+      "type": "string"
+    },
+    "base": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

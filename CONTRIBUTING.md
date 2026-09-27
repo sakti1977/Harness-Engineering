@@ -18,6 +18,7 @@ python3 scripts/harness_check.py --adapter copilot
 python3 -m unittest discover -s tests -v
 python3 -m unittest examples.booking.test_booking -v
 python3 -m examples.booking.demo
+python3 -m examples.gate.demo
 python3 scripts/export_handbook.py
 python3 scripts/check_docs.py
 ```

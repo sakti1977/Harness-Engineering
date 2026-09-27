@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Harness evidence log v1",
+  "description": "Append one entry each time a claim's verification is run. The latest entry per claim counts.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "claim",
+      "command",
+      "result",
+      "revision"
+    ],
+    "properties": {
+      "claim": {
+        "type": "string",
+        "minLength": 1
+      },
+      "command": {
+        "type": "string",
+        "minLength": 1
+      },
+      "result": {
+        "type": "string",
+        "enum": [
+          "pass",
+          "fail"
+        ]
+      },
+      "revision": {
+        "type": "string",
+        "minLength": 1
+      },
+      "observed": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

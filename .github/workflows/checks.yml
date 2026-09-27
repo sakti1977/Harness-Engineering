@@ -17,5 +17,6 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: python -m unittest examples.booking.test_booking -v
       - run: python -m examples.booking.demo
+      - run: python -m examples.gate.demo
       - run: python scripts/export_handbook.py --check
       - run: python scripts/check_docs.py
