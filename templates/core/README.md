@@ -1,6 +1,6 @@
 # Filled core templates
 
-These are copies of this repository's small teaching contracts, not universal policies. Read and adapt them; never overwrite existing project files automatically.
+These are copies of this repository's small teaching contracts, filled for the Jyotish Coach example. To set up your own project, use `scripts/harness_adopt.py` instead: it creates blank, project-shaped versions and never overwrites existing files. See [the adoption guide](../../docs/adoption.md).
 
 - [Authority](docs/authority.md)
 - [Scope](docs/scope-contract.md)

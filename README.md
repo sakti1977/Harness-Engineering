@@ -47,6 +47,15 @@ I lead engineering teams building US healthcare software, and I use coding agent
 
 Reach, Power, Ground, Verdict and Carry are this project's organizing synthesis, not an industry standard. [Source history](docs/handbook/00%20-%20Start%20Here/Source%20Coverage%20Index.md) separates inherited teaching material from newly cited primary sources.
 
+## Adopt it in your project
+
+```sh
+python3 scripts/harness_adopt.py --root /path/to/project            # preview; writes nothing
+python3 scripts/harness_adopt.py --root /path/to/project --apply    # create missing files; never overwrites
+```
+
+It adds the core contracts, a first feature to fill in, verification routes, agent instructions with the Resume Protocol and, with `--ci`, a GitHub Actions workflow. Your project can be in any language. [Adoption guide](docs/adoption.md).
+
 ## Check your own project
 
 ```sh
@@ -116,7 +125,7 @@ Check a live session against its contract at any time with `python3 scripts/harn
 ## Choose your route
 
 - **Learn:** [learning path](docs/handbook/00%20-%20Start%20Here/Learning%20Path.md) and [complete handbook](docs/handbook/00%20-%20Start%20Here/Harness%20Engineering%20-%20MOC.md).
-- **Adopt:** [project assessment](docs/handbook/11%20-%20Practical%20Implementations/Project%20Harness%20Assessment.md), [adoption guide](docs/adoption.md) and [filled templates](templates/core/README.md).
+- **Adopt:** `scripts/harness_adopt.py`, the [adoption guide](docs/adoption.md), [project assessment](docs/handbook/11%20-%20Practical%20Implementations/Project%20Harness%20Assessment.md) and [filled templates](templates/core/README.md).
 - **Evaluate:** [agent evaluation suite](docs/handbook/10%20-%20Harness%20Testing/Agent%20Evaluation%20Suite.md), [experiment template](docs/handbook/Templates/Experiment%20Template.md) and [source register](docs/handbook/00%20-%20Start%20Here/Source%20Register.md).
 - **Use Obsidian:** open `vault/` as a vault. No community plugin is required.
 
@@ -135,7 +144,7 @@ Check a live session against its contract at any time with `python3 scripts/harn
 | --- | --- |
 | `examples/astro/` | The Jyotish Coach failure-to-fix lab, sweep and ablation |
 | `examples/gate/` | The transition-gate demo |
-| `scripts/` | The checker, transition, handoff and handbook commands, and doc checks |
+| `scripts/` | The adopt, checker, transition, handoff and handbook commands, and doc checks |
 | `harness-tests/` | Defect and clean fixtures that test every gate, with a coverage rule |
 | `templates/core/` | Filled starter artifacts to copy into your project |
 | `vault/` | The handbook source, written as an Obsidian vault (edit here) |
@@ -155,7 +164,7 @@ python3 scripts/export_handbook.py --check
 python3 scripts/check_docs.py
 ```
 
-See [contributing](CONTRIBUTING.md), [security scope](SECURITY.md), [roadmap](docs/roadmap.md) and [verification record](docs/verification.md). Live-model benchmarks, automatic installation, production sandboxing and tested multi-vendor runtime adapters remain future work.
+See [contributing](CONTRIBUTING.md), [security scope](SECURITY.md), [roadmap](docs/roadmap.md) and [verification record](docs/verification.md). Live-model benchmarks, production sandboxing and tested multi-vendor runtime adapters remain future work.
 
 ## Try it and tell me what broke
 
