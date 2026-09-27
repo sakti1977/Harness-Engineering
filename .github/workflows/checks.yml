@@ -14,7 +14,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python scripts/harness_check.py --adapter copilot
-      - run: python -m unittest discover -s tests -v
+      - name: Unit tests (failures are also reported as annotations)
+        run: |
+          if ! python -m unittest discover -s tests -v > unittest.txt 2>&1; then
+            cat unittest.txt
+            python scripts/annotate_failures.py unittest.txt
+            exit 1
+          fi
+          tail -n 3 unittest.txt
       - run: python -m unittest examples.astro.test_astro -v
       - run: python -m examples.astro.demo
       - run: python -m examples.astro.sweep --free-runs 0
