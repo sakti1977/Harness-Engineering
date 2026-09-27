@@ -8,10 +8,16 @@
 - MIT code/documentation license, contribution guidance, issue forms and CI configuration.
 - Expanded Obsidian learning content and generated GitHub navigation from the same source.
 
+## Implemented after the first release
+
+- Session mode: changed files against `expected_surface` and `excluded_paths`, claims against recorded evidence.
+- Feature transition policy with planner, worker and verifier roles, an independence rule for `passing`, a hash-chained append-only audit log, and automatic staleness when verified code or claims change.
+
 ## Next acceptance gates
 
 - Observe at least three unfamiliar users complete the lab without maintainer assistance; record friction.
-- Design an evidence receipt bound to revision, command, claim and outcome, then test completion-state transitions.
+- Let CI record evidence and `passing` transitions directly, so no human or agent writes them by hand.
+- Support several features per ledger, with dependencies.
 - Add a preview-first installer that preserves existing project files, only if manual adoption is a demonstrated barrier.
 - Add a second stack and adapters only with explicit platform coverage and maintained fixtures.
 - Run live-agent baseline/variant trials with a calibrated grader, recorded cost and held-out tasks.

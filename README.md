@@ -47,9 +47,31 @@ Reach, Power, Ground, Verdict and Carry are this project's organizing synthesis,
 python3 scripts/harness_check.py --root /path/to/project
 python3 scripts/harness_check.py --root /path/to/project --format json
 python3 scripts/harness_check.py --adapter copilot
+python3 scripts/harness_check.py --root /path/to/project --session --base main
 ```
 
-The checker is read-only: it checks six core artifacts, nonempty files and the feature ledger's structure, types, states and relative paths. The optional Copilot check adds its instruction file. It **never executes** a project's verification string. It does not verify readiness, enforce permissions, inspect code changes or establish task completion. [Checker contract](docs/checker.md).
+The checker is read-only: it checks six core artifacts, nonempty files and the feature ledger's structure, types, states and relative paths. The optional Copilot check adds its instruction file. It **never executes** a project's verification string. `--session` adds read-only git queries: changed files against the feature's scope, and claims against recorded evidence. It does not verify readiness, enforce permissions or judge what a change means. [Checker contract](docs/checker.md).
+
+## Make "done" a gate, not a memo
+
+An agent that can write `passing` into a feature list will. The next session then trusts it. The ledger here only changes state through a transition policy, and every change lands in a hash-chained audit log that the checker replays.
+
+```sh
+python3 -m examples.gate.demo
+```
+
+```text
+REFUSED  Agent marks its own work passing
+         TRANSITION_NOT_ALLOWED: active -> passing. Allowed from active: blocked, ready_for_verification.
+REFUSED  Agent asks for verification
+         SCOPE_OUTSIDE_SURFACE src/billing.py: Not in expected_surface: amend the scope with a reason, or revert.
+REFUSED  Same agent approves its own request
+         TRANSITION_NOT_INDEPENDENT: copilot-agent requested verification and cannot approve it
+RECORDED Independent verifier approves with evidence
+STALE    Next session changes verified code: passing is flagged stale
+```
+
+Check a live session against its contract at any time with `python3 scripts/harness_check.py --session`. Roles are declared, not authenticated: pair this with CODEOWNERS or branch protection on the log. [Transition policy and limits](docs/transitions.md).
 
 ## Choose your route
 
@@ -61,6 +83,7 @@ The checker is read-only: it checks six core artifacts, nonempty files and the f
 ## What is included
 
 - Tool-neutral artifact validation with actionable failures and JSON output.
+- Session scope checks and a feature transition gate with an append-only audit log.
 - A versioned feature schema and negative regression fixtures.
 - A model-free booking demonstration with persisted-state and concurrency assertions.
 - A source-backed learning handbook, repository pattern atlas and reusable note templates.
@@ -71,7 +94,8 @@ The checker is read-only: it checks six core artifacts, nonempty files and the f
 | Path | What it is |
 | --- | --- |
 | `examples/booking/` | The runnable failure-to-fix lab |
-| `scripts/` | The checker, handbook exporter and doc checks |
+| `examples/gate/` | The transition-gate demo |
+| `scripts/` | The checker, transition command, handbook exporter and doc checks |
 | `templates/core/` | Filled starter artifacts to copy into your project |
 | `vault/` | The handbook source, written as an Obsidian vault (edit here) |
 | `docs/handbook/` | The same handbook generated from `vault/` with GitHub-friendly links (do not edit) |
@@ -82,6 +106,7 @@ The checker is read-only: it checks six core artifacts, nonempty files and the f
 python3 -m unittest discover -s tests -v
 python3 -m unittest examples.booking.test_booking -v
 python3 -m examples.booking.demo
+python3 -m examples.gate.demo
 python3 scripts/export_handbook.py --check
 python3 scripts/check_docs.py
 ```

@@ -27,7 +27,11 @@ def errors(root):
             resolved = (path.parent / unquote(parsed.path)).resolve()
             if not resolved.is_relative_to(root.resolve()) or not resolved.exists():
                 problems.append(f"{path.relative_to(root)}: missing local target {target}")
+    # Labs mirrored into the vault must run standalone; the gate demo needs scripts/, so it stays repo-only.
+    repo_only = {"gate"}
     for path in (root / "examples").rglob("*.py"):
+        if repo_only & set(path.relative_to(root / "examples").parts):
+            continue
         copy = root / "vault/Labs/examples" / path.relative_to(root / "examples")
         if not copy.exists() or path.read_bytes() != copy.read_bytes():
             problems.append(f"Lab copy differs: {copy.relative_to(root)}")
