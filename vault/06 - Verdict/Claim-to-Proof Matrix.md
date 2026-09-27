@@ -26,4 +26,7 @@ Changing claim, observation, producer, route, or revision invalidates affected v
 
 ## Practical extension
 
+The repository's `docs/proof-gaps.md` turns this note into a procedure: a claim checklist with weak-to-strong rewrites, eight gap types (boundary, state, negative, timing, fidelity, oracle, staleness, attribution), a six-step audit and the booking lab as a worked example. `docs/proof-matrix.md` holds the filled matrix, which the checker enforces before a feature may request verification.
+
+
 Verify that a grader rejects a plausible broken solution and accepts a valid alternative. See [[Grader Reliability]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

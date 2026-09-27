@@ -36,7 +36,7 @@ I lead engineering teams building US healthcare software, and I use coding agent
 | **Reach** | Can the agent find the right context and the owner of the behavior? | [Copilot instructions](.github/copilot-instructions.md) |
 | **Power** | What may it run, edit or touch, and what is off limits? | [Authority policy](docs/authority.md), [scope contract](docs/scope-contract.md) |
 | **Ground** | Does it work in an environment that is ready and reproducible? | [Readiness contract](docs/readiness.md) |
-| **Verdict** | What evidence proves each claim, beyond "tests pass"? | [Proof matrix](docs/proof-matrix.md), [feature ledger](.harness/feature.json) |
+| **Verdict** | What evidence proves each claim, beyond "tests pass"? | [Proof matrix](docs/proof-matrix.md), [proof gaps guide](docs/proof-gaps.md), [feature ledger](.harness/feature.json) |
 | **Carry** | Can a fresh session pick up where the last one stopped? | [Checkpoint](.harness/checkpoint.md) |
 
 Reach, Power, Ground, Verdict and Carry are this project's organizing synthesis, not an industry standard. [Source history](docs/handbook/00%20-%20Start%20Here/Source%20Coverage%20Index.md) separates inherited teaching material from newly cited primary sources.
