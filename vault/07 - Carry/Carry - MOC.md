@@ -26,11 +26,6 @@ Return to [[Harness Engineering - MOC]].
 - [[Context Compaction Contract]]
 - [[Resume Replay and Fork]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Further study
 
 - [[Memory Scope and Retention]]

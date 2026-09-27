@@ -25,11 +25,6 @@ A faithful red E2E test is a successful harness detection; keep feature active.
 - [[Readiness Contract]]
 - [[First Divergence and Failure Packet]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Run a helper check and persistent-state checks on the same broken implementation to see the proof gap. See [[First Executable Harness Lab]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

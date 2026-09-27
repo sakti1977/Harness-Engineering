@@ -25,11 +25,6 @@ Codes: PATH_OUTSIDE_SURFACE, SECRET_PATH_DENIED, INVALID_TRANSITION, STALE_EVIDE
 - [[Feature Ledger as a Gate]]
 - [[Safe Exact-Anchor Editing]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Keep deterministic control fixtures separate from stochastic live-agent trials. See [[Agent Evaluation Suite]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

@@ -24,11 +24,6 @@ Break one prerequisite, assert BLOCKED, repair, run twice for idempotence, then 
 - [[Readiness Contract]]
 - [[Verification Routes and Test Fidelity]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Anthropic’s long-running-agent account (S2) supplies external context for initializer and progress artifacts. See [[Source Register]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

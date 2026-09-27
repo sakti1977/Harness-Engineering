@@ -23,8 +23,3 @@ Observe what it reads *before* editing; repair navigation rather than only addin
 ## Connected concepts
 - [[Repository as Shared Context]]
 - [[Cold-Session Checkpoint]]
-
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?

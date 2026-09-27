@@ -24,11 +24,6 @@ Record exact argv/cwd/exit and revision; verify packaged thing, not a nearby wor
 - [[Claim-to-Proof Matrix]]
 - [[Readiness Contract]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Tie evidence to the task, patch, harness and environment versions actually exercised. See [[Reproducible Evaluation Environment]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

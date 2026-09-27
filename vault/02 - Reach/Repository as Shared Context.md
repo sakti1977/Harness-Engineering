@@ -24,11 +24,6 @@ Use root routes to docs/product.md, docs/architecture.md, docs/domain.md, docs/v
 - [[Recovery Audit]]
 - [[AGENTS.md as a Map]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Make the authoritative source and its review trigger visible. See [[Knowledge Base Maintenance]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

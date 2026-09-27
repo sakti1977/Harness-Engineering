@@ -24,11 +24,6 @@ Events: run_start, assistant_message, tool_call, tool_result, turn_end, compact,
 - [[Resume Replay and Fork]]
 - [[Context Compaction Contract]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 A recorded attempt is not proof that its effect occurred exactly once. See [[Retry and Idempotency Contract]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

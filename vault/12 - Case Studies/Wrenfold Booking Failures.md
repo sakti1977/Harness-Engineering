@@ -24,11 +24,6 @@ Two concurrent bookings both return success and persist.
 - [[Recovery Audit]]
 - [[Verification Routes and Test Fidelity]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Reproduction route
 
 Use [[Case Study Template]] to record evidence and uncertainty. The executable synthetic counterpart is [[First Executable Harness Lab]].

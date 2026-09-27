@@ -24,11 +24,6 @@ Match limits cap context, not filesystem work; add file/time/cancel budgets.
 - [Repository as Shared Context](Repository%20as%20Shared%20Context.md)
 - [Three Tools and One Permit](../09%20-%20Tools%20and%20Interfaces/Three%20Tools%20and%20One%20Permit.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Compare a repository map with plain search on tasks with known dependency paths. See [Context Retrieval Experiments](Context%20Retrieval%20Experiments.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).

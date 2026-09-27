@@ -25,11 +25,6 @@ Record applied rules and observations, not hidden reasoning; redact secrets and 
 - [[Claim-to-Proof Matrix]]
 - [[Secret Handling]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Turn the minimal reproduction into a regression case before closing the incident. See [[Failure to Evaluation Workflow]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

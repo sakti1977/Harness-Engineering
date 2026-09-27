@@ -24,11 +24,6 @@ Two concurrent bookings both return success and persist.
 - [Recovery Audit](../02%20-%20Reach/Recovery%20Audit.md)
 - [Verification Routes and Test Fidelity](../06%20-%20Verdict/Verification%20Routes%20and%20Test%20Fidelity.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Reproduction route
 
 Use [Case Study Template](../Templates/Case%20Study%20Template.md) to record evidence and uncertainty. The executable synthetic counterpart is [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md).

@@ -24,11 +24,6 @@ Never compact unresolved tool call; block if newest complete exchange cannot fit
 - [[Append-Only Journal]]
 - [[Agent Loop and Provider Seam]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Worked cold-resume exercise
 
 Before compaction, suppose the journal contains: task BOOK-1; a denied production write; an approved disposable SQLite fixture; a failed concurrency assertion; and an unresolved tool request. A valid checkpoint retains those distinctions and the current revision. It must not turn “proposed transaction fix” into “verified fix.”

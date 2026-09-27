@@ -24,11 +24,6 @@ Events: run_start, assistant_message, tool_call, tool_result, turn_end, compact,
 - [Resume Replay and Fork](Resume%20Replay%20and%20Fork.md)
 - [Context Compaction Contract](Context%20Compaction%20Contract.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 A recorded attempt is not proof that its effect occurred exactly once. See [Retry and Idempotency Contract](../08%20-%20Agent%20Runtime/Retry%20and%20Idempotency%20Contract.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).

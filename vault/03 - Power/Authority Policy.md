@@ -25,11 +25,6 @@ Example refusal codes: SECRET_PATH_DENIED, PATH_OUTSIDE_SURFACE, COMMAND_NOT_ALL
 - [[Three Tools and One Permit]]
 - [[Destructive Database Reset]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Record which execution route actually enforces each policy; an instruction file alone cannot enforce it. See [[Sandbox Enforcement Matrix]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

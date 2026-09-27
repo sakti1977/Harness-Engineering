@@ -24,11 +24,6 @@ In this instructional scenario, `db:reset` deletes existing bookings. The earlie
 - [Authority Policy](../03%20-%20Power/Authority%20Policy.md)
 - [Secret Handling](../03%20-%20Power/Secret%20Handling.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Reproduction route
 
 Use [Case Study Template](../Templates/Case%20Study%20Template.md) to record evidence and uncertainty. The scenario does not yet have an executed local reproduction; see [Failure to Evaluation Workflow](../10%20-%20Harness%20Testing/Failure%20to%20Evaluation%20Workflow.md).

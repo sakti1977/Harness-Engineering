@@ -25,11 +25,6 @@ Assistant message before tool calls; ordered calls; awaited journal; run_end for
 - [Append-Only Journal](../07%20-%20Carry/Append-Only%20Journal.md)
 - [TUI Controls and Cancellation](../09%20-%20Tools%20and%20Interfaces/TUI%20Controls%20and%20Cancellation.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Record an explicit stop reason and preserve verification time. See [Budgets and Termination](Budgets%20and%20Termination.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).

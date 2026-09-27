@@ -26,11 +26,6 @@ Return to [Harness Engineering - MOC](../00%20-%20Start%20Here/Harness%20Enginee
 - [AGENTS.md as a Map](AGENTS.md%20as%20a%20Map.md)
 - [Repository Discovery Funnel](Repository%20Discovery%20Funnel.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Further study
 
 - [Knowledge Base Maintenance](Knowledge%20Base%20Maintenance.md)

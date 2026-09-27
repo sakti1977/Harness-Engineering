@@ -24,11 +24,6 @@ Changing claim, observation, producer, route, or revision invalidates affected v
 - [[Verification Routes and Test Fidelity]]
 - [[Feature Ledger as a Gate]]
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Verify that a grader rejects a plausible broken solution and accepts a valid alternative. See [[Grader Reliability]] for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [[Source Coverage Index]].

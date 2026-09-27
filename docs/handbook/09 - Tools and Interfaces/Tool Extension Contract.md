@@ -24,11 +24,6 @@ Add clean/denied/failure/cancel fixtures; event ownership remains kernel-side.
 - [Three Tools and One Permit](Three%20Tools%20and%20One%20Permit.md)
 - [Harness-Control Tests](../10%20-%20Harness%20Testing/Harness-Control%20Tests.md)
 
-## Reflection questions
-- What specific failure would this concept prevent or reveal?
-- Which artifact owns the rule, and how could we test that the rule works?
-- What would a cold session need to recover this decision?
-
 ## Practical extension
 
 Contract correctness and agent usability need different tests. See [Tool Usability Evaluations](Tool%20Usability%20Evaluations.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).
