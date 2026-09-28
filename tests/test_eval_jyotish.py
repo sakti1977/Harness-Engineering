@@ -75,7 +75,7 @@ class JyotishEval(unittest.TestCase):
 
     def test_harness_run_gets_a_stripped_kit_and_no_grader(self):
         run, prompt = prepare.prepare(self.out, "harness", "t")
-        kit = self.out / "kit"
+        kit = self.out.resolve() / "kit"
         self.assertEqual(sorted(p.name for p in (kit / "scripts").iterdir()),
                          ["harness_check.py", "harness_handoff.py", "harness_transition.py"])
         self.assertFalse(any(kit.rglob("grade.py")) or any(run.rglob("grade.py")))

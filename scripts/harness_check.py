@@ -91,6 +91,7 @@ def path_errors(field, items):
 
 
 def read_artifact(root, name):
+    root = root.resolve()   # compare real paths: temp dirs are symlinks on macOS and short names on Windows
     path = root / name
     # Refuse symlinks outside the inspected project; do not print file contents.
     if not path.resolve().is_relative_to(root):

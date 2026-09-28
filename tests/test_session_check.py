@@ -6,9 +6,21 @@ import importlib.util
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import unittest
+
+
+def remove_tree(path):
+    """shutil.rmtree that also removes read-only files (git objects on Windows)."""
+    def retry(func, name, _):
+        os.chmod(name, stat.S_IWRITE)
+        func(name)
+    if sys.version_info >= (3, 12):
+        shutil.rmtree(path, onexc=retry)
+    else:
+        shutil.rmtree(path, onerror=retry)
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("harness_check", ROOT / "scripts/harness_check.py")
@@ -216,7 +228,7 @@ class SessionChecks(unittest.TestCase):
 
     # safety and CLI ------------------------------------------------------
     def test_not_a_git_repository_fails_clearly(self):
-        shutil.rmtree(self.root / ".git")
+        remove_tree(self.root / ".git")
         self.assertEqual(self.codes(self.check(), ok=False), ["SESSION_GIT_UNAVAILABLE"])
 
     def test_invalid_ledger_skips_session_checks(self):

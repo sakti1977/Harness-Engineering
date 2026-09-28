@@ -235,6 +235,7 @@ def safe_target(root, relative):
     parent = target.parent
     while not parent.exists():
         parent = parent.parent
+    root = root.resolve()
     if not parent.resolve().is_relative_to(root) or (target.is_symlink() and not target.resolve().is_relative_to(root)):
         raise ValueError(f"{relative} resolves outside the project")
     return target

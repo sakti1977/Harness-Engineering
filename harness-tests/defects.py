@@ -5,9 +5,23 @@ ready_for_verification) and then introduce exactly one fault. Setup uses the rea
 code; only the fault is hand-made.
 """
 import json
+import os
 import shutil
+import stat
+import sys
 
 CLAIMS_ROW_1 = "saving a profile reports synced only when the profile is stored"
+
+
+def remove_tree(path):
+    """shutil.rmtree that also removes read-only files (git objects on Windows)."""
+    def retry(func, name, _):
+        os.chmod(name, stat.S_IWRITE)
+        func(name)
+    if sys.version_info >= (3, 12):
+        shutil.rmtree(path, onexc=retry)
+    else:
+        shutil.rmtree(path, onerror=retry)
 
 
 # setup helpers -------------------------------------------------------------------------
@@ -219,7 +233,7 @@ def edit_excluded_path(s):
 
 
 def no_git(s):
-    shutil.rmtree(s.root / ".git")
+    remove_tree(s.root / ".git")
 
 
 def ledger_path_traversal(s):
