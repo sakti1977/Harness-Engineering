@@ -124,7 +124,7 @@ def inspect(root, adapter=None, session=False, base=None):
             findings.append({"code": "FEATURE_JSON_INVALID", "ok": False,
                              "detail": "Use a UTF-8 JSON object with the documented fields."})
         else:
-            schema = json.loads((ROOT / "schemas/feature.schema.json").read_text())
+            schema = json.loads((ROOT / "schemas/feature.schema.json").read_text(encoding="utf-8"))
             errors = schema_errors(data, schema)
             if isinstance(data, dict):
                 errors += path_errors("expected_surface", data.get("expected_surface"))
@@ -185,7 +185,7 @@ def load_evidence(root):
         data = json.loads(read_artifact(root, EVIDENCE_FILE))
     except (OSError, ValueError, RuntimeError) as error:
         return None, [f"evidence: {error}"]
-    schema = json.loads((ROOT / "schemas/evidence.schema.json").read_text())
+    schema = json.loads((ROOT / "schemas/evidence.schema.json").read_text(encoding="utf-8"))
     return data, schema_errors(data, schema, "evidence")
 
 
@@ -352,7 +352,7 @@ def read_log(root):
     except (OSError, ValueError, RuntimeError) as error:
         return None, None, [f"log: {error}"]
     lines = text.rstrip("\n").split("\n")
-    schema = json.loads((ROOT / "schemas/feature-log.schema.json").read_text())
+    schema = json.loads((ROOT / "schemas/feature-log.schema.json").read_text(encoding="utf-8"))
     entries, errors = [], []
     for number, line in enumerate(lines, 1):
         try:

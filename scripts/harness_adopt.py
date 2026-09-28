@@ -31,7 +31,7 @@ def portable(text):
 
 
 def resume_protocol():
-    text = (KIT / "AGENTS.md").read_text()
+    text = (KIT / "AGENTS.md").read_text(encoding="utf-8")
     return portable(text[text.index(PROTOCOL_START):].strip() + "\n")
 
 
@@ -197,11 +197,11 @@ def plan(root, agents, ci):
     kit = str(KIT)
     files = [
         (".harness/feature.json", feature_ledger(root.name), "the first feature: fill outcome, surface, verification and claims"),
-        (".harness/checkpoint.md", portable((KIT / "templates/core/.harness/checkpoint.md").read_text()), "written by harness_handoff.py --write"),
+        (".harness/checkpoint.md", portable((KIT / "templates/core/.harness/checkpoint.md").read_text(encoding="utf-8")), "written by harness_handoff.py --write"),
         ("docs/authority.md", AUTHORITY.format(kit=kit), "fill the TODOs for this project"),
-        ("docs/scope-contract.md", (KIT / "templates/core/docs/scope-contract.md").read_text(), "reference; no edits needed"),
+        ("docs/scope-contract.md", (KIT / "templates/core/docs/scope-contract.md").read_text(encoding="utf-8"), "reference; no edits needed"),
         ("docs/proof-matrix.md", PROOF_MATRIX.format(kit=kit), "one row per claim"),
-        ("docs/readiness.md", (KIT / "templates/core/docs/readiness.md").read_text(), "reference; add your readiness probes"),
+        ("docs/readiness.md", (KIT / "templates/core/docs/readiness.md").read_text(encoding="utf-8"), "reference; add your readiness probes"),
         ("docs/verify.md", VERIFY.format(kit=kit), "one route per claim that crosses a boundary"),
     ]
     protocol = resume_protocol()
@@ -252,7 +252,7 @@ def adopt(root, *, apply=False, agents="agents", ci=False):
             continue
         if target.exists() or target.is_symlink():
             actions.append(("skip", relative, "exists; left unchanged"))
-            existing = target.read_text(errors="replace") if target.is_file() else ""
+            existing = target.read_text(errors="replace", encoding="utf-8") if target.is_file() else ""
             if relative in INSTRUCTION_FILES and PROTOCOL_START not in existing and \
                     not (relative in IMPORTS_AGENTS and "@AGENTS.md" in existing.replace("@./AGENTS.md", "@AGENTS.md")):
                 hints.append(f"{relative} already exists: add the Resume Protocol and handoff gate to it by hand, "

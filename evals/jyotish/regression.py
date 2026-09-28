@@ -51,7 +51,7 @@ r = R(); unittest.defaultTestLoader.discover("tests").run(r); print(json.dumps(r
 
 def app_with(defect):
     """The task app with every fix applied except ``defect`` ('none' for the fully correct app)."""
-    text = (HERE / "task/jyotish/app.py").read_text()
+    text = (HERE / "task/jyotish/app.py").read_text(encoding="utf-8")
     for name, (broken, fixed) in FIXES.items():
         if name != defect:
             assert broken in text, name
@@ -63,10 +63,10 @@ def results(tests_dir, defect):
     with TemporaryDirectory() as d:
         d = Path(d)
         (d / "jyotish").mkdir()
-        (d / "jyotish/__init__.py").write_text("")
-        (d / "jyotish/app.py").write_text(app_with(defect))
+        (d / "jyotish/__init__.py").write_text("", encoding="utf-8")
+        (d / "jyotish/app.py").write_text(app_with(defect), encoding="utf-8")
         shutil.copytree(tests_dir, d / "tests", ignore=shutil.ignore_patterns("__pycache__"))
-        (d / "run_tests.py").write_text(RUNNER)
+        (d / "run_tests.py").write_text(RUNNER, encoding="utf-8")
         r = subprocess.run([sys.executable, "-B", "run_tests.py"], cwd=d, capture_output=True, text=True, timeout=300,
                            env=dict(os.environ, PYTHONPATH=str(d)))
         return json.loads(r.stdout.strip().splitlines()[-1])

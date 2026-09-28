@@ -142,11 +142,11 @@ def render(observed, kept, now=None):
 
 def write(root, now=None):
     path = root / CHECKPOINT
-    kept = parse(path.read_text())[1] if path.is_file() else {}
+    kept = parse(path.read_text(encoding="utf-8"))[1] if path.is_file() else {}
     kept = {name: text for name, text in kept.items() if not placeholder(text)}
     text = render(observe(root), kept, now)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text)
+    path.write_text(text, encoding="utf-8")
     return text
 
 

@@ -38,8 +38,8 @@ class TransitionGate(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         for name in checker.CORE_FILES:
-            self.put(name, (ROOT / name).read_text())
-        feature = json.loads((ROOT / ".harness/feature.json").read_text())
+            self.put(name, (ROOT / name).read_text(encoding="utf-8"))
+        feature = json.loads((ROOT / ".harness/feature.json").read_text(encoding="utf-8"))
         feature["state"] = "planned"
         self.put(".harness/feature.json", json.dumps(feature, indent=2))
         self.claims = feature["claims"]
@@ -52,7 +52,7 @@ class TransitionGate(unittest.TestCase):
     def put(self, name, text):
         path = self.root / name
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
+        path.write_text(text, encoding="utf-8")
 
     def git(self, *args):
         return subprocess.run(["git", "-C", str(self.root), *args], check=True,
@@ -87,7 +87,7 @@ class TransitionGate(unittest.TestCase):
              for c in (self.claims if claims is None else claims)]))
 
     def state(self):
-        return json.loads((self.root / ".harness/feature.json").read_text())["state"]
+        return json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))["state"]
 
     def codes(self):
         return [f["code"] for f in checker.inspect(self.root)["findings"] if not f["ok"]]
@@ -108,7 +108,7 @@ class TransitionGate(unittest.TestCase):
         self.assertEqual(self.state(), "passing")
         result = checker.inspect(self.root)
         self.assertTrue(result["ok"], result)
-        log = [json.loads(line) for line in (self.root / LOG).read_text().splitlines()]
+        log = [json.loads(line) for line in (self.root / LOG).read_text(encoding="utf-8").splitlines()]
         self.assertEqual([(e["from"], e["to"], e["role"]) for e in log], [
             ("none", "planned", "planner"), ("planned", "active", "worker"),
             ("active", "ready_for_verification", "worker"),
@@ -118,7 +118,7 @@ class TransitionGate(unittest.TestCase):
 
     # policy --------------------------------------------------------------
     def test_self_attested_passing_without_log_is_rejected(self):
-        feature = json.loads((self.root / ".harness/feature.json").read_text())
+        feature = json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))
         self.put(".harness/feature.json", json.dumps(dict(feature, state="passing")))
         self.assertIn("PASSING_WITHOUT_LOG", self.codes())
 
@@ -153,7 +153,7 @@ class TransitionGate(unittest.TestCase):
     def test_verification_request_needs_a_complete_proof_matrix(self):
         self.ok("planned", actor="sakti", role="planner")
         self.ok("active")
-        matrix = (self.root / "docs/proof-matrix.md").read_text()
+        matrix = (self.root / "docs/proof-matrix.md").read_text(encoding="utf-8")
         claim = "coaching started before a birth-time correction is not stored against the old chart"
         # Weaken only the Tested boundary column (the last occurrence on the row).
         gapped = "\n".join("entry |".join(line.rsplit("entry, persistence, concurrency |", 1))
@@ -163,7 +163,7 @@ class TransitionGate(unittest.TestCase):
         self.refused("ready_for_verification", "PROOF_BOUNDARY_GAP")
 
     def save_scope_and_commit(self):
-        feature = json.loads((self.root / ".harness/feature.json").read_text())
+        feature = json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))
         feature["expected_surface"] = feature["expected_surface"] + ["docs/proof-matrix.md"]
         self.put(".harness/feature.json", json.dumps(feature, indent=2))
         self.commit()
@@ -191,13 +191,13 @@ class TransitionGate(unittest.TestCase):
     # audit log integrity -------------------------------------------------
     def test_hand_edited_state_is_detected(self):
         self.to_ready()
-        feature = json.loads((self.root / ".harness/feature.json").read_text())
+        feature = json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))
         self.put(".harness/feature.json", json.dumps(dict(feature, state="passing")))
         self.assertIn("STATE_MISMATCH", self.codes())
 
     def test_edited_log_entry_breaks_the_chain(self):
         self.to_ready()
-        lines = (self.root / LOG).read_text().splitlines()
+        lines = (self.root / LOG).read_text(encoding="utf-8").splitlines()
         lines[0] = lines[0].replace('"reason":"test"', '"reason":"rewritten"')
         self.put(LOG, "\n".join(lines) + "\n")
         self.assertIn("LOG_CHAIN_BROKEN", self.codes())
@@ -205,27 +205,27 @@ class TransitionGate(unittest.TestCase):
     def test_forged_entry_with_valid_hash_is_still_checked_against_policy(self):
         self.ok("planned", actor="sakti", role="planner")
         self.ok("active")
-        lines = (self.root / LOG).read_text().splitlines()
+        lines = (self.root / LOG).read_text(encoding="utf-8").splitlines()
         forged = {"seq": len(lines) + 1, "at": "2026-01-01T00:00:00Z", "feature": "jyotish-profile-coaching",
                   "from": "active", "to": "passing", "actor": "copilot-agent", "role": "verifier",
                   "revision": self.git("rev-parse", "HEAD"), "reason": "trust me",
                   "prev": checker.line_hash(lines[-1]), "claims": self.claims}
         self.put(LOG, "\n".join(lines + [json.dumps(forged)]) + "\n")
-        feature = json.loads((self.root / ".harness/feature.json").read_text())
+        feature = json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))
         self.put(".harness/feature.json", json.dumps(dict(feature, state="passing")))
         self.assertIn("TRANSITION_NOT_ALLOWED", self.codes())
 
     def test_rewriting_committed_history_is_detected(self):
         self.to_ready()
         # Rebuild a fully consistent but different history (valid hashes) over the committed one.
-        entries = [json.loads(line) for line in (self.root / LOG).read_text().splitlines()][:2]
+        entries = [json.loads(line) for line in (self.root / LOG).read_text(encoding="utf-8").splitlines()][:2]
         entries[1]["actor"] = "someone-else"
         lines = []
         for entry in entries:
             entry["prev"] = checker.line_hash(lines[-1]) if lines else ""
             lines.append(json.dumps(entry, sort_keys=True, separators=(",", ":")))
         self.put(LOG, "\n".join(lines) + "\n")
-        feature = json.loads((self.root / ".harness/feature.json").read_text())
+        feature = json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))
         self.put(".harness/feature.json", json.dumps(dict(feature, state="active")))
         self.assertIn("LOG_REWRITTEN", self.codes())
 
@@ -246,7 +246,7 @@ class TransitionGate(unittest.TestCase):
         self.record_evidence()
         self.commit()
         self.ok("passing", actor="sakti", role="verifier")
-        feature = json.loads((self.root / ".harness/feature.json").read_text())
+        feature = json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))
         feature["claims"].append("every remedy includes a behavioural practice")
         self.put(".harness/feature.json", json.dumps(feature, indent=2))
         self.assertIn("PASSING_STALE", self.codes())

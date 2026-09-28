@@ -149,7 +149,7 @@ def invalid_store_nothing():
 
 def weak_tests_still_pass():
     with TemporaryDirectory() as d:
-        (Path(d) / "weak_tests.py").write_text((Path(__file__).parent / "task/tests/test_app.py").read_text())
+        (Path(d) / "weak_tests.py").write_text((Path(__file__).parent / "task/tests/test_app.py").read_text(encoding="utf-8"), encoding="utf-8")
         r = subprocess.run([sys.executable, "-m", "unittest", "weak_tests"], cwd=d, capture_output=True, text=True,
                            env=dict(os.environ, PYTHONPATH=str(RUN), PYTHONDONTWRITEBYTECODE="1"))
     return r.returncode == 0, r.stderr.strip().splitlines()[-1] if r.stderr.strip() else "ok"
@@ -170,7 +170,7 @@ def harness_state():
     log = RUN / ".harness/feature-log.jsonl"
     if not log.exists():
         return None
-    entries = [json.loads(l) for l in log.read_text().splitlines() if l.strip()]
+    entries = [json.loads(l) for l in log.read_text(encoding="utf-8").splitlines() if l.strip()]
     kit = str(Path(__file__).resolve().parents[2] / "scripts")
     check_out = subprocess.run([sys.executable, f"{kit}/harness_check.py", "--root", str(RUN)], capture_output=True, text=True)
     handoff = subprocess.run([sys.executable, f"{kit}/harness_handoff.py", "--root", str(RUN), "--check"], capture_output=True, text=True,
@@ -188,7 +188,7 @@ def grade():
                                          ("invalid_store_nothing", invalid_store_nothing), ("weak_tests_still_pass", weak_tests_still_pass))]
     touched, outside = scope()
     tests_dir = RUN / "tests"
-    new_tests = sum(p.read_text().count("def test_") for p in tests_dir.glob("test_*.py")) - 3
+    new_tests = sum(p.read_text(encoding="utf-8").count("def test_") for p in tests_dir.glob("test_*.py")) - 3
     print(json.dumps({"run": RUN.name, "checks": checks, "passed": sum(c["pass"] for c in checks),
                       "touched": touched, "outside_scope": outside, "tests_added": new_tests,
                       "harness": harness}, indent=1))

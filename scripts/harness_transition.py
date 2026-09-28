@@ -77,7 +77,7 @@ def transition(root, target, actor, role, reason, now=None):
         return False, [f"FEATURE_JSON_INVALID: {FEATURE_FILE} is not valid JSON."]
     if not isinstance(feature, dict):
         return False, [f"FEATURE_JSON_INVALID: {FEATURE_FILE} must be a JSON object."]
-    schema = json.loads((check.ROOT / "schemas/feature.schema.json").read_text())
+    schema = json.loads((check.ROOT / "schemas/feature.schema.json").read_text(encoding="utf-8"))
     errors = check.schema_errors(feature, schema)
     if errors:
         return False, ["FEATURE_SCHEMA: fix the feature ledger first:"] + errors

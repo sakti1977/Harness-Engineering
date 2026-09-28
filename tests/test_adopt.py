@@ -32,7 +32,7 @@ class Adopt(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / "my-app"
         (self.root / "src").mkdir(parents=True)
-        (self.root / "src/app.ts").write_text("export const save = () => true;\n")
+        (self.root / "src/app.ts").write_text("export const save = () => true;\n", encoding="utf-8")
 
     def run_script(self, script, *args):
         return subprocess.run([sys.executable, str(SCRIPTS / script), "--root", str(self.root), *args],
@@ -57,13 +57,13 @@ class Adopt(unittest.TestCase):
     def test_agent_lists_create_the_right_instruction_files(self):
         result = self.run_script("harness_adopt.py", "--apply", "--agents", "gemini,cursor")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("@./AGENTS.md", (self.root / "GEMINI.md").read_text())
+        self.assertIn("@./AGENTS.md", (self.root / "GEMINI.md").read_text(encoding="utf-8"))
         self.assertIn("imported by GEMINI.md", result.stdout)
-        rule = (self.root / ".cursor/rules/harness.mdc").read_text()
+        rule = (self.root / ".cursor/rules/harness.mdc").read_text(encoding="utf-8")
         self.assertTrue(rule.startswith("---\n"))
         self.assertIn("alwaysApply: true", rule.split("---")[1])
         self.assertIn(adopt.PROTOCOL_START, rule)
-        self.assertIn(adopt.PROTOCOL_START, (self.root / "AGENTS.md").read_text())
+        self.assertIn(adopt.PROTOCOL_START, (self.root / "AGENTS.md").read_text(encoding="utf-8"))
         self.assertFalse((self.root / "CLAUDE.md").exists())
         self.assertFalse((self.root / ".github/copilot-instructions.md").exists())
 
@@ -75,19 +75,19 @@ class Adopt(unittest.TestCase):
         self.assertEqual(snapshot(self.root), before)
 
     def test_existing_importer_needs_no_hint(self):
-        (self.root / "GEMINI.md").write_text("# Ours\n\n@AGENTS.md\n")
-        (self.root / "CLAUDE.md").write_text("# Ours\n")
+        (self.root / "GEMINI.md").write_text("# Ours\n\n@AGENTS.md\n", encoding="utf-8")
+        (self.root / "CLAUDE.md").write_text("# Ours\n", encoding="utf-8")
         result = self.run_script("harness_adopt.py", "--agents", "claude,gemini")
         self.assertIn("CLAUDE.md already exists", result.stdout)
         self.assertNotIn("GEMINI.md already exists", result.stdout)
 
     def test_existing_files_are_never_changed_and_rerun_is_a_no_op(self):
-        (self.root / "CLAUDE.md").write_text("# House rules\n")
+        (self.root / "CLAUDE.md").write_text("# House rules\n", encoding="utf-8")
         (self.root / "docs").mkdir()
-        (self.root / "docs/authority.md").write_text("# Our policy\n")
+        (self.root / "docs/authority.md").write_text("# Our policy\n", encoding="utf-8")
         self.run_script("harness_adopt.py", "--apply", "--agents", "all")
-        self.assertEqual((self.root / "CLAUDE.md").read_text(), "# House rules\n")
-        self.assertEqual((self.root / "docs/authority.md").read_text(), "# Our policy\n")
+        self.assertEqual((self.root / "CLAUDE.md").read_text(encoding="utf-8"), "# House rules\n")
+        self.assertEqual((self.root / "docs/authority.md").read_text(encoding="utf-8"), "# Our policy\n")
         after_first = snapshot(self.root)
         second = self.run_script("harness_adopt.py", "--apply", "--agents", "all")
         self.assertIn("Created 0 file(s)", second.stdout)
@@ -129,7 +129,7 @@ class Adopt(unittest.TestCase):
 
     def test_commands_in_project_files_point_at_real_kit_scripts(self):
         self.run_script("harness_adopt.py", "--apply", "--agents", "all", "--ci")
-        text = "".join((self.root / name).read_text() for name in
+        text = "".join((self.root / name).read_text(encoding="utf-8") for name in
                        ("AGENTS.md", ".harness/agent-protocol.md", ".harness/checkpoint.md", ".github/workflows/harness.yml",
                         ".cursor/rules/harness.mdc", ".github/copilot-instructions.md"))
         self.assertNotIn(str(ROOT), text, "project files must not embed this machine's kit path")
@@ -144,25 +144,25 @@ class Adopt(unittest.TestCase):
         self.run_script("harness_adopt.py", "--apply")
         subprocess.run(["git", "init", "-q", "-b", "main"], cwd=self.root, check=True, env=ENV)
         claim = "saving returns true and stores the record"
-        ledger = json.loads((self.root / ".harness/feature.json").read_text())
+        ledger = json.loads((self.root / ".harness/feature.json").read_text(encoding="utf-8"))
         ledger.update(outcome="Saving stores the record", expected_surface=["src/app.ts"],
                       verification="npm test -- save", claims=[claim])
-        (self.root / ".harness/feature.json").write_text(json.dumps(ledger, indent=2))
+        (self.root / ".harness/feature.json").write_text(json.dumps(ledger, indent=2), encoding="utf-8")
         matrix = self.root / "docs/proof-matrix.md"
-        row = next(line for line in matrix.read_text().splitlines() if line.startswith("| TODO: first claim"))
-        matrix.write_text(matrix.read_text().replace(
-            row, f"| {claim} | true, then the record read back | entry, persistence | `save.test.ts` | entry, persistence | None |"))
+        row = next(line for line in matrix.read_text(encoding="utf-8").splitlines() if line.startswith("| TODO: first claim"))
+        matrix.write_text(matrix.read_text(encoding="utf-8").replace(
+            row, f"| {claim} | true, then the record read back | entry, persistence | `save.test.ts` | entry, persistence | None |"), encoding="utf-8")
         subprocess.run(["git", "add", "-A"], cwd=self.root, check=True, env=ENV)
         subprocess.run(["git", "commit", "-q", "-m", "adopt"], cwd=self.root, check=True, env=ENV)
         for to, role in (("planned", "planner"), ("active", "worker")):
             moved = self.run_script("harness_transition.py", "--to", to, "--actor", "sakti", "--role", role, "--reason", "start")
             self.assertEqual(moved.returncode, 0, moved.stdout)
-        (self.root / "src/app.ts").write_text("export const save = () => store();\n")
+        (self.root / "src/app.ts").write_text("export const save = () => store();\n", encoding="utf-8")
         self.assertEqual(self.run_script("harness_handoff.py", "--write").returncode, 0)
         checkpoint = self.root / ".harness/checkpoint.md"
-        self.assertIn("$HARNESS_KIT/scripts/harness_handoff.py --root . --resume", checkpoint.read_text())
-        checkpoint.write_text(checkpoint.read_text().replace("## Next bounded edit\n\nTODO",
-                                                             "## Next bounded edit\n\nWrite save.test.ts reading the record back."))
+        self.assertIn("$HARNESS_KIT/scripts/harness_handoff.py --root . --resume", checkpoint.read_text(encoding="utf-8"))
+        checkpoint.write_text(checkpoint.read_text(encoding="utf-8").replace("## Next bounded edit\n\nTODO",
+                                                             "## Next bounded edit\n\nWrite save.test.ts reading the record back."), encoding="utf-8")
         handoff = self.run_script("harness_handoff.py", "--check")
         self.assertEqual(handoff.returncode, 0, handoff.stdout)
         self.assertEqual(self.run_script("harness_handoff.py", "--resume").returncode, 0)
