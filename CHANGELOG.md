@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+**Added**
+
+- Adopt writes instruction files for Gemini CLI (`GEMINI.md`) and Cursor (`.cursor/rules/harness.mdc`), and `--agents` takes a comma-separated list, for example `--agents claude,cursor`.
+- A code of conduct, a social preview image, and issue template links for security reports and evaluation results.
+- Twenty core handbook notes rewritten around the executable examples, with a `status` label on every note saying how far to trust it.
+
 ## v0.2.0 (2026-09-28)
 
 The kit goes from checking files to gating work: a feature can only be called done with evidence, and every gate is tested against the defect it promises to catch.

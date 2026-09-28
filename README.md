@@ -75,7 +75,7 @@ python3 scripts/harness_adopt.py --root /path/to/project            # preview; w
 python3 scripts/harness_adopt.py --root /path/to/project --apply    # create missing files; never overwrites
 ```
 
-This sets up a first feature to fill in, the contracts, instructions for Claude Code, Codex or Copilot, and optionally a CI workflow. Your project can be in any language. [Adoption guide](docs/adoption.md).
+This sets up a first feature to fill in, the contracts, instructions for Claude Code, Codex, Copilot, Gemini CLI or Cursor, and optionally a CI workflow. Your project can be in any language. [Adoption guide](docs/adoption.md).
 
 ## Why this exists
 

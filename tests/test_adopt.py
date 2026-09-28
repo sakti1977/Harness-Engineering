@@ -48,11 +48,38 @@ class Adopt(unittest.TestCase):
     def test_apply_creates_files_the_checker_accepts(self):
         result = self.run_script("harness_adopt.py", "--apply", "--agents", "all", "--ci")
         self.assertEqual(result.returncode, 0, result.stderr)
-        for name in ("AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md",
+        for name in ("AGENTS.md", "CLAUDE.md", "GEMINI.md", ".github/copilot-instructions.md", ".cursor/rules/harness.mdc",
                      ".github/workflows/harness.yml", ".harness/agent-protocol.md", "docs/verify.md"):
             self.assertTrue((self.root / name).is_file(), name)
         check = self.run_script("harness_check.py")
         self.assertEqual(check.returncode, 0, check.stdout)
+
+    def test_agent_lists_create_the_right_instruction_files(self):
+        result = self.run_script("harness_adopt.py", "--apply", "--agents", "gemini,cursor")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("@./AGENTS.md", (self.root / "GEMINI.md").read_text())
+        self.assertIn("imported by GEMINI.md", result.stdout)
+        rule = (self.root / ".cursor/rules/harness.mdc").read_text()
+        self.assertTrue(rule.startswith("---\n"))
+        self.assertIn("alwaysApply: true", rule.split("---")[1])
+        self.assertIn(adopt.PROTOCOL_START, rule)
+        self.assertIn(adopt.PROTOCOL_START, (self.root / "AGENTS.md").read_text())
+        self.assertFalse((self.root / "CLAUDE.md").exists())
+        self.assertFalse((self.root / ".github/copilot-instructions.md").exists())
+
+    def test_unknown_agent_is_rejected_before_anything_is_written(self):
+        before = snapshot(self.root)
+        result = self.run_script("harness_adopt.py", "--apply", "--agents", "claude,vim")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unknown --agents value vim", result.stderr)
+        self.assertEqual(snapshot(self.root), before)
+
+    def test_existing_importer_needs_no_hint(self):
+        (self.root / "GEMINI.md").write_text("# Ours\n\n@AGENTS.md\n")
+        (self.root / "CLAUDE.md").write_text("# Ours\n")
+        result = self.run_script("harness_adopt.py", "--agents", "claude,gemini")
+        self.assertIn("CLAUDE.md already exists", result.stdout)
+        self.assertNotIn("GEMINI.md already exists", result.stdout)
 
     def test_existing_files_are_never_changed_and_rerun_is_a_no_op(self):
         (self.root / "CLAUDE.md").write_text("# House rules\n")
@@ -103,7 +130,8 @@ class Adopt(unittest.TestCase):
     def test_commands_in_project_files_point_at_real_kit_scripts(self):
         self.run_script("harness_adopt.py", "--apply", "--agents", "all", "--ci")
         text = "".join((self.root / name).read_text() for name in
-                       ("AGENTS.md", ".harness/agent-protocol.md", ".harness/checkpoint.md", ".github/workflows/harness.yml"))
+                       ("AGENTS.md", ".harness/agent-protocol.md", ".harness/checkpoint.md", ".github/workflows/harness.yml",
+                        ".cursor/rules/harness.mdc", ".github/copilot-instructions.md"))
         self.assertNotIn(str(ROOT), text, "project files must not embed this machine's kit path")
         scripts = set(re.findall(r"\$HARNESS_KIT/scripts/(harness_\w+\.py)", text))
         self.assertTrue(scripts)
