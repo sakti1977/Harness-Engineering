@@ -577,9 +577,25 @@
       ]
     },
     {
-      "id": "resume-template-never-written",
+      "id": "clean-resume-no-handoff-yet",
       "gate": "resume",
       "defect": "none",
+      "expect": []
+    },
+    {
+      "id": "handoff-template-never-written",
+      "gate": "handoff",
+      "defect": "none",
+      "expect": [
+        "CHECKPOINT_MISSING_FIELD",
+        "CHECKPOINT_STALE",
+        "CHECKPOINT_UNDECLARED_UNVERIFIED"
+      ]
+    },
+    {
+      "id": "resume-half-filled-template",
+      "gate": "resume",
+      "defect": "checkpoint_revision_only",
       "expect": [
         "CHECKPOINT_MISSING_FIELD",
         "CHECKPOINT_STALE",

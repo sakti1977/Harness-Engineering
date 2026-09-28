@@ -1,0 +1,690 @@
+{
+ "date": "2026-09-27",
+ "models": {
+  "haiku": "Claude Haiku 4.5",
+  "sonnet": "Claude Sonnet",
+  "opus": "Claude Opus"
+ },
+ "runs": {
+  "haiku-bare-1": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": false,
+    "age_all_offsets": true,
+    "stale_coaching": false,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 4,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "200 {'synced': True} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=201; correction applied; profile version=2 time=07:10; coaching versions=[1]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": null,
+   "regression": {
+    "tests": 6,
+    "valid_on_correct_app": 6,
+    "catches_sync": [
+     "test_coaching_uses_current_profile",
+     "test_profile_is_persisted_after_sync"
+    ],
+    "catches_age": [
+     "test_age_with_different_timezones"
+    ],
+    "catches_race": []
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 3
+   },
+   "usage": {
+    "tokens": 82612,
+    "tool_calls": 15,
+    "duration_ms": 139258
+   }
+  },
+  "haiku-bare-2": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": false,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 5,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'database error'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=201; correction applied; profile version=2 time=07:10; coaching versions=[1]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": null,
+   "regression": {
+    "tests": 10,
+    "valid_on_correct_app": 9,
+    "catches_sync": [
+     "test_issue1_profile_persists_after_save",
+     "test_issue1_profile_update_increments_version",
+     "test_issue3_new_coaching_tracked_correctly"
+    ],
+    "catches_age": [
+     "test_issue2_age_correct_in_utc_minus_5"
+    ],
+    "catches_race": []
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 7
+   },
+   "usage": {
+    "tokens": 88480,
+    "tool_calls": 20,
+    "duration_ms": 188162
+   }
+  },
+  "haiku-harness-1": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "200 {'synced': False} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=201; correction applied; profile version=2 time=07:10; coaching versions=[]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": {
+    "states": [
+     "planned",
+     "active",
+     "ready_for_verification"
+    ],
+    "actors": [
+     "haiku-run1",
+     "sakti"
+    ],
+    "checker_ok": true,
+    "handoff_ok": false,
+    "handoff_fails": [
+     "CHECKPOINT_STALE"
+    ],
+    "evidence_written_by_agent": false
+   },
+   "regression": {
+    "tests": 15,
+    "valid_on_correct_app": 14,
+    "catches_sync": [
+     "test_coaching_not_stored_if_profile_changes_mid_generation",
+     "test_valid_save_returns_synced_true_and_stores_profile"
+    ],
+    "catches_age": [
+     "test_age_at_utc_minus_10",
+     "test_age_at_utc_minus_5"
+    ],
+    "catches_race": [
+     "test_coaching_not_stored_if_profile_changes_mid_generation"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 12
+   },
+   "usage": {
+    "tokens": 104180,
+    "tool_calls": 51,
+    "duration_ms": 214872
+   }
+  },
+  "haiku-harness-2": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "200 {'synced': False} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=409; correction applied; profile version=2 time=07:10; coaching versions=[]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": {
+    "states": [
+     "planned",
+     "active",
+     "ready_for_verification"
+    ],
+    "actors": [
+     "haiku-run2",
+     "sakti"
+    ],
+    "checker_ok": true,
+    "handoff_ok": true,
+    "handoff_fails": [],
+    "evidence_written_by_agent": false
+   },
+   "regression": {
+    "tests": 18,
+    "valid_on_correct_app": 17,
+    "catches_sync": [
+     "test_coaching_not_stored_if_profile_changed",
+     "test_valid_profile_saves_successfully"
+    ],
+    "catches_age": [
+     "test_age_at_utc_minus_10",
+     "test_age_at_utc_minus_5"
+    ],
+    "catches_race": [
+     "test_coaching_not_stored_if_profile_changed"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 15
+   },
+   "usage": {
+    "tokens": 106769,
+    "tool_calls": 41,
+    "duration_ms": 248463
+   }
+  },
+  "opus-bare-1": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'profile could not be saved'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=201; correction applied; profile version=2 time=07:10; coaching versions=[2]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": null,
+   "regression": {
+    "tests": 11,
+    "valid_on_correct_app": 10,
+    "catches_sync": [
+     "test_constantly_changing_profile_gives_409_and_stores_nothing",
+     "test_normal_generation",
+     "test_saved_profile_visible_from_new_connection",
+     "test_storage_failure_is_not_reported_as_synced",
+     "test_update_is_persisted_and_bumps_version"
+    ],
+    "catches_age": [
+     "test_negative_offset_birthday_not_early",
+     "test_positive_and_zero_offsets"
+    ],
+    "catches_race": [
+     "test_constantly_changing_profile_gives_409_and_stores_nothing"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 8
+   },
+   "usage": {
+    "tokens": 89392,
+    "tool_calls": 4,
+    "duration_ms": 42117
+   }
+  },
+  "opus-bare-2": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'profile could not be saved'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=201; correction applied; profile version=2 time=07:10; coaching versions=[2]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": null,
+   "regression": {
+    "tests": 11,
+    "valid_on_correct_app": 10,
+    "catches_sync": [
+     "test_coaching_is_generated",
+     "test_constant_edits_give_conflict_and_store_nothing",
+     "test_failed_save_is_not_reported_synced",
+     "test_saved_profile_visible_from_new_connection",
+     "test_update_is_durable_and_bumps_version"
+    ],
+    "catches_age": [
+     "test_age_negative_offset"
+    ],
+    "catches_race": [
+     "test_constant_edits_give_conflict_and_store_nothing"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 8
+   },
+   "usage": {
+    "tokens": 91517,
+    "tool_calls": 5,
+    "duration_ms": 45193
+   }
+  },
+  "opus-harness-1": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'profile not stored'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=201; correction applied; profile version=2 time=07:10; coaching versions=[2]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": {
+    "states": [
+     "planned",
+     "active",
+     "ready_for_verification"
+    ],
+    "actors": [
+     "opus-run1",
+     "sakti"
+    ],
+    "checker_ok": true,
+    "handoff_ok": true,
+    "handoff_fails": [],
+    "evidence_written_by_agent": false
+   },
+   "regression": {
+    "tests": 13,
+    "valid_on_correct_app": 13,
+    "catches_sync": [
+     "test_correction_during_generation_is_not_stored_against_old_chart",
+     "test_failed_update_keeps_previous_profile_and_reports_not_synced",
+     "test_failed_write_reports_not_synced_and_stores_nothing",
+     "test_invalid_correction_keeps_existing_profile",
+     "test_synced_profile_is_readable_from_another_connection",
+     "test_uninterrupted_generation_stores_current_chart"
+    ],
+    "catches_age": [
+     "test_eve_of_birthday_is_still_previous_age_in_every_zone"
+    ],
+    "catches_race": [
+     "test_correction_during_generation_is_not_stored_against_old_chart"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 10
+   },
+   "usage": {
+    "tokens": 109398,
+    "tool_calls": 13,
+    "duration_ms": 119077
+   }
+  },
+  "opus-harness-2": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'profile could not be saved'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=201; correction applied; profile version=2 time=07:10; coaching versions=[2]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": {
+    "states": [
+     "planned",
+     "active",
+     "ready_for_verification"
+    ],
+    "actors": [
+     "opus-run2",
+     "sakti"
+    ],
+    "checker_ok": true,
+    "handoff_ok": true,
+    "handoff_fails": [],
+    "evidence_written_by_agent": false
+   },
+   "regression": {
+    "tests": 13,
+    "valid_on_correct_app": 12,
+    "catches_sync": [
+     "test_coaching_without_interference_is_stored",
+     "test_correction_saved_mid_generation_is_not_stored_against_old_chart",
+     "test_failed_write_reports_not_synced_and_stores_nothing",
+     "test_locked_database_reports_not_synced",
+     "test_synced_profile_is_readable_from_a_new_connection",
+     "test_update_is_synced_and_bumps_chart_version"
+    ],
+    "catches_age": [
+     "test_eve_of_birthday_is_still_previous_age_in_every_offset"
+    ],
+    "catches_race": [
+     "test_correction_saved_mid_generation_is_not_stored_against_old_chart"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 10
+   },
+   "usage": {
+    "tokens": 104863,
+    "tool_calls": 14,
+    "duration_ms": 101116
+   }
+  },
+  "sonnet-bare-1": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'storage unavailable'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=409; correction applied; profile version=2 time=07:10; coaching versions=[]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": null,
+   "regression": {
+    "tests": 6,
+    "valid_on_correct_app": 6,
+    "catches_sync": [
+     "test_saved_profile_is_actually_persisted",
+     "test_stale_coaching_is_rejected_when_profile_changes_mid_generation"
+    ],
+    "catches_age": [
+     "test_age_not_shifted_early_for_negative_offset"
+    ],
+    "catches_race": [
+     "test_stale_coaching_is_rejected_when_profile_changes_mid_generation"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 3
+   },
+   "usage": {
+    "tokens": 106664,
+    "tool_calls": 18,
+    "duration_ms": 109720
+   }
+  },
+  "sonnet-bare-2": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'storage unavailable'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=409; correction applied; profile version=2 time=07:10; coaching versions=[]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": null,
+   "regression": {
+    "tests": 9,
+    "valid_on_correct_app": 9,
+    "catches_sync": [
+     "test_generate_coaching_rejects_when_profile_changes_mid_flight",
+     "test_stale_chart_is_not_saved_as_latest_coaching",
+     "test_synced_profile_is_actually_persisted",
+     "test_synced_profile_survives_update_too"
+    ],
+    "catches_age": [
+     "test_age_matches_across_offsets_on_day_before_birthday",
+     "test_age_not_early_for_negative_utc_offset"
+    ],
+    "catches_race": []
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 6
+   },
+   "usage": {
+    "tokens": 102850,
+    "tool_calls": 13,
+    "duration_ms": 94247
+   }
+  },
+  "sonnet-harness-1": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'database write failed'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=409; correction applied; profile version=2 time=07:10; coaching versions=[]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": {
+    "states": [
+     "planned",
+     "active",
+     "ready_for_verification"
+    ],
+    "actors": [
+     "sakti",
+     "sonnet-run1"
+    ],
+    "checker_ok": true,
+    "handoff_ok": true,
+    "handoff_fails": [],
+    "evidence_written_by_agent": false
+   },
+   "regression": {
+    "tests": 9,
+    "valid_on_correct_app": 9,
+    "catches_sync": [
+     "test_concurrent_correction_mid_generation_is_not_stored_against_old_chart",
+     "test_failed_write_reports_not_synced_and_stores_nothing",
+     "test_synced_profile_is_actually_stored"
+    ],
+    "catches_age": [
+     "test_age_matches_across_timezones"
+    ],
+    "catches_race": [
+     "test_concurrent_correction_mid_generation_is_not_stored_against_old_chart",
+     "test_correction_mid_generation_is_not_stored_against_old_chart"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 6
+   },
+   "usage": {
+    "tokens": 139309,
+    "tool_calls": 47,
+    "duration_ms": 213016
+   }
+  },
+  "sonnet-harness-2": {
+   "grade": {
+    "sync_stored": true,
+    "sync_failure_honest": true,
+    "age_all_offsets": true,
+    "stale_coaching": true,
+    "invalid_store_nothing": true,
+    "weak_tests_still_pass": true
+   },
+   "passed": 6,
+   "grade_details": {
+    "sync_stored": "200 {'synced': True} stored=[(1,)]",
+    "sync_failure_honest": "503 {'synced': False, 'error': 'database unavailable'} stored=[]",
+    "age_all_offsets": "{330: 48, 0: 48, -300: 48, -600: 48}",
+    "stale_coaching": "coaching=409; correction applied; profile version=2 time=07:10; coaching versions=[]",
+    "invalid_store_nothing": "[(400, False), (400, False), (400, False)] stored=[]",
+    "weak_tests_still_pass": "OK"
+   },
+   "outside_scope": [],
+   "harness": {
+    "states": [
+     "planned",
+     "active",
+     "ready_for_verification"
+    ],
+    "actors": [
+     "sakti",
+     "sonnet-run2"
+    ],
+    "checker_ok": true,
+    "handoff_ok": true,
+    "handoff_fails": [],
+    "evidence_written_by_agent": false
+   },
+   "regression": {
+    "tests": 8,
+    "valid_on_correct_app": 8,
+    "catches_sync": [
+     "test_coaching_started_before_correction_is_not_stored_against_old_chart",
+     "test_failed_write_reports_synced_false_and_stores_nothing",
+     "test_saved_profile_is_readable_after_sync"
+    ],
+    "catches_age": [
+     "test_age_across_timezones"
+    ],
+    "catches_race": [
+     "test_coaching_started_before_correction_is_not_stored_against_old_chart"
+    ]
+   },
+   "agent_report": {
+    "fixed": [
+     1,
+     2,
+     3
+    ],
+    "tests_added_claimed": 5
+   },
+   "usage": {
+    "tokens": 122193,
+    "tool_calls": 37,
+    "duration_ms": 154102
+   }
+  }
+ }
+}

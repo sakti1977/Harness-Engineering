@@ -2,6 +2,8 @@
 
 This repository is a harness kit for AI coding agents. The same rules apply to any agent working in it; `CLAUDE.md` and `.github/copilot-instructions.md` point here.
 
+In this kit's own repository, run the handoff gate before opening a pull request and put its result in the pull request description. Do not commit the filled checkpoint: `main` keeps the blank template, so a fresh clone starts with no handoff to resume.
+
 Read `docs/authority.md` (what you may read, write and run) and `.harness/feature.json` (the active outcome, scope and claims) before editing. Verify claims through the routes in `docs/verify.md`. Change feature state only through `scripts/harness_transition.py`.
 
 ## Resume Protocol: the first action of every session

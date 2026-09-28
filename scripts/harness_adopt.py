@@ -236,13 +236,18 @@ def adopt(root, *, apply=False, agents="agents", ci=False):
     return actions, hints
 
 
-def next_steps(root):
+def next_steps(root, created):
     check, move, hand = (kit_command(s) for s in ("harness_check.py", "harness_transition.py", "harness_handoff.py"))
+    files = " ".join(f"'{path}'" if " " in path else path for path in created)
+    commit = (f"""  0. Commit the new files first, so the scope check measures your work and not the setup:
+       git add {files} && git commit -m "Adopt Harness Engineering"
+
+""" if created else "")
     return f"""Set HARNESS_KIT once so the commands in your project files work (add it to your shell profile):
   export HARNESS_KIT={KIT}
 
 Next steps (from {root}):
-  1. Pick one real failure your agent caused. Describe it in .harness/feature.json: outcome, the files it
+{commit}  1. Pick one real failure your agent caused. Describe it in .harness/feature.json: outcome, the files it
      may touch, the verification command, and 2-4 claims (checklist: {KIT / 'docs/proof-gaps.md'}).
   2. Give each claim a row in docs/proof-matrix.md and a route in docs/verify.md. Seed a broken version
      and confirm at least one check fails on it.
@@ -284,7 +289,7 @@ def main(argv=None):
         print(f"Run again with --apply to create {created} file(s). Existing files are never changed.")
     else:
         print(f"Created {created} file(s). Existing files were not changed.")
-        print(next_steps(root))
+        print(next_steps(root, [relative for verb, relative, _ in actions if verb == "create"]))
     return 1 if any(verb == "refuse" for verb, _, _ in actions) else 0
 
 
