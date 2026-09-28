@@ -5,8 +5,14 @@
 **Added**
 
 - Adopt writes instruction files for Gemini CLI (`GEMINI.md`) and Cursor (`.cursor/rules/harness.mdc`), and `--agents` takes a comma-separated list, for example `--agents claude,cursor`.
+- CI on macOS and Windows as well as Linux.
 - A code of conduct, a social preview image, and issue template links for security reports and evaluation results.
 - Twenty core handbook notes rewritten around the executable examples, with a `status` label on every note saying how far to trust it.
+
+**Fixed**
+
+- On macOS and Windows, where temporary directories are symlinks or short names, the handoff and resume gates refused every project with `artifact resolves outside project`. Project roots are now resolved before comparison.
+- All file reads and writes use UTF-8 explicitly, instead of the Windows default code page.
 
 ## v0.2.0 (2026-09-28)
 

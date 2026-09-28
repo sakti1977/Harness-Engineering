@@ -13,7 +13,7 @@ This kit shows why in one command, and gives you small, checkable controls aroun
 
 ## Try it in 10 seconds
 
-Python 3.10+. No model key, no install, no network.
+Python 3.10+ on Linux, macOS or Windows. No model key, no install, no network.
 
 ```sh
 git clone https://github.com/sakti1977/Harness-Engineering.git
