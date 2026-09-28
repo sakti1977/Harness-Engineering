@@ -10,7 +10,7 @@ For each entry in [`manifest.json`](manifest.json), the runner copies a fixture 
 
 ```text
 FAIL transition-self-approval: expected ['TRANSITION_NOT_INDEPENDENT'] received PASS
-Harness tests: 64 entries, 1 problem(s).
+Harness tests: 66 entries, 1 problem(s).
 ```
 
 ## The rule

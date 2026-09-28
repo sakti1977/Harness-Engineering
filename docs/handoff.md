@@ -40,7 +40,9 @@ Anthropic's [long-running agent harness](https://www.anthropic.com/engineering/e
 7. Which decisions and constraints must be preserved?
 8. What is the first command, and the next bounded edit?
 
-If the checkpoint is stale or incomplete, it fails and says so: re-derive the state from the repository before acting, then rewrite the checkpoint. The protocol lives in [AGENTS.md](../AGENTS.md), which `CLAUDE.md` and the Copilot instructions point to.
+A checkpoint that has never been written (the template a new project starts with) means there is no handoff yet: `--resume` passes and says to start from the ledger and routes. The handoff gate still refuses the template, so every session must write one before it ends.
+
+If a written checkpoint is stale or incomplete, it fails and says so: re-derive the state from the repository before acting, then rewrite the checkpoint. The protocol lives in [AGENTS.md](../AGENTS.md), which `CLAUDE.md` and the Copilot instructions point to.
 
 ## Testing the handoff
 

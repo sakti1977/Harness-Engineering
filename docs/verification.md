@@ -1,5 +1,16 @@
 # Local verification record
 
+## 2026-09-28: v0.2.0 release candidate
+
+Host: Linux. Interpreters: Python 3.10, 3.12 and 3.13. No model calls, paid APIs or third-party packages.
+
+- `python3 -m unittest discover -s tests -v`: 99 tests passed on each interpreter.
+- `python3 harness-tests/run.py`: 66 entries, 0 problems on each interpreter (every failure code covered; every gate has a clean fixture).
+- `python3 scripts/harness_check.py --adapter copilot`: passed. `python3 scripts/harness_handoff.py --resume` on a fresh clone: passes with "no handoff has been written yet".
+- Lab demo, gate demo, sweep and ablation: all report PASSED. Handbook export: 95 files verified. Documentation checks: 0 issues.
+- Every command in the README was run from a fresh clone of `main` before this release candidate; the adopt-then-session-check friction found there is fixed in this release.
+- `evals/jyotish`: the grader self-check (`tests/test_eval_jyotish.py`) passes; the published pilot results were regenerated with the committed `grade.py` and `regression.py`.
+
 ## 2026-09-27: Jyotish Coach lab
 
 Host: Linux. Interpreters: Python 3.10, 3.12 and 3.13 (default 3.11.15). No model calls, paid APIs or third-party packages.

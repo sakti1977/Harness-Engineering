@@ -26,7 +26,7 @@ python3 scripts/export_handbook.py
 python3 scripts/check_docs.py
 ```
 
-**A new gate ships with a defect fixture and a clean fixture, or it does not ship.** Any new failure code in the checker or transition command needs a manifest entry in `harness-tests/` that makes the gate emit it, and each gate keeps a clean entry it must pass. `python3 harness-tests/run.py` reports `UNCOVERED` until both exist. See [harness tests](harness-tests/README.md).
+**A new gate ships with a defect fixture and a clean fixture, or it does not ship.** Any new failure code in the checker, transition or handoff command needs a manifest entry in `harness-tests/` that makes the gate emit it, and each gate keeps a clean entry it must pass. `python3 harness-tests/run.py` reports `UNCOVERED` until both exist. See [harness tests](harness-tests/README.md).
 
 Edit learning content in `vault/`; `docs/handbook/` is generated. Run the exporter after edits. When working from a separate Obsidian copy, sync that reviewed Markdown into `vault/` first; never edit both copies independently. Source findings, synthetic scenarios and local results must remain distinguishable.
 

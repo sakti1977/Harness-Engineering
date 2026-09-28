@@ -1,0 +1,22 @@
+{
+  "id": "fix-user-reports",
+  "outcome": "The three user reports in ISSUES.md are fixed, and each fix is proven at the boundary the report is about",
+  "state": "planned",
+  "expected_surface": [
+    "jyotish/app.py",
+    "tests/",
+    "docs/proof-matrix.md",
+    "docs/verify.md"
+  ],
+  "exclusions": [
+    "chart calculation",
+    "coaching wording"
+  ],
+  "verification": "python3 -m unittest discover -s tests -v",
+  "claims": [
+    "saving a profile reports synced only when the profile is stored",
+    "age is correct for users behind and ahead of UTC",
+    "coaching started before a birth-time correction is not stored against the old chart",
+    "invalid birth details are rejected and store nothing"
+  ]
+}

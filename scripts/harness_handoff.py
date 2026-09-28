@@ -209,6 +209,11 @@ def honesty(sections, observed):
     return problems
 
 
+def never_written(header):
+    """True for the untouched template: no session has handed off yet."""
+    return placeholder(header.get("Revision")) and placeholder(header.get("Written"))
+
+
 def load(root):
     text = check.read_artifact(root, CHECKPOINT)
     return parse(text)
@@ -236,6 +241,8 @@ def resume_findings(root):
         header, sections = load(root)
     except (OSError, ValueError, RuntimeError) as error:
         return [finding("HANDOFF_UNREADABLE", f"cannot observe the repository or read the checkpoint: {error}")], None
+    if never_written(header):
+        return [], None   # the template: no handoff exists, so there is nothing stale to follow
     problems = completeness(header, sections) + staleness(root, header, observed) + honesty(sections, observed)
     feature = observed["feature"]
     answers = [
@@ -274,6 +281,9 @@ def main(argv=None):
     for f in problems:
         print(f"FAIL {f['code']} {f.get('path', '')}".rstrip())
         print(f"  {f['detail']}")
+    if args.resume and not problems and answers is None:
+        print("No handoff has been written yet, so there is nothing to resume. Start from .harness/feature.json "
+              "and docs/verify.md, and end the session with --write and --check.")
     if args.resume and problems:
         print("Checkpoint is stale or incomplete: do not follow its next edit. Re-derive the state from the "
               "repository, then rewrite it with --write.")

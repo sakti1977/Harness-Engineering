@@ -339,3 +339,9 @@ def evidence_outdated_after_checkpoint(s):
 
 def checkpoint_deleted(s):
     s.delete(".harness/checkpoint.md")
+
+
+def checkpoint_revision_only(s):
+    """Someone started a handoff (filled the revision) but wrote nothing else: that is not 'no handoff'."""
+    s.write(".harness/checkpoint.md", s.read(".harness/checkpoint.md").replace(
+        "- Revision: <git rev-parse HEAD>", f"- Revision: {s.head()}"))

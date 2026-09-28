@@ -67,6 +67,21 @@ class Adopt(unittest.TestCase):
         self.assertIn("CLAUDE.md already exists", second.stdout)
         self.assertEqual(snapshot(self.root), after_first)
 
+    @unittest.skipUnless(shutil.which("git"), "git is required")
+    def test_printed_commit_step_leaves_a_clean_session_check(self):
+        subprocess.run(["git", "init", "-q", "-b", "main"], cwd=self.root, check=True, env=ENV)
+        subprocess.run(["git", "add", "-A"], cwd=self.root, check=True, env=ENV)
+        subprocess.run(["git", "commit", "-q", "-m", "app"], cwd=self.root, check=True, env=ENV)
+        result = self.run_script("harness_adopt.py", "--apply", "--agents", "all")
+        command = next(line.strip() for line in result.stdout.splitlines() if line.strip().startswith("git add "))
+        before = self.run_script("harness_check.py", "--session")
+        self.assertIn("SCOPE_OUTSIDE_SURFACE", before.stdout, "uncommitted setup files are reported until committed")
+        subprocess.run(command, shell=True, cwd=self.root, check=True, env=ENV)
+        after = self.run_script("harness_check.py", "--session")
+        self.assertEqual(after.returncode, 0, after.stdout)
+        self.assertEqual(subprocess.run(["git", "status", "--porcelain"], cwd=self.root, capture_output=True,
+                                        text=True, env=ENV).stdout, "", "the printed command must commit every created file")
+
     def test_symlink_escaping_the_project_is_refused(self):
         outside = Path(self.temp.name) / "outside"
         outside.mkdir()

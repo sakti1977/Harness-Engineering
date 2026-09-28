@@ -91,6 +91,13 @@ class Handoff(unittest.TestCase):
         self.assertIn("CHECKPOINT_STALE", result.stdout)
         self.assertIn("do not follow its next edit", result.stdout)
 
+    def test_fresh_template_means_no_handoff_yet(self):
+        resume = self.cli("--resume")
+        self.assertEqual(resume.returncode, 0, resume.stdout)
+        self.assertIn("No handoff has been written yet", resume.stdout)
+        check = self.cli("--check")
+        self.assertEqual(check.returncode, 1, "the handoff gate must still refuse an unwritten checkpoint")
+
     def test_modes_are_required_and_exclusive(self):
         self.assertEqual(self.cli().returncode, 2)
         self.assertEqual(self.cli("--check", "--resume").returncode, 2)
