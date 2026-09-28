@@ -173,15 +173,15 @@ jobs:
     env:
       HARNESS_KIT: .harness-kit
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           repository: sakti1977/Harness-Engineering
           ref: main   # pin to a release tag or commit you have reviewed
           path: .harness-kit
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Harness artifacts, proof plan and transition log
