@@ -1,0 +1,20 @@
+name: Bug in a gate or command
+description: A check passed when it should fail, failed when it should pass, or a command crashed.
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: What you ran
+      description: The exact command, the kit revision (`git rev-parse HEAD`), Python version and operating system.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What happened and what you expected
+      description: Paste the output. For a wrong verdict, say which result the gate should have returned and why.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Smallest reproduction
+      description: If you can, the fixture or files that trigger it. A failing harness-tests entry is ideal. Do not include secrets or private data.

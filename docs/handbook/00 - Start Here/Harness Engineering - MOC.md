@@ -1,13 +1,15 @@
 ---
 type: moc
 status: maintained
-reviewed: 2026-09-26
+reviewed: 2026-09-28
 tags: [harness-engineering, start-here]
 ---
 
 # Harness Engineering - MOC
 
 Harness engineering shapes the environment around an agent: discoverable knowledge, tools and authority, meaningful execution, verification and durable state. This vault’s five-layer vocabulary is an organizing synthesis, not an external standard.
+
+Each note's `status` says how far to trust it. `maintained` notes were rewritten around this repository's executable examples, and their commands were run. `synthesized-from-shared-material` notes are inherited teaching summaries: useful orientation, not a description of what the repository implements. [Vault Update Record](Vault%20Update%20Record.md) lists which is which.
 
 ## Start here
 

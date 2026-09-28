@@ -1,3 +1,5 @@
+> **Maintainer research snapshot (2026-09-26).** Planning notes kept for transparency, not user documentation. Current status is in the [roadmap](https://github.com/sakti1977/Harness-Engineering/blob/main/docs/roadmap.md) and the [changelog](https://github.com/sakti1977/Harness-Engineering/blob/main/CHANGELOG.md).
+
 # sakti1977/Harness-Engineering: verified audit and adoption plan
 
 ## What is actually in the repository?

@@ -1,7 +1,7 @@
 ---
 type: verification-record
 status: locally-verified
-reviewed: 2026-09-27
+reviewed: 2026-09-28
 ---
 
 # Vault Update Record
@@ -35,3 +35,9 @@ External pilot feedback, independently produced evidence receipts, a second stac
 ## Update 2026-09-27
 
 The booking lab is replaced by the Jyotish Coach lab in [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md), modelled on incidents recorded in [Jyotish Coach Sync and Age Incidents](../12%20-%20Case%20Studies/Jyotish%20Coach%20Sync%20and%20Age%20Incidents.md). The repository adds written verification routes (`docs/verify.md`), an interleaving sweep, route-aware failure messages and a fidelity ablation. Executed locally on Python 3.10, 3.12 and 3.13: the lab demo, sweep, ablation and 70 repository tests passed; the threaded stale-coaching check was repeated 30 times per variant without an unexpected result. Other inherited clinic scenarios in this vault remain instructional examples.
+
+## Update 2026-09-28
+
+Twenty core notes were rewritten around this repository's executable examples and now carry `status: maintained` with a review date: the two foundation notes, the five layer maps, [Claim-to-Proof Matrix](../06%20-%20Verdict/Claim-to-Proof%20Matrix.md), [Verification Routes and Test Fidelity](../06%20-%20Verdict/Verification%20Routes%20and%20Test%20Fidelity.md), [Feature Ledger as a Gate](../06%20-%20Verdict/Feature%20Ledger%20as%20a%20Gate.md), [Cold-Session Checkpoint](../07%20-%20Carry/Cold-Session%20Checkpoint.md), [Authority Policy](../03%20-%20Power/Authority%20Policy.md), [Scope Contract](../05%20-%20Scope/Scope%20Contract.md), [Readiness Contract](../04%20-%20Ground/Readiness%20Contract.md), [Recovery Audit](../02%20-%20Reach/Recovery%20Audit.md), [AGENTS.md as a Map](../02%20-%20Reach/AGENTS.md%20as%20a%20Map.md), [Harness-Control Tests](../10%20-%20Harness%20Testing/Harness-Control%20Tests.md), [Minimal Harness Adoption Path](../11%20-%20Practical%20Implementations/Minimal%20Harness%20Adoption%20Path.md), [False Passing Feature](../12%20-%20Case%20Studies/False%20Passing%20Feature.md) and [Cold Session Loses Diagnosis](../12%20-%20Case%20Studies/Cold%20Session%20Loses%20Diagnosis.md). Each follows problem, mechanism, worked example, try it, limits. Every "try it" command was run against a clean clone before publishing.
+
+[False Passing Feature](../12%20-%20Case%20Studies/False%20Passing%20Feature.md) now cites the evaluation pilot in `evals/jyotish/results/` as its measured counterpart; the pilot's limits (two runs per cell, Claude models only, one author) apply. Notes still marked `synthesized-from-shared-material` are inherited teaching summaries that have not yet been rewritten; treat them as orientation, not as a description of what this repository implements.

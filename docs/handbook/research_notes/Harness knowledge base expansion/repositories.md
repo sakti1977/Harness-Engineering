@@ -1,3 +1,5 @@
+> **Maintainer research snapshot (2026-09-26).** Planning notes kept for transparency, not user documentation. Current status is in the [roadmap](https://github.com/sakti1977/Harness-Engineering/blob/main/docs/roadmap.md) and the [changelog](https://github.com/sakti1977/Harness-Engineering/blob/main/CHANGELOG.md).
+
 # Official repository research for harness engineering
 
 ## Which repository patterns add useful depth to this vault?
