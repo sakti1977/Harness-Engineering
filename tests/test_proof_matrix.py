@@ -21,14 +21,14 @@ class ProofMatrix(unittest.TestCase):
         for name in checker.CORE_FILES:
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text((ROOT / name).read_text())
-        self.feature = json.loads((ROOT / ".harness/feature.json").read_text())
+            target.write_text((ROOT / name).read_text(encoding="utf-8"), encoding="utf-8")
+        self.feature = json.loads((ROOT / ".harness/feature.json").read_text(encoding="utf-8"))
         self.claims = self.feature["claims"]
 
     def matrix(self, rows, state="ready_for_verification"):
         body = "".join(f"| {c} | obs | {req} | {prod} | {tested} | |\n" for c, req, prod, tested in rows)
-        (self.root / "docs/proof-matrix.md").write_text("# Proof\n\n" + HEADER + body + "\nTrailing text.\n")
-        (self.root / ".harness/feature.json").write_text(json.dumps(dict(self.feature, state=state)))
+        (self.root / "docs/proof-matrix.md").write_text("# Proof\n\n" + HEADER + body + "\nTrailing text.\n", encoding="utf-8")
+        (self.root / ".harness/feature.json").write_text(json.dumps(dict(self.feature, state=state)), encoding="utf-8")
         return checker.inspect(self.root)
 
     def full(self, **override):
@@ -76,8 +76,8 @@ class ProofMatrix(unittest.TestCase):
                          ["PROOF_BOUNDARY_GAP"])
 
     def test_matrix_without_table(self):
-        (self.root / "docs/proof-matrix.md").write_text("# Proof\n\nWe test things.\n")
-        (self.root / ".harness/feature.json").write_text(json.dumps(dict(self.feature, state="ready_for_verification")))
+        (self.root / "docs/proof-matrix.md").write_text("# Proof\n\nWe test things.\n", encoding="utf-8")
+        (self.root / ".harness/feature.json").write_text(json.dumps(dict(self.feature, state="ready_for_verification")), encoding="utf-8")
         self.assertEqual(self.failing(checker.inspect(self.root)), ["PROOF_MATRIX_NO_TABLE"])
 
     def test_gaps_are_advisory_before_verification_is_requested(self):

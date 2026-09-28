@@ -1,6 +1,8 @@
 ---
 type: concept
-status: synthesized-from-shared-material
+status: maintained
+reviewed: 2026-09-28
+provenance: inherited teaching material, rewritten around this repository's executable examples
 tags:
   - harness-engineering
   - carry
@@ -8,26 +10,49 @@ tags:
 
 # Cold-Session Checkpoint
 
-## Core idea and problem
-“Mostly implemented” loses diagnosis and invites the next session to repeat or contradict work.
+## Problem
 
-## How it works
-Record active outcome, revision/dirty state, commands/results, expected vs actual, preserved decisions, non-obvious diagnosis, first reproduction command, next bounded edit. Reconcile with actual repo on resume.
+Sessions end mid-task: context runs out, the laptop closes, a different agent picks up tomorrow. "Mostly implemented, a few edge cases left" loses the diagnosis and invites the next session to repeat work or contradict a decision. Worse, a handoff written from memory can claim more than the repository shows.
 
-## Example / failure mode
-Session discovers booking transaction bug but next agent only sees vague handoff.
+## Mechanism
 
-## Implementation and verification notes
-Prefer “both requests returned 201 and two rows persisted” over “almost done”.
+Write the checkpoint (`.harness/checkpoint.md`) from the observed repository, not from recollection, and make it answer eight questions for a session with no history:
+
+1. What is the active outcome and state?
+2. Which revision, and which files are uncommitted?
+3. What is verified, and by what?
+4. What is not verified since the last edit?
+5. What are the suspected causes (kept apart from verified facts)?
+6. What blocks progress, and which commands are still to run?
+7. Which decisions must be preserved?
+8. What is the first command and the next bounded edit?
+
+`--write` fills the observable parts. The hand-written parts (causes, blockers, decisions, next edit) survive rewrites. `--check` is the gate at the end of a session; `--resume` is the first action of the next.
+
+## Worked example
+
+A session diagnoses the stale-coaching race but runs out of time before fixing it. A weak handoff says "race mostly fixed". A checkpoint says: revision `a31c872`, `examples/astro/astro.py` uncommitted; claim "coaching started before a correction is not stored against the old chart" **not verified since the last edit**; suspected cause: the write does not compare chart versions; first command `python3 -m unittest examples.astro.test_astro -v`; next edit: make the coaching insert conditional on the chart version read.
+
+## Try it
+
+```sh
+python3 scripts/harness_handoff.py --write
+python3 scripts/harness_handoff.py --check    # CHECKPOINT_MISSING_FIELD: the next bounded edit is still TODO
+# write the next edit under "## Next bounded edit" in .harness/checkpoint.md, then:
+python3 scripts/harness_handoff.py --check    # Handoff check passed.
+echo "# edit" >> examples/astro/astro.py
+python3 scripts/harness_handoff.py --resume   # CHECKPOINT_STALE: the handoff is a failed check, not guidance
+git checkout -- examples/astro/astro.py .harness/checkpoint.md
+```
+
+## Limits
+
+The checkpoint can verify what it observes (revision, files, state, evidence freshness) and the presence of the hand-written sections. It cannot verify that a suspected cause is right or that the next edit is wise. A never-written template means "no handoff yet", which `--resume` reports and `--check` refuses.
 
 ## Connected concepts
+
 - [Append-Only Journal](Append-Only%20Journal.md)
 - [Resume Replay and Fork](Resume%20Replay%20and%20Fork.md)
 - [Recovery Audit](../02%20-%20Reach/Recovery%20Audit.md)
-
-## Practical extension
-
-The repository makes this executable. `python3 scripts/harness_handoff.py --write` drafts the checkpoint from the observed repository (uncommitted files recorded without a ceremonial commit; claims verified only with current evidence), `--check` is the handoff gate at the end of a session, and `--resume` answers the eight recovery questions at the start of the next and fails on a stale or incomplete checkpoint. See `docs/handoff.md` and the Resume Protocol in `AGENTS.md`.
-
-
-Check stored revision and unresolved effects against current state before acting. See [Memory Scope and Retention](Memory%20Scope%20and%20Retention.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).
+- [Cold Session Loses Diagnosis](../12%20-%20Case%20Studies/Cold%20Session%20Loses%20Diagnosis.md)
+- [Memory Scope and Retention](Memory%20Scope%20and%20Retention.md)

@@ -5,6 +5,8 @@ reviewed: 2026-09-26
 tags: [harness-engineering, research, roadmap]
 ---
 
+> **Maintainer research snapshot (2026-09-26).** Planning notes kept for transparency, not user documentation. Current status is in the [roadmap](https://github.com/sakti1977/Harness-Engineering/blob/main/docs/roadmap.md) and the [changelog](https://github.com/sakti1977/Harness-Engineering/blob/main/CHANGELOG.md).
+
 # Build a harness universe readers can use
 
 **The strongest next step is to connect the vault's concepts to trustworthy sources, working examples, and evidence that a harness change helps a real project.** The local vault has a useful conceptual skeleton, but its original 44 Markdown files contain only about 6,395 words and no external source URLs; the existing source index maps earlier conversation material rather than an independently checkable bibliography. The public repository should become the practical companion: diagnose a project's weaknesses, install a small set of appropriate controls, and measure the result. This research reviewed a curated set of 13 repositories with at least 1,000 visible stars, eight first-party engineering articles, and additional official material on evaluation, security, infrastructure and reliability. It does not exhaust every credible repository or blog, and upstream benchmark claims were not reproduced. The recommended roadmap starts with correctness and a runnable starter, then broadens into source-backed lessons, adapters and reproducible experiments. Thousands of stars and clones are an adoption ambition; useful first experiences, credible evidence and sustained maintenance are the work that can support it.

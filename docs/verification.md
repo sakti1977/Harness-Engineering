@@ -1,5 +1,15 @@
 # Local verification record
 
+## 2026-09-28: portability and handbook update (unreleased)
+
+Host: Linux. Interpreters: Python 3.10, 3.12 and 3.13. Hosted CI: Linux (3.10, 3.12, 3.13), macOS and Windows (3.12). No model calls, paid APIs or third-party packages.
+
+- `python3 -m unittest discover -s tests -v`: 102 tests passed on each local interpreter (three new adopt tests).
+- `python3 harness-tests/run.py`: 66 entries, 0 problems on each interpreter.
+- Lab demo, gate demo, sweep and ablation: all report PASSED. Handbook export: 95 files verified. Documentation checks: 0 issues.
+- The first macOS and Windows CI runs failed: 15 handoff and resume fixtures were refused with `artifact resolves outside project`, two `.git` removals hit read-only files on Windows, and one eval test compared a short Windows path with a resolved one. The first failure was reproduced on Linux by pointing `TMPDIR` at a symlink (15 problems before the fix, 0 after). After the fixes, every job in the hosted matrix passed.
+- Every "try it" command in the twenty rewritten handbook notes was run against a clean clone; three that did not behave as first written were corrected before publishing.
+
 ## 2026-09-28: v0.2.0 release candidate
 
 Host: Linux. Interpreters: Python 3.10, 3.12 and 3.13. No model calls, paid APIs or third-party packages.

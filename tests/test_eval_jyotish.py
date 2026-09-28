@@ -49,7 +49,7 @@ class JyotishEval(unittest.TestCase):
                 text = regression.app_with("none")
                 if style == "regenerate":
                     text = text.replace(regression.FIXES["race"][1], REGENERATE)
-                (run / "jyotish/app.py").write_text(text)
+                (run / "jyotish/app.py").write_text(text, encoding="utf-8")
                 self.assertEqual(self.grade(run)["passed"], 6)
 
     def test_grading_does_not_change_the_run(self):
@@ -64,7 +64,7 @@ class JyotishEval(unittest.TestCase):
         for defect in ("sync", "age", "race"):
             with self.subTest(defect=defect):
                 run, _ = prepare.prepare(self.out, "bare", defect)
-                (run / "jyotish/app.py").write_text(regression.app_with(defect))
+                (run / "jyotish/app.py").write_text(regression.app_with(defect), encoding="utf-8")
                 expected = {"sync": ["sync_failure_honest", "sync_stored"], "age": ["age_all_offsets"],
                             "race": ["stale_coaching"]}[defect]
                 self.assertEqual(self.failing(self.grade(run)), expected)
@@ -75,7 +75,7 @@ class JyotishEval(unittest.TestCase):
 
     def test_harness_run_gets_a_stripped_kit_and_no_grader(self):
         run, prompt = prepare.prepare(self.out, "harness", "t")
-        kit = self.out / "kit"
+        kit = self.out.resolve() / "kit"
         self.assertEqual(sorted(p.name for p in (kit / "scripts").iterdir()),
                          ["harness_check.py", "harness_handoff.py", "harness_transition.py"])
         self.assertFalse(any(kit.rglob("grade.py")) or any(run.rglob("grade.py")))

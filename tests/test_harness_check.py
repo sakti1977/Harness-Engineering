@@ -21,12 +21,12 @@ class ArtifactChecks(unittest.TestCase):
         for name in checker.CORE_FILES:
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text((ROOT / name).read_text())
+            target.write_text((ROOT / name).read_text(encoding="utf-8"), encoding="utf-8")
         self.feature = self.root / ".harness/feature.json"
-        self.data = json.loads(self.feature.read_text())
+        self.data = json.loads(self.feature.read_text(encoding="utf-8"))
 
     def write(self, data):
-        self.feature.write_text(json.dumps(data))
+        self.feature.write_text(json.dumps(data), encoding="utf-8")
 
     def test_valid_core_does_not_require_vendor_file(self):
         self.assertTrue(checker.inspect(self.root)["ok"])
@@ -35,7 +35,7 @@ class ArtifactChecks(unittest.TestCase):
     def test_malformed_and_nonobject_json(self):
         for raw in ("{", "[]", "null", '"text"', "42"):
             with self.subTest(raw=raw):
-                self.feature.write_text(raw)
+                self.feature.write_text(raw, encoding="utf-8")
                 self.assertFalse(checker.inspect(self.root)["ok"])
 
     def test_state_is_enum_and_not_self_attested_passing(self):
@@ -72,7 +72,7 @@ class ArtifactChecks(unittest.TestCase):
         path.mkdir()
         self.assertFalse(checker.inspect(self.root)["ok"])
         path.rmdir()
-        path.write_text("")
+        path.write_text("", encoding="utf-8")
         self.assertFalse(checker.inspect(self.root)["ok"])
         path.write_bytes(b"\xff")
         self.assertFalse(checker.inspect(self.root)["ok"])
@@ -89,7 +89,7 @@ class ArtifactChecks(unittest.TestCase):
         self.assertTrue(json.loads(result.stdout)["ok"])
         after = {str(p.relative_to(self.root)): p.read_bytes() for p in self.root.rglob("*") if p.is_file()}
         self.assertEqual(before, after)
-        self.feature.write_text("{")
+        self.feature.write_text("{", encoding="utf-8")
         result = subprocess.run([sys.executable, str(ROOT / "scripts/harness_check.py"), "--root", str(self.root), "--format", "json"], capture_output=True, text=True)
         self.assertEqual(result.returncode, 1)
         self.assertFalse(json.loads(result.stdout)["ok"])

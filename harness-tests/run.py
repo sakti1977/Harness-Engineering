@@ -69,12 +69,12 @@ class Scratch:
         return self.git("rev-parse", "HEAD")
 
     def read(self, name):
-        return (self.root / name).read_text()
+        return (self.root / name).read_text(encoding="utf-8")
 
     def write(self, name, text):
         path = self.root / name
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
+        path.write_text(text, encoding="utf-8")
 
     def delete(self, name):
         (self.root / name).unlink()
@@ -120,7 +120,7 @@ def run_entry(entry):
 
 def gate_codes():
     """Every failure code the gates can emit, read from their source."""
-    source = "".join((ROOT / f"scripts/{name}.py").read_text() for name in ("harness_check", "harness_transition", "harness_handoff"))
+    source = "".join((ROOT / f"scripts/{name}.py").read_text(encoding="utf-8") for name in ("harness_check", "harness_transition", "harness_handoff"))
     literals = set(re.findall(r'"([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)', source))
     return {code for code in literals if code not in NOT_FAILURES and not code.startswith("GIT_")}
 
@@ -149,27 +149,27 @@ def drift_problems():
             if not (fixture / name).is_file():
                 problems.append(f"FIXTURE_DRIFT {fixture.name}: missing {name}")
         try:
-            feature = json.loads((fixture / ".harness/feature.json").read_text())
-            schema = json.loads((ROOT / "schemas/feature.schema.json").read_text())
+            feature = json.loads((fixture / ".harness/feature.json").read_text(encoding="utf-8"))
+            schema = json.loads((ROOT / "schemas/feature.schema.json").read_text(encoding="utf-8"))
             for error in check.schema_errors(feature, schema):
                 problems.append(f"FIXTURE_DRIFT {fixture.name}: {error}")
         except (OSError, ValueError) as error:
             problems.append(f"FIXTURE_DRIFT {fixture.name}: feature ledger unreadable ({error})")
         checkpoint = fixture / ".harness/checkpoint.md"
         if checkpoint.is_file():
-            sections = handoff.parse(checkpoint.read_text())[1]
+            sections = handoff.parse(checkpoint.read_text(encoding="utf-8"))[1]
             for name in handoff.SECTIONS:
                 if name not in sections:
                     problems.append(f"FIXTURE_DRIFT {fixture.name}: checkpoint lacks '## {name}'")
         matrix = fixture / "docs/proof-matrix.md"
-        if matrix.is_file() and check.proof_table(matrix.read_text()) is None:
+        if matrix.is_file() and check.proof_table(matrix.read_text(encoding="utf-8")) is None:
             problems.append(f"FIXTURE_DRIFT {fixture.name}: proof matrix lacks the columns {check.PROOF_COLUMNS}")
     return problems
 
 
 def main(manifest=None):
     if manifest is None:
-        manifest = json.loads((HERE / "manifest.json").read_text())["entries"]
+        manifest = json.loads((HERE / "manifest.json").read_text(encoding="utf-8"))["entries"]
     failures = coverage_problems(manifest) + drift_problems()
     for entry in manifest:
         try:

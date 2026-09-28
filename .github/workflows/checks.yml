@@ -9,8 +9,8 @@ jobs:
       matrix:
         python-version: ['3.10', '3.12', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - run: python scripts/harness_check.py --adapter copilot
@@ -31,3 +31,30 @@ jobs:
       - run: python -m examples.gate.demo
       - run: python scripts/export_handbook.py --check
       - run: python scripts/check_docs.py
+
+  portability:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python scripts/harness_check.py
+      - name: Unit tests
+        run: |
+          if ! python -m unittest discover -s tests -v > unittest.txt 2>&1; then
+            cat unittest.txt
+            python scripts/annotate_failures.py unittest.txt
+            exit 1
+          fi
+          tail -n 3 unittest.txt
+      - run: python harness-tests/run.py
+      - run: python -m examples.astro.demo
+      - run: python -m examples.gate.demo

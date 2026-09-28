@@ -38,15 +38,15 @@ def main():
 
         def put(name, text):
             (root / name).parent.mkdir(parents=True, exist_ok=True)
-            (root / name).write_text(text)
+            (root / name).write_text(text, encoding="utf-8")
 
         def commit():
             git("add", "-A")
             git("commit", "-q", "--allow-empty", "-m", "step")
 
         for name in check.CORE_FILES:
-            put(name, (ROOT / name).read_text())
-        feature = json.loads((ROOT / ".harness/feature.json").read_text())
+            put(name, (ROOT / name).read_text(encoding="utf-8"))
+        feature = json.loads((ROOT / ".harness/feature.json").read_text(encoding="utf-8"))
         put(".harness/feature.json", json.dumps(dict(feature, state="planned"), indent=2))
         put("examples/astro/astro.py", "# broken: coaching write ignores chart_version\n")
         put("app/support/upi.py", "# voluntary contributions: never touches coaching\n")
@@ -91,7 +91,7 @@ def main():
         print(("STALE    " if stale else "MISSED   ") + "Next session changes verified code: passing is flagged stale")
         results.append(bool(stale))
 
-        log = (root / check.LOG_FILE).read_text().splitlines()
+        log = (root / check.LOG_FILE).read_text(encoding="utf-8").splitlines()
         print(f"\nAudit log: {len(log)} hash-chained entries in {check.LOG_FILE}")
         for line in log:
             e = json.loads(line)

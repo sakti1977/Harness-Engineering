@@ -41,14 +41,14 @@ class Handoff(unittest.TestCase):
 
     def fill_next_edit(self, text="Add the read-back assertion to tests/test_profile.py."):
         path = self.root / ".harness/checkpoint.md"
-        path.write_text(path.read_text().replace("## Next bounded edit\n\nTODO", f"## Next bounded edit\n\n{text}"))
+        path.write_text(path.read_text(encoding="utf-8").replace("## Next bounded edit\n\nTODO", f"## Next bounded edit\n\n{text}"), encoding="utf-8")
 
     def test_write_records_dirty_work_without_committing(self):
-        (self.root / "src/profile.py").write_text("# half-finished change\n")
+        (self.root / "src/profile.py").write_text("# half-finished change\n", encoding="utf-8")
         head = self.git("rev-parse", "HEAD")
         self.assertEqual(self.cli("--write").returncode, 0)
         self.assertEqual(self.git("rev-parse", "HEAD"), head, "writing a checkpoint must not commit")
-        text = (self.root / ".harness/checkpoint.md").read_text()
+        text = (self.root / ".harness/checkpoint.md").read_text(encoding="utf-8")
         self.assertIn("- Uncommitted files: src/profile.py", text)
         self.assertIn(f"- Revision: {head}", text)
         self.assertIn("## Not verified since the last edit", text)
@@ -57,11 +57,11 @@ class Handoff(unittest.TestCase):
         self.cli("--write")
         self.fill_next_edit("Wrap the insert in a transaction in src/profile.py.")
         path = self.root / ".harness/checkpoint.md"
-        path.write_text(path.read_text().replace("## Suspected causes (not verified)\n\nNone recorded.",
-                                                 "## Suspected causes (not verified)\n\nThe write is never committed."))
-        (self.root / "src/profile.py").write_text("# another edit\n")
+        path.write_text(path.read_text(encoding="utf-8").replace("## Suspected causes (not verified)\n\nNone recorded.",
+                                                 "## Suspected causes (not verified)\n\nThe write is never committed."), encoding="utf-8")
+        (self.root / "src/profile.py").write_text("# another edit\n", encoding="utf-8")
         self.cli("--write")
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         self.assertIn("The write is never committed.", text)
         self.assertIn("Wrap the insert in a transaction in src/profile.py.", text)
 
@@ -85,7 +85,7 @@ class Handoff(unittest.TestCase):
     def test_resume_detects_a_change_made_after_the_checkpoint(self):
         self.cli("--write")
         self.fill_next_edit()
-        (self.root / "src/profile.py").write_text("# someone kept working after the handoff\n")
+        (self.root / "src/profile.py").write_text("# someone kept working after the handoff\n", encoding="utf-8")
         result = self.cli("--resume")
         self.assertEqual(result.returncode, 1)
         self.assertIn("CHECKPOINT_STALE", result.stdout)

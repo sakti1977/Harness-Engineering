@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("harness_tests_run", ROOT / "harness-tests/run.py")
 runner = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runner)
-MANIFEST = json.loads((ROOT / "harness-tests/manifest.json").read_text())["entries"]
+MANIFEST = json.loads((ROOT / "harness-tests/manifest.json").read_text(encoding="utf-8"))["entries"]
 
 
 def entries(*ids):
@@ -68,7 +68,7 @@ class HarnessTests(unittest.TestCase):
             shutil.copytree(ROOT / "harness-tests/fixtures", fixtures)
             (fixtures / "clean-project/docs/readiness.md").unlink()
             matrix = fixtures / "clean-project/docs/proof-matrix.md"
-            matrix.write_text(matrix.read_text().replace("Tested boundary", "Coverage"))
+            matrix.write_text(matrix.read_text(encoding="utf-8").replace("Tested boundary", "Coverage"), encoding="utf-8")
             with patch.object(runner, "HERE", Path(directory)):
                 problems = runner.drift_problems()
         self.assertIn("FIXTURE_DRIFT clean-project: missing docs/readiness.md", problems)

@@ -22,9 +22,18 @@ export HARNESS_KIT=~/Harness-Engineering   # add to your shell profile
 | `docs/proof-matrix.md` | One row per claim: required boundary, evidence producer, tested boundary |
 | `docs/verify.md` | One verification route per claim that crosses a boundary |
 | `docs/scope-contract.md`, `docs/readiness.md` | Reference contracts |
-| `AGENTS.md` (`--agents agents`, the default) | Agent instructions with the Resume Protocol |
-| `CLAUDE.md`, `.github/copilot-instructions.md` (`--agents claude`, `copilot` or `all`) | Tool-specific instructions |
+| `AGENTS.md` (`--agents agents`, the default) | Agent instructions with the Resume Protocol; Codex and Cursor read it natively |
+| Tool-specific instructions (`--agents` with a comma-separated list, or `all`) | See the table below |
 | `.github/workflows/harness.yml` (`--ci`) | Runs the checker on every push and the scope check on pull requests |
+
+| `--agents` | File | How it reaches the agent |
+| --- | --- | --- |
+| `claude` | `CLAUDE.md` | One line, `@AGENTS.md`, which Claude Code imports |
+| `gemini` | `GEMINI.md` | `@./AGENTS.md`, which Gemini CLI imports (or set `context.fileName` to include `AGENTS.md`) |
+| `copilot` | `.github/copilot-instructions.md` | A full copy; Copilot reads it on every request |
+| `cursor` | `.cursor/rules/harness.mdc` | A full copy as a project rule with `alwaysApply: true`, in addition to Cursor's own `AGENTS.md` support |
+
+For example, `--agents claude,cursor`. Choosing `claude` or `gemini` also creates `AGENTS.md`, since those files import it. Copies do not update themselves: if you edit `AGENTS.md`, edit the copies too, or keep only the files your team uses. Other tools that read `AGENTS.md` need nothing more; for a tool with its own rules format, paste `.harness/agent-protocol.md` into it.
 
 If an instruction file already exists, adopt leaves it alone and tells you to add the protocol from `.harness/agent-protocol.md` (for `CLAUDE.md`, the line `@AGENTS.md` is enough). Project files refer to the kit as `$HARNESS_KIT`, so they work on every machine and in CI.
 

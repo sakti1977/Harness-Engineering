@@ -1,34 +1,34 @@
 ---
 type: moc
-status: synthesized-from-shared-material
+status: maintained
+reviewed: 2026-09-28
+provenance: inherited teaching material, rewritten around this repository's executable examples
 tags:
   - harness-engineering
   - verdict
+  - moc
 ---
 
 # Verdict - MOC
 
-## Core idea and problem
-What actually proves the requested behavior?
+**What evidence proves each claim, beyond "tests pass"?**
 
-## How it works
-Study these concepts in relation, not as independent tips.
+Verdict is where most agent failures surface: a green check that observed the wrong thing. The controls here turn "done" from a statement into a gate: claims are written first, each names the check that proves it at the right boundary, and state changes require current evidence from someone other than the author.
 
-## Example / failure mode
-A missing layer can invalidate an otherwise plausible agent result.
+## In this repository
 
-## Implementation and verification notes
-Return to [[Harness Engineering - MOC]].
+- `docs/proof-matrix.md`: one row per claim, with the required and tested boundary; the checker fails a gap once verification is requested.
+- `docs/proof-gaps.md`: a claim checklist, eight gap types and an audit.
+- `scripts/harness_transition.py`: planner, worker and verifier roles; `passing` needs an independent verifier and evidence newer than the code.
+- `harness-tests/`: every gate is itself tested against a defect fixture and a clean fixture.
 
-## Connected concepts
-- [[Feature Ledger as a Gate]]
+## Notes
+
 - [[Claim-to-Proof Matrix]]
 - [[Verification Routes and Test Fidelity]]
+- [[Feature Ledger as a Gate]]
 - [[First Divergence and Failure Packet]]
-- [[Harness-Control Tests]]
-- [[Release Evidence]]
-
-## Further study
-
 - [[Traces Metrics and Privacy]]
-- [[Grader Reliability]]
+- [[Harness-Control Tests]]
+
+Return to [[Five Layers of a Harness]] or [[Harness Engineering - MOC]].

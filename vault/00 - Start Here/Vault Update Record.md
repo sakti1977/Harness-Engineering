@@ -1,7 +1,7 @@
 ---
 type: verification-record
 status: locally-verified
-reviewed: 2026-09-27
+reviewed: 2026-09-28
 ---
 
 # Vault Update Record
@@ -35,3 +35,9 @@ External pilot feedback, independently produced evidence receipts, a second stac
 ## Update 2026-09-27
 
 The booking lab is replaced by the Jyotish Coach lab in [[First Executable Harness Lab]], modelled on incidents recorded in [[Jyotish Coach Sync and Age Incidents]]. The repository adds written verification routes (`docs/verify.md`), an interleaving sweep, route-aware failure messages and a fidelity ablation. Executed locally on Python 3.10, 3.12 and 3.13: the lab demo, sweep, ablation and 70 repository tests passed; the threaded stale-coaching check was repeated 30 times per variant without an unexpected result. Other inherited clinic scenarios in this vault remain instructional examples.
+
+## Update 2026-09-28
+
+Twenty core notes were rewritten around this repository's executable examples and now carry `status: maintained` with a review date: the two foundation notes, the five layer maps, [[Claim-to-Proof Matrix]], [[Verification Routes and Test Fidelity]], [[Feature Ledger as a Gate]], [[Cold-Session Checkpoint]], [[Authority Policy]], [[Scope Contract]], [[Readiness Contract]], [[Recovery Audit]], [[AGENTS.md as a Map]], [[Harness-Control Tests]], [[Minimal Harness Adoption Path]], [[False Passing Feature]] and [[Cold Session Loses Diagnosis]]. Each follows problem, mechanism, worked example, try it, limits. Every "try it" command was run against a clean clone before publishing.
+
+[[False Passing Feature]] now cites the evaluation pilot in `evals/jyotish/results/` as its measured counterpart; the pilot's limits (two runs per cell, Claude models only, one author) apply. Notes still marked `synthesized-from-shared-material` are inherited teaching summaries that have not yet been rewritten; treat them as orientation, not as a description of what this repository implements.

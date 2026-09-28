@@ -1,33 +1,33 @@
 ---
 type: moc
-status: synthesized-from-shared-material
+status: maintained
+reviewed: 2026-09-28
+provenance: inherited teaching material, rewritten around this repository's executable examples
 tags:
   - harness-engineering
   - power
+  - moc
 ---
 
 # Power - MOC
 
-## Core idea and problem
-What may the agent read, write, and execute?
+**What may the agent read, write and run, and what stays off limits?**
 
-## How it works
-Study these concepts in relation, not as independent tips.
+Capability and permission are different things. The model can do almost anything; the harness decides what this session may do. Power controls are strongest when they are enforced by a tool or a gate, and weakest when they only live in an instruction file.
 
-## Example / failure mode
-A missing layer can invalidate an otherwise plausible agent result.
+## In this repository
 
-## Implementation and verification notes
-Return to [[Harness Engineering - MOC]].
+- `docs/authority.md` states the policy and, crucially, which mechanism enforces each rule.
+- `harness_check.py --session` compares changed files with the feature's `expected_surface` and `excluded_paths`.
+- The transition gate refuses state changes outside the policy, so an agent cannot widen its own authority by editing the ledger.
 
-## Connected concepts
+## Notes
+
 - [[Authority Policy]]
 - [[Secret Handling]]
-- [[Three Tools and One Permit]]
-- [[Safe Exact-Anchor Editing]]
-
-## Further study
-
-- [[Untrusted Content and Prompt Injection]]
 - [[Sandbox Enforcement Matrix]]
 - [[MCP Identity and Network Boundaries]]
+- [[Untrusted Content and Prompt Injection]]
+- [[Scope Contract]]
+
+Return to [[Five Layers of a Harness]] or [[Harness Engineering - MOC]].

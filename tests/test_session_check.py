@@ -6,9 +6,21 @@ import importlib.util
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import unittest
+
+
+def remove_tree(path):
+    """shutil.rmtree that also removes read-only files (git objects on Windows)."""
+    def retry(func, name, _):
+        os.chmod(name, stat.S_IWRITE)
+        func(name)
+    if sys.version_info >= (3, 12):
+        shutil.rmtree(path, onexc=retry)
+    else:
+        shutil.rmtree(path, onerror=retry)
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("harness_check", ROOT / "scripts/harness_check.py")
@@ -31,8 +43,8 @@ class SessionChecks(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         for name in checker.CORE_FILES:
-            self.put(name, (ROOT / name).read_text())
-        self.feature = json.loads((ROOT / ".harness/feature.json").read_text())
+            self.put(name, (ROOT / name).read_text(encoding="utf-8"))
+        self.feature = json.loads((ROOT / ".harness/feature.json").read_text(encoding="utf-8"))
         self.feature["excluded_paths"] = ["examples/astro/migrations/"]
         self.save_feature()
         self.put("examples/astro/astro.py", "print('v1')\n")
@@ -47,7 +59,7 @@ class SessionChecks(unittest.TestCase):
     def put(self, name, text):
         path = self.root / name
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
+        path.write_text(text, encoding="utf-8")
 
     def git(self, *args):
         return subprocess.run(["git", "-C", str(self.root), *args], check=True,
@@ -216,7 +228,7 @@ class SessionChecks(unittest.TestCase):
 
     # safety and CLI ------------------------------------------------------
     def test_not_a_git_repository_fails_clearly(self):
-        shutil.rmtree(self.root / ".git")
+        remove_tree(self.root / ".git")
         self.assertEqual(self.codes(self.check(), ok=False), ["SESSION_GIT_UNAVAILABLE"])
 
     def test_invalid_ledger_skips_session_checks(self):
@@ -238,7 +250,7 @@ class SessionChecks(unittest.TestCase):
     def test_repository_fsmonitor_hook_is_not_run(self):
         marker = self.root.parent / f"{self.root.name}-fsmonitor-ran"
         hook = self.root / "hook.sh"
-        hook.write_text(f"#!/bin/sh\ntouch '{marker}'\n")
+        hook.write_text(f"#!/bin/sh\ntouch '{marker}'\n", encoding="utf-8")
         hook.chmod(0o755)
         self.git("add", "hook.sh")
         self.git("config", "core.fsmonitor", str(hook))

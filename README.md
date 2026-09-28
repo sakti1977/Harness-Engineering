@@ -13,7 +13,7 @@ This kit shows why in one command, and gives you small, checkable controls aroun
 
 ## Try it in 10 seconds
 
-Python 3.10+. No model key, no install, no network.
+Python 3.10+ on Linux, macOS or Windows. No model key, no install, no network.
 
 ```sh
 git clone https://github.com/sakti1977/Harness-Engineering.git
@@ -75,7 +75,7 @@ python3 scripts/harness_adopt.py --root /path/to/project            # preview; w
 python3 scripts/harness_adopt.py --root /path/to/project --apply    # create missing files; never overwrites
 ```
 
-This sets up a first feature to fill in, the contracts, instructions for Claude Code, Codex or Copilot, and optionally a CI workflow. Your project can be in any language. [Adoption guide](docs/adoption.md).
+This sets up a first feature to fill in, the contracts, instructions for Claude Code, Codex, Copilot, Gemini CLI or Cursor, and optionally a CI workflow. Your project can be in any language. [Adoption guide](docs/adoption.md).
 
 ## Why this exists
 

@@ -1,6 +1,8 @@
 ---
 type: concept
-status: synthesized-from-shared-material
+status: maintained
+reviewed: 2026-09-28
+provenance: inherited teaching material, rewritten around this repository's executable examples
 tags:
   - harness-engineering
   - verdict
@@ -8,26 +10,44 @@ tags:
 
 # Verification Routes and Test Fidelity
 
-## Core idea and problem
-A run proves only the path it exercised. Sequential and mocked tests can miss production races.
+## Problem
 
-## How it works
-Route fields Claim, Entry, Boundaries, Setup, Actions, Observations, Cleanup. Check entry/state/timing/response/persistence fidelity. Create concurrent requests before awaiting; inspect responses and shared DB.
+A run proves only the path it exercised. Sequential tests cannot open a race window, mocked stores cannot reject a write, and a test pinned to one time zone cannot see an off-by-one-day age. The run is green and honest about what it did; the gap is between what it did and what the claim needs.
 
-## Example / failure mode
-Coaching reads chart version 1, the user corrects their birth time, and coaching still writes against version 1: a sequential test never opens that window.
+## Mechanism
 
-## Implementation and verification notes
-A faithful red E2E test is a successful harness detection; keep feature active.
+A verification route is the smallest run that crosses every boundary a claim depends on. Write it in seven fields: **claim, entry, boundaries, setup, actions, observations, cleanup**. Then compare it with production on five fidelity checks:
+
+| Check | Question |
+| --- | --- |
+| Entry | Does it call the same entry point real callers use? |
+| State | Do all actions share one store? |
+| Timing | Does it preserve the ordering or overlap that can change the result? |
+| Response | Does it assert exact visible outcomes, not "any status below 500"? |
+| Persistence | Does it read the lasting state back? |
+
+A route that fails one check is a different route and proves less. A faithful route that goes red is the harness working: the feature stays `active`.
+
+## Worked example
+
+The stale-coaching route in `docs/verify.md`: coaching reads the chart at version 1, pauses, the user saves a corrected birth time, then coaching writes. The observation is a 409 for the losing request and no coaching row whose chart version differs from the current one at write time. A sequential test (generate, then correct) never opens that window and passes on the broken app.
+
+## Try it
+
+```sh
+python3 -m examples.astro.sweep      # inject the correction at every step of generation
+python3 -m examples.astro.ablation   # weaken one fidelity check at a time
+```
+
+The sweep shows which interleavings expose the race. The ablation shows which weakenings turn the route into a false pass on the broken app, and which still catch it.
+
+## Limits
+
+A route is a hypothesis about where the claim can fail; it is only as good as the boundaries you listed. Deterministic pauses stand in for real scheduling and cannot prove the absence of every interleaving. Record the environment actually exercised ([Readiness Contract](../04%20-%20Ground/Readiness%20Contract.md)), and when a route fails, report the first divergence rather than the last symptom ([First Divergence and Failure Packet](First%20Divergence%20and%20Failure%20Packet.md)).
 
 ## Connected concepts
+
 - [Claim-to-Proof Matrix](Claim-to-Proof%20Matrix.md)
 - [Readiness Contract](../04%20-%20Ground/Readiness%20Contract.md)
-- [First Divergence and Failure Packet](First%20Divergence%20and%20Failure%20Packet.md)
-
-## Practical extension
-
-The repository's `docs/verify.md` writes each route down with seven fields (claim, entry, boundaries, setup, actions, observations, cleanup) and compares it on five fidelity checks (entry, state, timing, response, persistence). `python3 -m examples.astro.sweep` injects the competing write at every step, and `python3 -m examples.astro.ablation` weakens one fidelity dimension at a time to show which weakenings produce a false pass.
-
-
-Run a helper check and persistent-state checks on the same broken implementation to see the proof gap. See [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md) for the worked exercise and primary-source context. This addition does not change the legacy provenance recorded in [Source Coverage Index](../00%20-%20Start%20Here/Source%20Coverage%20Index.md).
+- [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md)
+- [Harness Ablation Experiments](../10%20-%20Harness%20Testing/Harness%20Ablation%20Experiments.md)

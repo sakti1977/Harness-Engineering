@@ -19,26 +19,26 @@ class DocumentationTools(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "Topic Folder").mkdir()
-            (root / "Topic Folder/Target.md").write_text("# Target\n")
-            (root / "Index.md").write_text("[[Target|Read this]]\n")
+            (root / "Topic Folder/Target.md").write_text("# Target\n", encoding="utf-8")
+            (root / "Index.md").write_text("[[Target|Read this]]\n", encoding="utf-8")
             self.assertEqual(exporter.render(root)[Path("Index.md")], "[Read this](Topic%20Folder/Target.md)\n")
 
     def test_unresolved_and_ambiguous_links_fail(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "Index.md").write_text("[[Missing]]")
+            (root / "Index.md").write_text("[[Missing]]", encoding="utf-8")
             with self.assertRaises(ValueError):
                 exporter.render(root)
-            (root / "Missing.md").write_text("one")
+            (root / "Missing.md").write_text("one", encoding="utf-8")
             (root / "other").mkdir()
-            (root / "other/Missing.md").write_text("two")
+            (root / "other/Missing.md").write_text("two", encoding="utf-8")
             with self.assertRaises(ValueError):
                 exporter.render(root)
 
     def test_missing_local_link_is_detected_but_external_is_not_fetched(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "README.md").write_text("[missing](no.md) [external](https://example.com)\n")
+            (root / "README.md").write_text("[missing](no.md) [external](https://example.com)\n", encoding="utf-8")
             found = checker.errors(root)
             self.assertEqual(len(found), 1)
             self.assertIn("no.md", found[0])

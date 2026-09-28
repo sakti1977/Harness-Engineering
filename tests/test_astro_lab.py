@@ -23,18 +23,18 @@ class AstroLabTools(unittest.TestCase):
         self.assertEqual(verdicts, ablation.EXPECTED)
 
     def test_route_messages_point_at_real_routes(self):
-        verify = (ROOT / "docs/verify.md").read_text()
+        verify = (ROOT / "docs/verify.md").read_text(encoding="utf-8")
         anchors = {"route-" + m for m in re.findall(r"^## Route: ([a-z-]+)$", verify, re.M)}
-        source = (ROOT / "examples/astro/test_astro.py").read_text()
+        source = (ROOT / "examples/astro/test_astro.py").read_text(encoding="utf-8")
         used = {"route-" + name for name in re.findall(r'route_failure\(\s*"[^"]+",\s*"([a-z-]+)"', source)}
         self.assertEqual(len(used), 3, used)
         self.assertLessEqual(used, anchors)
         self.assertIn("ROUTE     docs/verify.md#route-profile-sync", route_failure("c", "profile-sync", "e", "o", "r"))
 
     def test_every_claim_has_a_route(self):
-        verify = (ROOT / "docs/verify.md").read_text()
+        verify = (ROOT / "docs/verify.md").read_text(encoding="utf-8")
         import json
-        for claim in json.loads((ROOT / ".harness/feature.json").read_text())["claims"]:
+        for claim in json.loads((ROOT / ".harness/feature.json").read_text(encoding="utf-8"))["claims"]:
             self.assertIn(f"| Claim | {claim} |", verify)
 
 

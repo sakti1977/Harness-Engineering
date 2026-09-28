@@ -31,7 +31,7 @@ def portable(text):
 
 
 def resume_protocol():
-    text = (KIT / "AGENTS.md").read_text()
+    text = (KIT / "AGENTS.md").read_text(encoding="utf-8")
     return portable(text[text.index(PROTOCOL_START):].strip() + "\n")
 
 
@@ -140,6 +140,28 @@ The harness commands live in the Harness Engineering kit. Set `HARNESS_KIT` to y
 """
 
 CLAUDE = "# Claude Code instructions\n\nFollow the agent instructions, including the Resume Protocol and the handoff gate:\n\n@AGENTS.md\n"
+GEMINI = "# Gemini CLI instructions\n\nFollow the agent instructions in AGENTS.md, including the Resume Protocol and the handoff gate:\n\n@./AGENTS.md\n"
+CURSOR = "---\ndescription: Harness Engineering Resume Protocol and handoff gate\nalwaysApply: true\n---\n\n"
+
+# Instruction files per agent tool: (path, content builder, note). Tools that import AGENTS.md also get AGENTS.md.
+TARGETS = ("agents", "claude", "copilot", "gemini", "cursor")
+INSTRUCTION_FILES = ("AGENTS.md", "CLAUDE.md", "GEMINI.md", ".github/copilot-instructions.md", ".cursor/rules/harness.mdc")
+IMPORTS_AGENTS = {"CLAUDE.md", "GEMINI.md"}
+
+
+def parse_agents(value):
+    """'all', 'none', or a comma-separated list of TARGETS. Returns a set."""
+    if value == "all":
+        return set(TARGETS)
+    if value == "none":
+        return set()
+    chosen = {part.strip() for part in value.split(",") if part.strip()}
+    unknown = chosen - set(TARGETS)
+    if not chosen or unknown:
+        named = ", ".join(sorted(unknown)) if unknown else repr(value)
+        raise ValueError(f"unknown --agents value {named}; "
+                         f"use all, none or a comma-separated list of {', '.join(TARGETS)}")
+    return chosen
 
 WORKFLOW = """name: Harness
 on: [push, pull_request]
@@ -151,15 +173,15 @@ jobs:
     env:
       HARNESS_KIT: .harness-kit
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           repository: sakti1977/Harness-Engineering
           ref: main   # pin to a release tag or commit you have reviewed
           path: .harness-kit
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Harness artifacts, proof plan and transition log
@@ -175,25 +197,33 @@ def plan(root, agents, ci):
     kit = str(KIT)
     files = [
         (".harness/feature.json", feature_ledger(root.name), "the first feature: fill outcome, surface, verification and claims"),
-        (".harness/checkpoint.md", portable((KIT / "templates/core/.harness/checkpoint.md").read_text()), "written by harness_handoff.py --write"),
+        (".harness/checkpoint.md", portable((KIT / "templates/core/.harness/checkpoint.md").read_text(encoding="utf-8")), "written by harness_handoff.py --write"),
         ("docs/authority.md", AUTHORITY.format(kit=kit), "fill the TODOs for this project"),
-        ("docs/scope-contract.md", (KIT / "templates/core/docs/scope-contract.md").read_text(), "reference; no edits needed"),
+        ("docs/scope-contract.md", (KIT / "templates/core/docs/scope-contract.md").read_text(encoding="utf-8"), "reference; no edits needed"),
         ("docs/proof-matrix.md", PROOF_MATRIX.format(kit=kit), "one row per claim"),
-        ("docs/readiness.md", (KIT / "templates/core/docs/readiness.md").read_text(), "reference; add your readiness probes"),
+        ("docs/readiness.md", (KIT / "templates/core/docs/readiness.md").read_text(encoding="utf-8"), "reference; add your readiness probes"),
         ("docs/verify.md", VERIFY.format(kit=kit), "one route per claim that crosses a boundary"),
     ]
     protocol = resume_protocol()
     files.append((".harness/agent-protocol.md", "# Resume Protocol and handoff gate\n\nKeep this in your agent "
-                  "instructions (AGENTS.md, CLAUDE.md or .github/copilot-instructions.md).\n\n" + protocol,
+                  "instructions (for example AGENTS.md, CLAUDE.md, GEMINI.md, .github/copilot-instructions.md "
+                  "or a Cursor rule).\n\n" + protocol,
                   "the protocol to keep in your agent instructions"))
-    if agents in ("agents", "all"):
-        files.append(("AGENTS.md", AGENTS.format(kit=kit) + protocol, "Resume Protocol and handoff gate for any agent"))
-    if agents in ("claude", "all"):
-        files.append(("CLAUDE.md", CLAUDE, "imports AGENTS.md"))
-        if agents == "claude":
-            files.append(("AGENTS.md", AGENTS.format(kit=kit) + protocol, "imported by CLAUDE.md"))
-    if agents in ("copilot", "all"):
-        files.append((".github/copilot-instructions.md", AGENTS.format(kit=kit) + protocol, "Copilot reads this on every request"))
+    agents = parse_agents(agents) if isinstance(agents, str) else set(agents)
+    instructions = AGENTS.format(kit=kit) + protocol
+    if agents & {"agents", "claude", "gemini"}:
+        importers = sorted({"claude": "CLAUDE.md", "gemini": "GEMINI.md"}[a] for a in agents & {"claude", "gemini"})
+        note = ("Resume Protocol and handoff gate for any agent (Codex, Cursor and others read it natively)"
+                if "agents" in agents else f"imported by {' and '.join(importers)}")
+        files.append(("AGENTS.md", instructions, note))
+    if "claude" in agents:
+        files.append(("CLAUDE.md", CLAUDE, "Claude Code; imports AGENTS.md"))
+    if "gemini" in agents:
+        files.append(("GEMINI.md", GEMINI, "Gemini CLI; imports AGENTS.md"))
+    if "copilot" in agents:
+        files.append((".github/copilot-instructions.md", instructions, "Copilot reads this on every request"))
+    if "cursor" in agents:
+        files.append((".cursor/rules/harness.mdc", CURSOR + instructions, "Cursor project rule, always applied"))
     if ci:
         files.append((".github/workflows/harness.yml", WORKFLOW, "runs the checker on every push and PR"))
     return files
@@ -205,6 +235,7 @@ def safe_target(root, relative):
     parent = target.parent
     while not parent.exists():
         parent = parent.parent
+    root = root.resolve()
     if not parent.resolve().is_relative_to(root) or (target.is_symlink() and not target.resolve().is_relative_to(root)):
         raise ValueError(f"{relative} resolves outside the project")
     return target
@@ -222,11 +253,12 @@ def adopt(root, *, apply=False, agents="agents", ci=False):
             continue
         if target.exists() or target.is_symlink():
             actions.append(("skip", relative, "exists; left unchanged"))
-            if relative in ("AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md") and \
-                    PROTOCOL_START not in target.read_text(errors="replace"):
+            existing = target.read_text(errors="replace", encoding="utf-8") if target.is_file() else ""
+            if relative in INSTRUCTION_FILES and PROTOCOL_START not in existing and \
+                    not (relative in IMPORTS_AGENTS and "@AGENTS.md" in existing.replace("@./AGENTS.md", "@AGENTS.md")):
                 hints.append(f"{relative} already exists: add the Resume Protocol and handoff gate to it by hand, "
                              "copying them from .harness/agent-protocol.md"
-                             + (" (or add the line @AGENTS.md)." if relative == "CLAUDE.md" else "."))
+                             + (" (or add the line @AGENTS.md)." if relative in IMPORTS_AGENTS else "."))
             continue
         actions.append(("create", relative, note))
         if apply:
@@ -268,12 +300,17 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--root", type=Path, required=True, help="the project to adopt the harness in")
     parser.add_argument("--apply", action="store_true", help="write the files (default: preview only)")
-    parser.add_argument("--agents", choices=("agents", "claude", "copilot", "all", "none"), default="agents",
-                        help="which agent instruction files to create (default: AGENTS.md)")
+    parser.add_argument("--agents", default="agents", metavar="LIST",
+                        help="instruction files to create: all, none, or a comma-separated list of "
+                             f"{', '.join(TARGETS)} (default: agents, which creates AGENTS.md)")
     parser.add_argument("--ci", action="store_true", help="also create .github/workflows/harness.yml")
     args = parser.parse_args(argv)
     if not args.root.is_dir():
         parser.error("--root must be an existing directory")
+    try:
+        parse_agents(args.agents)
+    except ValueError as error:
+        parser.error(str(error))
     root = args.root.resolve()
     if root == KIT:
         parser.error("--root is this kit; point it at your own project")

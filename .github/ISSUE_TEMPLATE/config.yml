@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security problem
+    url: https://github.com/sakti1977/Harness-Engineering/security/advisories/new
+    about: Report a vulnerability or exposed data privately, not in a public issue.
+  - name: Share evaluation results
+    url: https://github.com/sakti1977/Harness-Engineering/blob/main/evals/jyotish/README.md
+    about: Ran the Jyotish evaluation with another agent or model? Open an issue with both scripts' JSON output.

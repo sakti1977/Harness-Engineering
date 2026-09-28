@@ -30,7 +30,7 @@ One fixture protects one modeled failure. Deduplicating cases improves maintenan
 
 ## Sources and interpretation
 
-[LangChain: Better Harness](https://www.langchain.com/blog/better-harness-a-recipe-for-harness-hill-climbing-with-evals) uses failures and traces to guide evaluations. The local booking fixture is a synthetic teaching example.
+[LangChain: Better Harness](https://www.langchain.com/blog/better-harness-a-recipe-for-harness-hill-climbing-with-evals) uses failures and traces to guide evaluations. The local Jyotish Coach lab is a model-free teaching example built from two real incidents; `evals/jyotish` is the live-agent counterpart.
 
 The worked example and exercise are local teaching designs unless identified as executed in [[Vault Update Record]]. Source findings do not establish that this design is best for every project.
 
