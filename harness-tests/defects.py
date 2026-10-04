@@ -359,3 +359,60 @@ def checkpoint_revision_only(s):
     """Someone started a handoff (filled the revision) but wrote nothing else: that is not 'no handoff'."""
     s.write(".harness/checkpoint.md", s.read(".harness/checkpoint.md").replace(
         "- Revision: <git rev-parse HEAD>", f"- Revision: {s.head()}"))
+
+
+# attempt gate: every setup uses the real gate; only the fault is hand-made -------------------
+ATTEMPT_KEY, ATTEMPT_PAYLOAD = "review-1", "run the smoke suite on staging"
+
+
+def attempt_run(s, outcome, *, key=ATTEMPT_KEY, actor="copilot-agent"):
+    def work():
+        if outcome == "lost":
+            raise TimeoutError("no response before the timeout")
+        if outcome == "fail":
+            raise RuntimeError("the test environment refused the run")
+        return {"records": 1}
+    return s.attempt.execute(s.root, key, ATTEMPT_PAYLOAD, work, actor=actor)
+
+
+def attempt_timed_out(s):
+    attempt_run(s, "lost")
+
+
+def attempt_caller_died(s):
+    s.attempt.begin(s.root, ATTEMPT_KEY, ATTEMPT_PAYLOAD, actor="copilot-agent")   # intent written, no outcome ever recorded
+
+
+def attempt_unreconcilable(s):
+    attempt_run(s, "lost")
+    s.attempt.reconcile(s.root, ATTEMPT_KEY, lambda: None, actor="copilot-agent")
+
+
+def attempt_probe_found_nothing(s):
+    attempt_run(s, "lost")
+    s.attempt.reconcile(s.root, ATTEMPT_KEY, lambda: False, actor="copilot-agent")
+
+
+def attempt_completed(s):
+    attempt_run(s, "ok")
+
+
+def attempt_failed_once(s):
+    attempt_run(s, "fail")
+
+
+def attempt_failed_three_times(s):
+    for _ in range(3):
+        attempt_run(s, "fail")
+
+
+def attempt_stopped(s):
+    s.attempt.stop(s.root, actor="sakti", reason="pause while I look")
+
+
+def attempt_ledger_edited(s):
+    attempt_run(s, "ok", key="review-0")
+    attempt_run(s, "ok", key="review-2")
+    path = s.root / ".harness/attempts.jsonl"
+    path.write_text(path.read_text(encoding="utf-8").replace('"actor":"copilot-agent"', '"actor":"somebody-else"', 1),
+                    encoding="utf-8")

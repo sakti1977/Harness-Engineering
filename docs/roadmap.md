@@ -18,6 +18,7 @@
 - Evaluation: the Jyotish user reports given to agents with and without the harness, with a hidden grader, a regression check and a 12-run Claude pilot.
 - Session handoff: a checkpoint written from the observed repository, a handoff gate for the end of a session and a Resume Protocol that treats stale checkpoints as failed checks.
 - Harness tests: every gate runs against a defect fixture and a clean fixture on each change and weekly; uncovered failure codes fail the build.
+- Attempt gate: work with side effects runs once per intent; a timeout is recorded as unknown and refused until reconciled or settled by an independent operator; kill switch, bounded retries, prerequisite checks and a simulated lost-response demo.
 
 ## Next acceptance gates
 
