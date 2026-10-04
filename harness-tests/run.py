@@ -27,7 +27,7 @@ CODE = re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b")
 # Codes that report success or information, and environment variable names, are not gates.
 NOT_FAILURES = {"ARTIFACT_PRESENT", "CLAIM_PENDING", "CLAIM_PROVEN", "EXCLUSIONS_REMINDER",
                 "LOG_VERIFIED", "PROOF_COVERED", "SESSION_CHANGES"}
-GATES = ("artifacts", "session", "transition", "handoff", "resume")
+GATES = ("artifacts", "session", "transition", "handoff", "resume", "attempt")
 GIT_ENV = dict(os.environ, GIT_AUTHOR_NAME="harness", GIT_AUTHOR_EMAIL="harness@example.com",
                GIT_COMMITTER_NAME="harness", GIT_COMMITTER_EMAIL="harness@example.com",
                GIT_CONFIG_COUNT="3", GIT_CONFIG_KEY_0="gc.auto", GIT_CONFIG_VALUE_0="0",
@@ -45,6 +45,7 @@ def load(name, path):
 check = load("harness_check", ROOT / "scripts/harness_check.py")
 mover = load("harness_transition", ROOT / "scripts/harness_transition.py")
 handoff = load("harness_handoff", ROOT / "scripts/harness_handoff.py")
+attempt = load("harness_attempt", ROOT / "scripts/harness_attempt.py")
 defects = load("harness_defects", HERE / "defects.py")
 
 
@@ -53,6 +54,7 @@ class Scratch:
 
     check = check
     handoff = handoff
+    attempt = attempt
 
     def __init__(self, root):
         self.root = root
@@ -104,6 +106,15 @@ def receipt(gate, root, entry):
         return sorted({f["code"] for f in handoff.handoff_findings(root)})
     if gate == "resume":
         return sorted({f["code"] for f in handoff.resume_findings(root)[0]})
+    if gate == "attempt":
+        spec = entry["attempt"]
+        if spec["op"] == "start":
+            found = attempt.permission(root, spec["key"], spec["payload"], spec.get("preconditions"))
+        elif spec["op"] == "resolve":
+            found = attempt.resolution_findings(root, spec["key"], spec["verdict"], spec["actor"], spec["role"])
+        else:
+            found = attempt.go_findings(root, spec["role"])
+        return sorted({f.code for f in found})
     raise ValueError(f"unknown gate {gate!r}")
 
 
@@ -120,7 +131,7 @@ def run_entry(entry):
 
 def gate_codes():
     """Every failure code the gates can emit, read from their source."""
-    source = "".join((ROOT / f"scripts/{name}.py").read_text(encoding="utf-8") for name in ("harness_check", "harness_transition", "harness_handoff"))
+    source = "".join((ROOT / f"scripts/{name}.py").read_text(encoding="utf-8") for name in ("harness_check", "harness_transition", "harness_handoff", "harness_attempt"))
     literals = set(re.findall(r'"([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)', source))
     return {code for code in literals if code not in NOT_FAILURES and not code.startswith("GIT_")}
 

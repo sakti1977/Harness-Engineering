@@ -46,6 +46,13 @@ class HarnessTests(unittest.TestCase):
         with patch.object(runner.check, "proof_findings", return_value=[]):
             self.assertEqual(runner.run_entry(entries("proof-boundary-gap")[0]), [])
 
+    def test_disabled_attempt_gate_is_caught(self):
+        with patch.object(runner.attempt, "_decide", return_value=[]):
+            self.assertEqual(runner.run_entry(entries("attempt-timeout-blocks-retry")[0]), [])
+            self.assertEqual(runner.run_entry(entries("attempt-kill-switch")[0]), [])
+        with patch.object(runner.attempt, "resolution_findings", return_value=[]):
+            self.assertEqual(runner.run_entry(entries("attempt-resolve-by-starter")[0]), [])
+
     def test_new_code_without_fixture_is_uncovered(self):
         with patch.object(runner, "gate_codes", return_value=runner.gate_codes() | {"NEW_GATE_DENIED"}):
             problems = runner.coverage_problems(MANIFEST)

@@ -20,6 +20,7 @@ git clone https://github.com/sakti1977/Harness-Engineering.git
 cd Harness-Engineering
 python3 -m examples.astro.demo    # green tests on a broken app, then the checks that catch it
 python3 -m examples.gate.demo     # an agent tries to mark its own work done
+python3 -m examples.gate.timeout_demo   # a lost response: one run and one record, not four
 ```
 
 The lab models [Jyotish Coach](https://github.com/sakti1977/astro-coach), a Vedic astrology coaching app I am building:
@@ -64,6 +65,7 @@ Every harness run also left a test that catches the race if it comes back (3 of 
 | Session check | Changed files against the feature's scope, claims against evidence | [checker](docs/checker.md) |
 | Handoff gate and Resume Protocol | A checkpoint written from the real repository; a stale one fails instead of misleading the next session | [handoff](docs/handoff.md), [AGENTS.md](AGENTS.md) |
 | Authority policy | What an agent may read, write and run, and what actually enforces each rule | [authority](docs/authority.md) |
+| Attempt gate | Work with side effects runs once per intent; a timeout is recorded as unknown, not retried; reconcile, an independent operator decision and a kill switch settle it | [attempts](docs/attempts.md) |
 | Harness tests | Every gate runs against a named defect and against clean work; a gate without both fails the build | [harness tests](harness-tests/README.md) |
 
 The controls are grouped into five layers (Reach, Power, Ground, Verdict, Carry). That grouping is this project's own synthesis, not an industry standard. The checker never runs your code: it reads files and git.

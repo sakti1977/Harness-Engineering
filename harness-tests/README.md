@@ -19,8 +19,8 @@ Harness tests: 66 entries, 1 problem(s).
 
 | Check | Fails when |
 | --- | --- |
-| `UNCOVERED` | a failure code appears in `scripts/harness_check.py`, `scripts/harness_transition.py` or `scripts/harness_handoff.py` with no manifest entry expecting it |
-| `NO_CLEAN_FIXTURE` | the `artifacts`, `session`, `transition`, `handoff` or `resume` gate has no entry it must pass |
+| `UNCOVERED` | a failure code appears in `scripts/harness_check.py`, `scripts/harness_transition.py`, `scripts/harness_handoff.py` or `scripts/harness_attempt.py` with no manifest entry expecting it |
+| `NO_CLEAN_FIXTURE` | the `artifacts`, `session`, `transition`, `handoff`, `resume` or `attempt` gate has no entry it must pass |
 | `FIXTURE_DRIFT` | a fixture lacks a core artifact, its ledger no longer matches the schema, or its proof matrix lacks the columns the checker reads |
 | `FAIL` | a gate returned a different receipt than expected |
 

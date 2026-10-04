@@ -22,6 +22,7 @@ python3 -m examples.astro.demo
 python3 -m examples.astro.sweep
 python3 -m examples.astro.ablation
 python3 -m examples.gate.demo
+python3 -m examples.gate.timeout_demo
 python3 scripts/export_handbook.py
 python3 scripts/check_docs.py
 ```

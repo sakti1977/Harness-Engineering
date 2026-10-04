@@ -4,6 +4,7 @@
 
 **Added**
 
+- **Attempt gate** (`scripts/harness_attempt.py`, [attempts](docs/attempts.md)): work with side effects runs at most once per intent. A timeout is recorded as `unknown` instead of a failure, and the same intent is refused until it is reconciled by a probe or settled by an independent operator. Includes a hash-chained attempt ledger, a stable key from what the work is, bounded retries for definite failures, prerequisite checks, a kill switch only an operator can lift, and saved command output so a replay returns the result instead of running again. `python3 -m examples.gate.timeout_demo` shows a lost response with and without it (simulated agent; not a measurement). It ships with 18 harness-test entries (every failure code, plus clean cases) and 39 unit tests.
 - Adopt writes instruction files for Gemini CLI (`GEMINI.md`) and Cursor (`.cursor/rules/harness.mdc`), and `--agents` takes a comma-separated list, for example `--agents claude,cursor`.
 - CI on macOS and Windows as well as Linux.
 - A code of conduct, a social preview image, and issue template links for security reports and evaluation results.
