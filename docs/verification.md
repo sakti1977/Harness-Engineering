@@ -1,5 +1,15 @@
 # Local verification record
 
+## 2026-10-04: attempt gate (unreleased)
+
+Host: Linux. Interpreters: Python 3.10, 3.11, 3.12 and 3.13. No model calls, paid APIs or third-party packages. Windows and macOS were not run locally; hosted CI for them is unverified for this change.
+
+- `python3 -m unittest discover -s tests`: 142 tests passed on each interpreter, 39 of them for the attempt gate.
+- `python3 harness-tests/run.py`: 84 entries, 0 problems (18 new `attempt` entries covering all ten codes, plus five clean cases).
+- `python3 -m examples.gate.timeout_demo`: `TIMEOUT DEMO PASSED`. In the simulation, 4 suite executions and 4 records without the gate; 1 and 1 with it, with a probe or with an operator decision.
+- Lab demo, gate demo, sweep and ablation: all report PASSED. Handbook export: 95 files verified. Documentation checks: 0 issues.
+- The agent in the demo is scripted. Time and tokens saved are not measured, and no live-agent improvement is claimed.
+
 ## 2026-09-28: portability and handbook update (unreleased)
 
 Host: Linux. Interpreters: Python 3.10, 3.12 and 3.13. Hosted CI: Linux (3.10, 3.12, 3.13), macOS and Windows (3.12). No model calls, paid APIs or third-party packages.

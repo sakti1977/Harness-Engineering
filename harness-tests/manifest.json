@@ -601,6 +601,240 @@
         "CHECKPOINT_STALE",
         "CHECKPOINT_UNDECLARED_UNVERIFIED"
       ]
+    },
+    {
+      "id": "clean-attempt-first-start",
+      "gate": "attempt",
+      "defect": "none",
+      "expect": [],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "clean-attempt-retry-after-definite-failure",
+      "gate": "attempt",
+      "defect": "attempt_failed_once",
+      "expect": [],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "clean-attempt-start-after-probe-found-nothing",
+      "gate": "attempt",
+      "defect": "attempt_probe_found_nothing",
+      "expect": [],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "clean-attempt-operator-resolves-timeout",
+      "gate": "attempt",
+      "defect": "attempt_timed_out",
+      "expect": [],
+      "attempt": {
+        "op": "resolve",
+        "key": "review-1",
+        "verdict": "complete",
+        "actor": "sakti",
+        "role": "operator"
+      }
+    },
+    {
+      "id": "clean-attempt-operator-lifts-stop",
+      "gate": "attempt",
+      "defect": "attempt_stopped",
+      "expect": [],
+      "attempt": {
+        "op": "go",
+        "role": "operator"
+      }
+    },
+    {
+      "id": "attempt-kill-switch",
+      "gate": "attempt",
+      "defect": "attempt_stopped",
+      "expect": [
+        "ATTEMPT_KILL_SWITCH"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "attempt-timeout-blocks-retry",
+      "gate": "attempt",
+      "defect": "attempt_timed_out",
+      "expect": [
+        "ATTEMPT_OUTCOME_UNKNOWN"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "attempt-dead-caller-blocks-retry",
+      "gate": "attempt",
+      "defect": "attempt_caller_died",
+      "expect": [
+        "ATTEMPT_OUTCOME_UNKNOWN"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "attempt-unreconcilable-blocks-retry",
+      "gate": "attempt",
+      "defect": "attempt_unreconcilable",
+      "expect": [
+        "ATTEMPT_OUTCOME_UNKNOWN"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "attempt-completed-work-not-rerun",
+      "gate": "attempt",
+      "defect": "attempt_completed",
+      "expect": [
+        "ATTEMPT_ALREADY_COMPLETE"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "attempt-key-reused-for-other-work",
+      "gate": "attempt",
+      "defect": "attempt_failed_once",
+      "expect": [
+        "ATTEMPT_KEY_PAYLOAD_MISMATCH"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the full suite on production"
+      }
+    },
+    {
+      "id": "attempt-prerequisite-missing",
+      "gate": "attempt",
+      "defect": "none",
+      "expect": [
+        "ATTEMPT_PRECONDITION_FAILED"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging",
+        "preconditions": {
+          "vpn": false,
+          "lock-clear": true
+        }
+      }
+    },
+    {
+      "id": "attempt-failure-budget-exhausted",
+      "gate": "attempt",
+      "defect": "attempt_failed_three_times",
+      "expect": [
+        "ATTEMPT_BUDGET_EXHAUSTED"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-1",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "attempt-edited-ledger",
+      "gate": "attempt",
+      "defect": "attempt_ledger_edited",
+      "expect": [
+        "ATTEMPT_LEDGER_INVALID"
+      ],
+      "attempt": {
+        "op": "start",
+        "key": "review-3",
+        "payload": "run the smoke suite on staging"
+      }
+    },
+    {
+      "id": "attempt-resolve-by-worker",
+      "gate": "attempt",
+      "defect": "attempt_timed_out",
+      "expect": [
+        "ATTEMPT_ROLE_DENIED"
+      ],
+      "attempt": {
+        "op": "resolve",
+        "key": "review-1",
+        "verdict": "complete",
+        "actor": "sakti",
+        "role": "worker"
+      }
+    },
+    {
+      "id": "attempt-resolve-by-starter",
+      "gate": "attempt",
+      "defect": "attempt_timed_out",
+      "expect": [
+        "ATTEMPT_RESOLVE_NOT_INDEPENDENT"
+      ],
+      "attempt": {
+        "op": "resolve",
+        "key": "review-1",
+        "verdict": "complete",
+        "actor": "copilot-agent",
+        "role": "operator"
+      }
+    },
+    {
+      "id": "attempt-resolve-nothing-pending",
+      "gate": "attempt",
+      "defect": "attempt_completed",
+      "expect": [
+        "ATTEMPT_RESOLVE_NOT_PENDING"
+      ],
+      "attempt": {
+        "op": "resolve",
+        "key": "review-1",
+        "verdict": "complete",
+        "actor": "sakti",
+        "role": "operator"
+      }
+    },
+    {
+      "id": "attempt-lift-stop-by-worker",
+      "gate": "attempt",
+      "defect": "attempt_stopped",
+      "expect": [
+        "ATTEMPT_ROLE_DENIED"
+      ],
+      "attempt": {
+        "op": "go",
+        "role": "worker"
+      }
     }
   ]
 }
