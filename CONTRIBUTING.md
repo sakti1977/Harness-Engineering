@@ -11,6 +11,8 @@ Start with a reproducible harness failure or a source correction. Small changes 
 
 For bounded starter tasks, see [contributor tasks](docs/handbook/00%20-%20Start%20Here/Contributor%20Tasks.md).
 
+You can also run the [three-developer adoption pilot](docs/pilot/README.md). Share de-identified friction and actual outcomes; incomplete attempts are useful contributions.
+
 ## Local checks
 
 Python 3.10+ is required. No third-party dependencies or model keys are needed.

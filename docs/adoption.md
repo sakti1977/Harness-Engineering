@@ -59,6 +59,10 @@ python3 $HARNESS_KIT/scripts/harness_handoff.py --root . --resume             # 
 
 Protect `.harness/feature-log.jsonl` and `.harness/evidence.json` with CODEOWNERS and branch protection, so only a person or CI records `passing`. See [transitions](transitions.md) and [handoff](handoff.md).
 
+## Help improve the adoption experience
+
+Try the [independent adoption pilot](pilot/README.md), with participant instructions and a feedback template. It distinguishes unaided completion, assisted completion and transfer to your own bug; no participant results are assumed.
+
 ## Limits
 
 The kit's commands need Python 3.10+; your project can be in any language, because the gates read files and git and never execute your code. Instruction files are guidance, not permission enforcement: pair them with your agent tool's permission settings. Adopt does not merge into existing files, and it does not know your domain: every TODO needs a person.
