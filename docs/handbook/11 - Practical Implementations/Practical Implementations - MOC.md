@@ -2,6 +2,8 @@
 
 Select a mechanism, study its limits and record the result of its exercise.
 
+- [Adopt One Outcome - Walkthrough](Adopt%20One%20Outcome%20-%20Walkthrough.md)
+- [Developer Problems - Start Here](../00%20-%20Start%20Here/Developer%20Problems%20-%20Start%20Here.md)
 - [Project Harness Assessment](Project%20Harness%20Assessment.md)
 - [First Executable Harness Lab](First%20Executable%20Harness%20Lab.md)
 - [Minimal Harness Adoption Path](Minimal%20Harness%20Adoption%20Path.md)

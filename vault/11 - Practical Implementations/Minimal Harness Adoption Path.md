@@ -10,6 +10,10 @@ tags:
 
 # Minimal Harness Adoption Path
 
+## Start with a filled example
+
+[[Adopt One Outcome - Walkthrough]] supplies an outcome contract, proof routes, regression tests and checkpoint in a disposable project. Use one outcome and one regression first; expand controls when observed failures justify them.
+
 ## Problem
 
 Teams that adopt a harness all at once build controls for failures they have never seen: ledgers, journals, compaction rules and sandboxes that cost maintenance and catch nothing. The result is ceremony, and the first time a control blocks real work it gets switched off.

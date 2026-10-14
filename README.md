@@ -72,6 +72,8 @@ The controls are grouped into five layers (Reach, Power, Ground, Verdict, Carry)
 
 ## Adopt it in your project
 
+Start with a [filled, minimal walkthrough](docs/handbook/11%20-%20Practical%20Implementations/Adopt%20One%20Outcome%20-%20Walkthrough.md), or [choose a control by the failure you see](docs/handbook/00%20-%20Start%20Here/Developer%20Problems%20-%20Start%20Here.md).
+
 ```sh
 python3 scripts/harness_adopt.py --root /path/to/project            # preview; writes nothing
 python3 scripts/harness_adopt.py --root /path/to/project --apply    # create missing files; never overwrites

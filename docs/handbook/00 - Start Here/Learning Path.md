@@ -16,6 +16,8 @@ Choose a route by what you need to do. The milestones below are observable outco
 
 ## Improve an existing project
 
+First complete [Adopt One Outcome - Walkthrough](../11%20-%20Practical%20Implementations/Adopt%20One%20Outcome%20-%20Walkthrough.md) for a filled example. Then apply the route below to one failure in your own project.
+
 1. Follow [Project Harness Assessment](../11%20-%20Practical%20Implementations/Project%20Harness%20Assessment.md) and [Recovery Audit](../02%20-%20Reach/Recovery%20Audit.md). **Milestone:** identify one observed failure and the control that owns it.
 2. Fill [Task Contract Template](../Templates/Task%20Contract%20Template.md), then read [Authority Policy](../03%20-%20Power/Authority%20Policy.md) and [Readiness Contract](../04%20-%20Ground/Readiness%20Contract.md). **Milestone:** record the change boundary and a reviewed verification command.
 3. Use [Claim-to-Proof Matrix](../06%20-%20Verdict/Claim-to-Proof%20Matrix.md) and [Failure to Evaluation Workflow](../10%20-%20Harness%20Testing/Failure%20to%20Evaluation%20Workflow.md). **Milestone:** produce a regression that fails on the defect and passes on the fix.

@@ -8,6 +8,10 @@ reviewed: 2026-09-26
 
 Connect every important recommendation to a failure, explanation, control, test and limitation. This roadmap separates delivered learning content and local implementation from experiments still requiring evidence.
 
+## Status of this dated roadmap
+
+This checklist records the September foundation. The public kit has since added adoption, transition and handoff mechanisms and links initial agent trials. Use [Companion Version and Sync](Companion%20Version%20and%20Sync.md), the executable docs and the results at your checked-out revision for current status. Older pending items do not establish that those features are absent today.
+
 ## Research and current evidence
 
 - [Harness knowledge base expansion](../reports/Harness%20knowledge%20base%20expansion.md) — original research and release proposal, preserved as a dated snapshot.

@@ -9,6 +9,8 @@ Start with a reproducible harness failure or a source correction. Small changes 
 - A clean example and a seeded failure that verifies the mechanism.
 - Exact commands and results; distinguish executed tests from proposed experiments.
 
+For bounded starter tasks, see [contributor tasks](docs/handbook/00%20-%20Start%20Here/Contributor%20Tasks.md).
+
 ## Local checks
 
 Python 3.10+ is required. No third-party dependencies or model keys are needed.
@@ -17,6 +19,7 @@ Python 3.10+ is required. No third-party dependencies or model keys are needed.
 python3 scripts/harness_check.py --adapter copilot
 python3 harness-tests/run.py
 python3 -m unittest discover -s tests -v
+python3 -m unittest examples.adoption.test_project -v
 python3 -m unittest examples.astro.test_astro -v
 python3 -m examples.astro.demo
 python3 -m examples.astro.sweep

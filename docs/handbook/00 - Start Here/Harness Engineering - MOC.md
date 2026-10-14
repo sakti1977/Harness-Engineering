@@ -13,6 +13,9 @@ Each note's `status` says how far to trust it. `maintained` notes were rewritten
 
 ## Start here
 
+- [Developer Problems - Start Here](Developer%20Problems%20-%20Start%20Here.md) — choose a control by the failure you see.
+- [Adopt One Outcome - Walkthrough](../11%20-%20Practical%20Implementations/Adopt%20One%20Outcome%20-%20Walkthrough.md) — filled contracts and a disposable defect/fix project.
+
 - [Learning Path](Learning%20Path.md) — beginner, project maintainer and runtime builder routes.
 - [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md) — demonstrate a false pass and a verified local fix.
 - [Project Harness Assessment](../11%20-%20Practical%20Implementations/Project%20Harness%20Assessment.md) — choose the next useful control for your project.

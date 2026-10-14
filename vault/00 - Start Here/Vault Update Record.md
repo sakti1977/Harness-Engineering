@@ -6,6 +6,20 @@ reviewed: 2026-09-28
 
 # Vault Update Record
 
+## Minimal adoption walkthrough — 2026-10-14
+
+Integrated [[Adopt One Outcome - Walkthrough]], [[Developer Problems - Start Here]], [[Contributor Tasks]] and [[Companion Version and Sync]]. The standalone adoption lab includes filled task/proof/checkpoint artifacts, a seeded duplicate-booking defect and a reviewed fix. CI exercises its integration and file-preservation checks; canonical and handbook lab copies remain identical.
+
+Executed on Linux, Python 3.14.4, against a checkout based on `6006f0674a0bfc50e3317679c8f111268979346c`:
+
+- Four adoption integration checks and seven current Astro tests passed. The seeded project fails exactly two outcome checks, and all three pass after the fix; contracts and tests are preserved.
+- Documented create/fix commands passed from the repository root and from `vault/Labs`.
+- Artifact validation, Astro demo/sweep/ablation and gate/timeout demos passed.
+- All 84 harness manifest entries and 142 repository tests passed with `GIT_DISCOVERY_ACROSS_FILESYSTEM=1`. Without that setting, this host injects a filesystem-boundary diagnostic into the existing no-Git fixture, causing one manifest comparison failure and its corresponding unit-test failure. No fixture or gate behavior was changed to hide it.
+- Handbook generation/parity and local documentation/lab-copy checks passed.
+
+These are local synthetic results. CI platforms, independent-user completion time and real-project transfer still require observation. No model calls, production data or external-user feedback were used. Historical results below retain their original scope and date.
+
 ## What changed
 
 The expansion adds source-backed notes on evaluation, grading, security boundaries, reproducible environments, context retrieval, tool usability, retries, budgets, memory, tracing and delegation. It adds a source register, repository pattern atlas, five reusable templates, three learning routes and a runnable synthetic booking lab.
