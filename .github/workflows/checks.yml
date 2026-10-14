@@ -25,6 +25,7 @@ jobs:
       - name: Harness tests (every gate against its defect and clean fixtures)
         run: python harness-tests/run.py
       - run: python -m unittest examples.astro.test_astro -v
+      - run: python -m unittest examples.adoption.test_project -v
       - run: python -m examples.astro.demo
       - run: python -m examples.astro.sweep --free-runs 0
       - run: python -m examples.astro.ablation
@@ -56,5 +57,6 @@ jobs:
           fi
           tail -n 3 unittest.txt
       - run: python harness-tests/run.py
+      - run: python -m unittest examples.adoption.test_project -v
       - run: python -m examples.astro.demo
       - run: python -m examples.gate.demo

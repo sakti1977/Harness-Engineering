@@ -1,5 +1,7 @@
 # Labs - MOC
 
+- [Adopt One Outcome - Walkthrough](../11%20-%20Practical%20Implementations/Adopt%20One%20Outcome%20-%20Walkthrough.md) — create a small project with filled contracts and test its defect/fix path.
+
 ## Executable now
 
 [First Executable Harness Lab](../11%20-%20Practical%20Implementations/First%20Executable%20Harness%20Lab.md): response-only, single-time-zone and sequential checks that stay green on a broken astrology coaching app, with an interleaving sweep and a fidelity ablation. Python standard library only; supplied code is under `Labs/examples/astro/`.

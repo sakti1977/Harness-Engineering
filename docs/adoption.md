@@ -1,5 +1,7 @@
 # Adopt the harness in an existing project
 
+Want to see one completely filled example first? Try the [minimal adoption walkthrough](handbook/11%20-%20Practical%20Implementations/Adopt%20One%20Outcome%20-%20Walkthrough.md). It creates a disposable project, checks a known defect, applies a fix and leaves an honest checkpoint. Its lightweight Markdown contracts are a teaching step before the feature ledger below.
+
 Start with one real failure your agent caused, not a framework rollout. The adopt command sets up the files; the judgment about outcomes, scope and claims stays yours.
 
 ## 1. Preview, then apply
