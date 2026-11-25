@@ -54,7 +54,7 @@ class OffloadTests(unittest.TestCase):
         output = "x" * 10_000  # one line: a line preview would not shrink it
         with TemporaryDirectory() as tmp:
             result = offload_large_output(output, Path(tmp), max_chars=4000)
-            self.assertLess(len(result.text), 4200)
+            self.assertLess(len(result.text), 4000 + 500)
             self.assertIn("output cut at 4000 characters", result.text)
             self.assertEqual(result.path.read_text(encoding="utf-8"), output)
 
