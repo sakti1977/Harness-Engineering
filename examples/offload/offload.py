@@ -42,12 +42,15 @@ def offload_large_output(
     if omitted <= 0:
         # Few lines but very long ones: a line preview would not shrink the output,
         # so cut by characters instead and keep the file as the full record.
-        preview = content[:max_chars]
+        # Keep the start and the end: the end usually holds the verdict.
+        keep_tail = max_chars // 10
+        head_part = content[: max_chars - keep_tail]
+        tail_part = content[-keep_tail:]
         note = f"[output cut at {max_chars} characters; full output saved to {path}]"
-        return Offload(f"{preview}\n{note}", path)
+        return Offload(f"{head_part}\n[... middle cut ...]\n{tail_part}\n{note}", path)
 
     head = lines[:head_lines]
-    tail = lines[-tail_lines:]
+    tail = lines[len(lines) - tail_lines:] if tail_lines > 0 else []
     note = f"[... {omitted} lines omitted; full output saved to {path}. Read it before relying on omitted lines ...]"
     return Offload("\n".join([*head, note, *tail]), path)
 
