@@ -58,6 +58,21 @@ class OffloadTests(unittest.TestCase):
             self.assertIn("output cut at 4000 characters", result.text)
             self.assertEqual(result.path.read_text(encoding="utf-8"), output)
 
+    def test_zero_tail_lines_still_offloads_instead_of_returning_everything(self):
+        output = noisy_test_run()
+        with TemporaryDirectory() as tmp:
+            result = offload_large_output(output, Path(tmp), tail_lines=0)
+            self.assertIsNotNone(result.path)
+            self.assertLess(len(result.text), 4000)
+            self.assertIn("lines omitted", result.text)
+
+    def test_few_long_lines_keep_the_verdict_at_the_end(self):
+        output = "x" * 4001 + "\nFAILED (failures=1)"
+        with TemporaryDirectory() as tmp:
+            result = offload_large_output(output, Path(tmp), max_chars=4000)
+            self.assertIn("FAILED (failures=1)", result.text)
+            self.assertEqual(result.path.read_text(encoding="utf-8"), output)
+
 
 if __name__ == "__main__":
     unittest.main()
