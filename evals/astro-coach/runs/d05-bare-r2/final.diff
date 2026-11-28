@@ -1,0 +1,74 @@
+diff --git a/astro-coach/lib/claude-dasha.test.ts b/astro-coach/lib/claude-dasha.test.ts
+new file mode 100644
+index 0000000..61604d4
+--- /dev/null
++++ b/astro-coach/lib/claude-dasha.test.ts
+@@ -0,0 +1,43 @@
++import { beforeEach, describe, expect, it, vi } from "vitest";
++
++const create = vi.fn();
++
++vi.mock("@anthropic-ai/sdk", () => ({
++  default: class {
++    messages = { create };
++  },
++}));
++vi.mock("@/lib/llm-usage", () => ({
++  recordLlmUsage: vi.fn(),
++  createStreamUsageTracker: vi.fn(),
++}));
++
++import { generateDashaPrediction } from "@/lib/claude";
++
++// Current Claude models reject a trailing assistant turn (prefill) with a 400,
++// which surfaced to users as "Dasha prediction failed".
++describe("generateDashaPrediction", () => {
++  beforeEach(() => create.mockReset());
++
++  it("does not send an assistant prefill turn", async () => {
++    create.mockResolvedValue({
++      content: [{ type: "text", text: '{"summary":"ok"}' }],
++      stop_reason: "end_turn",
++      usage: {},
++    });
++    await generateDashaPrediction("prompt");
++    const params = create.mock.calls[0][0];
++    expect(params.messages.at(-1).role).toBe("user");
++    expect(params.messages.some((m: { role: string }) => m.role === "assistant")).toBe(false);
++  });
++
++  it("returns the model's JSON unchanged (no doubled brace)", async () => {
++    create.mockResolvedValue({
++      content: [{ type: "text", text: '{"summary":"ok"}' }],
++      stop_reason: "end_turn",
++      usage: {},
++    });
++    const raw = await generateDashaPrediction("prompt");
++    expect(JSON.parse(raw)).toEqual({ summary: "ok" });
++  });
++});
+diff --git a/astro-coach/lib/claude.ts b/astro-coach/lib/claude.ts
+index 8e468b8..3b4e024 100644
+--- a/astro-coach/lib/claude.ts
++++ b/astro-coach/lib/claude.ts
+@@ -186,15 +186,14 @@ export async function generateDashaPrediction(
+     max_tokens: MAX_TOKENS_DASHA,
+     thinking: NO_THINKING,
+     system: "You are a strict JSON-only API. Output EXACTLY one valid JSON object and nothing else. Do not add any explanation, greeting, or markdown. Do not wrap the JSON in code fences. The output must start with { and end with }.",
+-    messages: [
+-      { role: "user", content: prompt },
+-      { role: "assistant", content: "{" },
+-    ],
++    // No assistant prefill: current Claude models reject a trailing assistant
++    // turn with a 400. The route's prepareJsonString extracts the JSON object.
++    messages: [{ role: "user", content: prompt }],
+   });
+   recordLlmUsage("dasha", MODEL_PRIMARY, response.usage);
+   const block = response.content[0];
+-  if (block.type !== "text") throw new Error("Unexpected response type");
+-  return "{" + block.text;
++  if (!block || block.type !== "text") throw new Error("Unexpected response type");
++  return block.text;
+ }
+ 
+ export async function generateHabits(prompt: string): Promise<string> {

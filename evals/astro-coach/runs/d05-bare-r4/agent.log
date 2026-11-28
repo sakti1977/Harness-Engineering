@@ -1,0 +1,10 @@
+Dasha predictions should load again. All 38 test files pass (281 tests) and `npx tsc --noEmit` is clean. I couldn't call the real Claude API here, so the new test checks the request we send rather than a live reply.
+
+**Cause:** `generateDashaPrediction` in `lib/claude.ts` ended its request with an assistant turn of `"{"` (a "prefill") and stuck `"{"` back onto the front of the reply. The Claude model the app now uses (`MODEL_PRIMARY`, Sonnet 5) rejects requests that end with an assistant turn and returns a 400. So `/api/dasha` hit its error branch every time and the dasha page showed the error. That fits "it worked before": it broke when the model was upgraded. The route's own comment already said prefill had been removed, but this call still used it.
+
+**Fix:**
+- **`lib/claude.ts`:** the request now sends only the user turn and returns the model's reply unchanged. The JSON-only system prompt and the route's existing `prepareJsonString()` and fallback parsing already handle getting JSON out of the reply. I also guard against a reply with no text in it.
+- **New test, `lib/claude-dasha-prefill.test.ts`:** stubs the Anthropic SDK and checks that the request ends with the user turn, has no assistant message, and that the reply comes back unchanged and parses as JSON.
+
+I first tried the shared `jsonReplyText` helper, which throws when a reply is cut off at the token limit. I backed that out because a long reply would then show a new error instead of falling back to the route's regex extraction, which is the current behaviour.
+AGENT_RC=0

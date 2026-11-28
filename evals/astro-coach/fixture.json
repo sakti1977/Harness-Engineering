@@ -1,6 +1,6 @@
 {
   "name": "astro-coach-fixture",
-  "status": "matrix complete: 4 defects x bare/harness x 5 repeats = 40 attempts; all 40 graded pass; discriminates nothing yet",
+  "status": "5 defects x bare/harness x 5 repeats = 50 attempts; all 50 graded pass; does not discriminate yet",
   "source": {
     "repo": "https://github.com/sakti1977/astro-coach",
     "pinned_commit": "43c695a",
@@ -87,6 +87,14 @@
       "method": "reverse the code hunk in lib/claude-json.ts; the commit's own test is kept, so defect is caught by visible tests",
       "verified": "baseline 16/16 pass; defect: 4 visible tests + held-out fail",
       "hidden_check": "evals/astro-coach/checks/defect-04-json-whitespace.test.ts"
+    },
+    {
+      "jyotish_task_defect": 5,
+      "fixing_commit": "f6a00b0",
+      "patch": "evals/astro-coach/defects/05-dasha-prefill.patch",
+      "method": "reintroduce the assistant prefill in generateDashaPrediction",
+      "verified": "baseline pass; defect: held-out fails; visible suite 280/280 passes on defect",
+      "hidden_check": "evals/astro-coach/checks/defect-05-dasha-prefill.test.ts"
     }
   ],
   "splits": {
@@ -109,7 +117,8 @@
     "defect-01": "written; sandbox-verified: passes on fixed, fails on defect",
     "defect-02": "written; sandbox-verified under TZ=America/New_York: passes on fixed, fails on defect",
     "defect-03": "written; sandbox-verified against Postgres 16 inside the sandbox: passes on fixed, fails on defect",
-    "defect-04": "written; verified on baseline (pass) and defect (fail)"
+    "defect-04": "written; verified on baseline (pass) and defect (fail)",
+    "defect-05": "written; verified on baseline (pass) and defect (fail); visible suite passes on defect"
   },
   "sandbox_verification": {
     "baseline_full_suite": "280/280 pass inside run_sandboxed.sh (whole repo mounted, app subdir as cwd)",
@@ -120,11 +129,11 @@
     "note": "defect-02 patch was regenerated as the reversal of 1fc5f00's validator.ts hunk; the earlier file was the forward fix and did not apply to the pin"
   },
   "results": {
-    "attempts": 40,
-    "graded_pass": 40,
+    "attempts": 50,
+    "graded_pass": 50,
     "existing_tests_edited": 0,
     "void": 0,
-    "note": "d04-harness-r3 (void: disk full) and d04-harness-r5 (stopped early: API credit) were rerun and pass"
+    "defect_05": "10/10 pass; invisible to the 280 visible tests, caught only by held-out"
   },
   "interpretation_note": "The reports in reports/ already state symptoms only, not causes. The ceiling is therefore not explained by leaked diagnoses. Likely causes: defects are one-line changes with specific tests, and the held-out checks target the same behaviour the report describes. Needs a harder set."
 }

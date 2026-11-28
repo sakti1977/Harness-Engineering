@@ -1,0 +1,18 @@
+I fixed the dasha predictions error. The full test suite and the typecheck pass, but I haven't tried it against the real Claude API, so I can't confirm the error is gone in the live app.
+
+**Cause:** when you open a dasha period, the app asks Claude for a prediction. That request still pre-filled the start of Claude's answer with `{` (an "assistant prefill"). The model the app now uses (`claude-sonnet-5`) rejects requests like that. The server then returned a 500 error and nothing loaded. The comment in `app/api/dasha/route.ts` already said the prefill had been dropped "because newer Claude models reject it", but `lib/claude.ts` still sent it. That fits "it worked before and stopped recently": it would have started failing when the app switched to Sonnet 5.
+
+**What I changed**
+- **`lib/claude.ts`:** `generateDashaPrediction` now sends only the user's request and returns Claude's reply through the existing `jsonReplyText` helper. That helper also gives a clear error if the reply gets cut off for length. The route's existing `prepareJsonString` still pulls the JSON out of the reply, so nothing else needed to change.
+- **`lib/claude-no-prefill.test.ts` (new):** checks that `lib/claude.ts` never sends a pre-filled assistant turn. With the Claude client faked, it also checks that the prediction request contains only the user's message, returns the reply text as-is, and reports a cut-off reply.
+- **`HARNESS_LOG.md`:** the plan, the commands I ran and their results.
+
+**Verified**
+- `npx vitest run`: 38 test files and 283 tests passed. There are 38 test files in the project including the new one, so it ran and passed.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified**
+- **The cause itself:** I'm going by the code, not by seeing the error. That Sonnet 5 rejects pre-filled answers comes from the code comments, and I didn't reproduce the 400 error.
+- **No live test:** I made no real call to Claude and didn't open the page in a running app.
+- **Two checks weren't approved:** running only the new test file, and temporarily undoing the fix to confirm the new test fails on the old code.
+AGENT_RC=0

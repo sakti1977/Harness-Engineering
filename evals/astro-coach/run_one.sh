@@ -73,6 +73,8 @@ case "$D" in
       GCMD='TZ=America/New_York timeout 240 npx vitest run lib/zz-heldout.test.ts >/tmp/h.txt 2>&1; RC=$?; sed "s/\x1b\[[0-9;]*m//g" /tmp/h.txt | grep -E "Tests |FAIL" | head -3; echo HELDOUT_RC=$RC' ;;
   04) cp checks/defect-04-json-whitespace.test.ts "$G/astro-coach/lib/zz-heldout.test.ts"
       GCMD='timeout 240 npx vitest run lib/zz-heldout.test.ts >/tmp/h.txt 2>&1; RC=$?; sed "s/\x1b\[[0-9;]*m//g" /tmp/h.txt | grep -E "Tests |FAIL" | head -3; echo HELDOUT_RC=$RC' ;;
+  05) cp checks/defect-05-dasha-prefill.test.ts "$G/astro-coach/lib/zz-heldout.test.ts"
+      GCMD='timeout 240 npx vitest run lib/zz-heldout.test.ts >/tmp/h.txt 2>&1; RC=$?; sed "s/\x1b\[[0-9;]*m//g" /tmp/h.txt | grep -E "Tests |FAIL" | head -3; echo HELDOUT_RC=$RC' ;;
   03) GCMD='sh /sandbox/checks/run-defect-03.sh /sandbox/work/astro-coach/supabase/migrations/009_atomic_sync_push.sql /sandbox/checks/defect-03-stubs.sql; echo HELDOUT_RC=$?' ;;
 esac
 HIDDEN_CHECKS="$EV/checks" MODEL=stub NODE_MODULES_SRC=/home/claude/astro-coach/astro-coach/node_modules \

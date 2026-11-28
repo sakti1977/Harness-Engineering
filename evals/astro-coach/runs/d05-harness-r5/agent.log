@@ -1,0 +1,18 @@
+I fixed the dasha predictions error. The full test suite and type check both pass, but I couldn't show that the new test fails on the old code, and I haven't tried it against the real API.
+
+**Cause:** in `lib/claude.ts`, `generateDashaPrediction` still sent an "assistant prefill": it ended the conversation with a message pretending the AI had already started its answer with `{`. The app now uses `claude-sonnet-5` (`lib/constants.ts:18`). The comment in `app/api/dasha/route.ts` says newer Claude models reject prefill and that the code no longer uses it, but this function was never updated. So the call to Claude fails, and the route returns a 500 "Dasha prediction failed" error. That matches "it stopped working recently": it broke when the app switched models.
+
+**What I changed:**
+- **`lib/claude.ts`:** removed the prefill, so the request is now just the user's prompt. The reply goes through the existing `jsonReplyText` helper, which also gives a clear error if the answer is cut off for length. The route already pulls the JSON out of the reply with `prepareJsonString`, so nothing else needed to change.
+- **New `lib/claude-dasha-request.test.ts`:** uses a fake Claude client to check that the request ends on the user's message with no prefill, that a normal reply comes back as valid JSON, and that a cut-off reply gives a clear error.
+- **`HARNESS_LOG.md`:** the plan, the commands I ran and their results.
+
+**Verified:**
+- `npx vitest run`: 38 test files and 283 tests passed. There are 38 test files on disk, so the new one was included.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- The sandbox blocked every command except those two, so I couldn't run the new test alone or temporarily restore the old code to see the test fail.
+- The fix wasn't run against the live Claude API. The finding that Sonnet 5 rejects prefill comes from the comment in the codebase, not from a call I made.
+- I didn't run the project's `astro-coach-evaluator` check against the non-negotiables.
+AGENT_RC=0
