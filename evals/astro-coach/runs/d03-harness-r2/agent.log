@@ -1,0 +1,23 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed the bug: a phone that hadn't refreshed can no longer save over newer notes from the laptop. Its save is now refused as a conflict, and the laptop's notes stay.
+
+**Cause:** saves go through a database function, `public.sync_push`, defined in `supabase/migrations/009_atomic_sync_push.sql`. Each save carries the version number the device last saw, and the function should refuse the save if the stored data has moved on since. That check had been replaced with `PERFORM 1;`, which does nothing, so whichever device saved last always won. The app code (`lib/storage-supabase.ts`, `app/api/sync/route.ts`, `lib/sync-push.ts`) already sends the version and handles a refusal correctly.
+
+**Change:** I put the check back in that function. If a save isn't forced, includes a version, the user already has saved data, and the stored version is different, the function returns `{ok:false, conflict:true, revision:<current>}` and writes nothing. The app already turns that into a "pull latest first" error (HTTP 409). Saves from older clients that don't send a version, forced saves, and a user's very first save all work as before.
+
+I also added `lib/sync-push.scenario.sql`, a small script that replays the two-device case against the local database. Commands and output are in `HARNESS_LOG.md`.
+
+**Verified:**
+- Reset the local database and reloaded the stubs plus the fixed migration: loaded with no errors.
+- `psql ... -At -f lib/sync-push.scenario.sql`:
+  - The laptop saves (version 1 → 2), then the stale phone saves expecting version 1. The phone gets `{"ok": false, "conflict": true, "revision": 2}`.
+  - The stored notes are still `{"notes": "laptop"}` and the laptop's saved observation is still there (count 1), even though the phone's save would have cleared it.
+  - A save with the current version, a save with no version, and a forced save all still succeed.
+- `npx vitest run`: 37 files, 280 tests passed.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I didn't run the full app with two real browsers; only the database function was exercised directly.
+- I didn't test two saves arriving at exactly the same moment for a user who has no saved data yet. That case relies on the insert's existing conflict handling, which I didn't change.
+- This fix edits migration 009 in place. If 009 has already been applied to production, the change will only take effect if the migration is re-run there or the fix is shipped as a new migration. I didn't check production's migration state.
+AGENT_RC=0

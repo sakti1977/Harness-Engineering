@@ -1,0 +1,11 @@
+I fixed the bug: the dasha predictions call was being rejected by the AI service, so every request failed. `npx vitest run` passes (38 files, 282 tests) and `npx tsc --noEmit` is clean. I haven't run the app or made a real API call, so the fix has only been checked against a mocked API.
+
+**Cause:** `generateDashaPrediction` in `lib/claude.ts` added a fake start to the model's reply: a final assistant message containing just `{`, a trick called "prefill". Newer Claude models reject requests that end with an assistant message and return a 400 error. The route caught that error and returned a 500, so the page showed "Dasha prediction failed" and nothing loaded. It started recently because the model changed (to Sonnet 5, according to the notes in `lib/claude.ts`), not because the code did. A comment in `app/api/dasha/route.ts` already says prefill had been removed for this reason, but this function was missed.
+
+**Fix (`lib/claude.ts`):**
+- The request now sends only the user prompt, with no assistant message.
+- It returns the model's text as-is instead of adding a `{` to the front. Kept, that extra brace would have produced `{{...` and broken parsing.
+- The system prompt already asks for JSON only, and the route's `prepareJsonString` pulls out the JSON object.
+
+**Test (`lib/claude-dasha.test.ts`, new):** with the Anthropic SDK mocked, it checks that no assistant message is sent and that the returned text parses as JSON without a doubled brace.
+AGENT_RC=0

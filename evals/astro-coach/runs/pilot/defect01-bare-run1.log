@@ -1,0 +1,17 @@
+I fixed the bug and added a regression test, but nothing has been run: the permission prompts for `npx vitest run` and `npx tsc --noEmit` weren't approved.
+
+I also couldn't open the bug report, because `../01-sync-saved-but-missing.md` is outside the folder I'm allowed to read. From the filename (data the app says was saved is missing), I went through the sync code and found a clear match.
+
+**The bug:** in `lib/sync-push.ts`, the backup save path ignored errors when writing the user's profile. That path is used when the database update that adds the newer save function (migration 009) hasn't been applied. If the profile write failed, `/api/sync` still returned success. The client then marked everything as synced, but nothing had been stored.
+
+**What I changed:**
+- **`lib/sync-push.ts`:** a failed profile write now raises an error instead of being ignored. The sync route already turns that into a 500 response, and the client already treats a failed response as an error, so the user no longer gets a false "saved". Coaching observations are left untouched when this happens.
+- **`lib/sync-push-profile-error.test.ts`** (new test): when the profile write fails, it checks that the save reports an error and that no observations are written or deleted.
+
+No existing tests, migrations or other files were changed.
+
+**Still to do:** please approve or run these from `astro-coach/`:
+- `npx vitest run`
+- `npx tsc --noEmit`
+
+If you also give me access to the bug report, I can confirm it describes this same problem.

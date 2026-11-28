@@ -1,0 +1,3 @@
+workspace: /tmp/ws-d05-bare-r4
+commits: 1
+tree hash: e41f19e3c3a9d7b3f6f4f40961a23232769d45a8

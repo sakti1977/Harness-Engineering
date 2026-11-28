@@ -1,0 +1,116 @@
+diff --git a/astro-coach/HARNESS_LOG.md b/astro-coach/HARNESS_LOG.md
+new file mode 100644
+index 0000000..99a2999
+--- /dev/null
++++ b/astro-coach/HARNESS_LOG.md
+@@ -0,0 +1,30 @@
++# HARNESS_LOG — dasha predictions error
++
++## Plan
++- Report: opening dasha predictions shows an error; worked before, broke recently.
++- Read: app/api/dasha/route.ts, lib/claude.ts, lib/constants.ts, lib/claude-json-reply.test.ts, lib/claude-models.test.ts.
++- Finding: `generateDashaPrediction` (lib/claude.ts) still sends an assistant prefill
++  (`{ role: "assistant", content: "{" }`) as the last message. MODEL_PRIMARY is now
++  `claude-sonnet-5`, which rejects assistant prefill (the route's own comment says so: "no more
++  assistant prefill is used because newer Claude models reject it"). The API call fails, and
++  /api/dasha returns 500 "Dasha prediction failed".
++- Fix: remove the prefill. (Change from the first plan: I kept the call inline and mocked the SDK
++  in the test, because lib/claude-models.test.ts inspects the inline `messages.create(` calls.)
++  Read the reply through `jsonReplyText` (which also reports max_tokens truncation clearly).
++  The route already runs `prepareJsonString`, which extracts the outermost JSON object.
++- Test: new lib/claude-dasha-request.test.ts checks the request ends on a user turn, has no
++  assistant prefill, and keeps thinking set explicitly.
++
++## Log
++
++### Change 1 — lib/claude.ts: remove assistant prefill from generateDashaPrediction; return via jsonReplyText
++### Change 2 — add lib/claude-dasha-request.test.ts (mocks @anthropic-ai/sdk)
++
++`npx vitest run`
++→ Test Files 38 passed (38), Tests 283 passed (283). 38 = every *.test.ts on disk, including the new file.
++
++`npx tsc --noEmit`
++→ no output (exit 0).
++
++Not run (the sandbox denied these commands): running only the new test file, and `git stash` to
++confirm the new test fails on the old code.
+diff --git a/astro-coach/lib/claude-dasha-request.test.ts b/astro-coach/lib/claude-dasha-request.test.ts
+new file mode 100644
+index 0000000..10d53fc
+--- /dev/null
++++ b/astro-coach/lib/claude-dasha-request.test.ts
+@@ -0,0 +1,49 @@
++import { beforeEach, describe, expect, it, vi } from "vitest";
++
++// User report: "dasha predictions show an error". generateDashaPrediction ended
++// its messages on an assistant prefill ("{"), which Sonnet 5 rejects, so every
++// /api/dasha call failed with a 500.
++const create = vi.fn();
++vi.mock("@anthropic-ai/sdk", () => ({
++  default: class {
++    messages = { create };
++  },
++}));
++vi.mock("@/lib/llm-usage", () => ({
++  recordLlmUsage: vi.fn(),
++  createStreamUsageTracker: vi.fn(),
++}));
++
++import { generateDashaPrediction } from "@/lib/claude";
++import { prepareJsonString } from "@/lib/claude-json";
++
++const reply = (text: string, stop_reason = "end_turn") => ({
++  content: [{ type: "text", text, citations: null }],
++  stop_reason,
++  usage: { input_tokens: 1, output_tokens: 1 },
++});
++
++describe("generateDashaPrediction", () => {
++  beforeEach(() => create.mockReset());
++
++  it("ends the conversation on a user turn (no assistant prefill)", async () => {
++    create.mockResolvedValue(reply('{"summary": "ok"}'));
++    await generateDashaPrediction("prompt");
++    const params = create.mock.calls[0][0];
++    expect(params.messages.at(-1).role).toBe("user");
++    expect(params.messages.some((m: { role: string }) => m.role === "assistant")).toBe(false);
++    expect(params.thinking).toEqual({ type: "disabled" });
++  });
++
++  it("returns a reply the route can parse as the full JSON object", async () => {
++    const json = '{"themes": ["a"], "cultivate": ["b"], "challenges": ["c"], "actions": ["d"], "summary": "e"}';
++    create.mockResolvedValue(reply(json));
++    const raw = await generateDashaPrediction("prompt");
++    expect(JSON.parse(prepareJsonString(raw))).toEqual(JSON.parse(json));
++  });
++
++  it("names a truncated reply instead of returning half a JSON document", async () => {
++    create.mockResolvedValue(reply('{"themes": ["a', "max_tokens"));
++    await expect(generateDashaPrediction("prompt")).rejects.toThrow(/Dasha prediction reply truncated/);
++  });
++});
+diff --git a/astro-coach/lib/claude.ts b/astro-coach/lib/claude.ts
+index 8e468b8..a5298f0 100644
+--- a/astro-coach/lib/claude.ts
++++ b/astro-coach/lib/claude.ts
+@@ -186,15 +186,13 @@ export async function generateDashaPrediction(
+     max_tokens: MAX_TOKENS_DASHA,
+     thinking: NO_THINKING,
+     system: "You are a strict JSON-only API. Output EXACTLY one valid JSON object and nothing else. Do not add any explanation, greeting, or markdown. Do not wrap the JSON in code fences. The output must start with { and end with }.",
+-    messages: [
+-      { role: "user", content: prompt },
+-      { role: "assistant", content: "{" },
+-    ],
++    // No assistant prefill: Sonnet 5 rejects a conversation that ends on an
++    // assistant turn, which made every dasha prediction fail. The route's
++    // prepareJsonString extracts the JSON object from the plain reply.
++    messages: [{ role: "user", content: prompt }],
+   });
+   recordLlmUsage("dasha", MODEL_PRIMARY, response.usage);
+-  const block = response.content[0];
+-  if (block.type !== "text") throw new Error("Unexpected response type");
+-  return "{" + block.text;
++  return jsonReplyText(response, "Dasha prediction");
+ }
+ 
+ export async function generateHabits(prompt: string): Promise<string> {

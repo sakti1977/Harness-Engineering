@@ -1,0 +1,8 @@
+I fixed the dasha predictions error. All 38 test files pass under `npx vitest run`, and `npx tsc --noEmit` is clean. I didn't make a real API call or open the page in the app, so the cause is inferred from the code rather than reproduced.
+
+**Cause:** the function that asks Claude for a dasha prediction (`generateDashaPrediction` in `lib/claude.ts`) sent an assistant "prefill" — a fake opening `{` placed as the start of Claude's reply so the answer would begin as JSON. Current Claude models reject any request that ends on an assistant message, so every prediction request failed. The route turned that into the generic "Dasha prediction failed" message the user saw. That explains why it "stopped recently": it broke when the model was upgraded. The comment in `app/api/dasha/route.ts` already said the prefill had been removed, but the function itself still sent it.
+
+**Changes:**
+- **`lib/claude.ts`:** the request now sends only the user prompt. Getting JSON back still works because the system prompt already demands a single JSON object, and the route's `prepareJsonString()` strips any stray text around it. The function now uses the existing `jsonReplyText()` helper, which also gives a clear "truncated" error if a reply gets cut off at the token limit instead of a confusing parse failure later.
+- **`lib/claude-dasha.test.ts` (new):** a test with the Anthropic client mocked. It checks that no assistant message is sent, that the reply text comes back unchanged and parses as JSON, and that a cut-off reply raises the "truncated" error.
+AGENT_RC=0

@@ -1,0 +1,15 @@
+I fixed the dasha predictions error. The cause was in `lib/claude.ts`: `generateDashaPrediction` still pre-filled the start of the model's reply with `{`. The app runs on `claude-sonnet-5`, which rejects that kind of request, so opening any dasha period gave an error. The code in `app/api/dasha/route.ts` already says this pre-fill was removed because newer models reject it, but this one function was never updated.
+
+**Changes**
+- **`lib/claude.ts`:** the request now sends only the user prompt, and the function returns the model's text unchanged. The route already pulls the JSON object out of the reply, and the system prompt still asks for JSON only. If a reply gets cut off at the length limit, the route's existing fallback still handles it.
+- **New test, `lib/claude-dasha-prefill.test.ts`:** it fakes the Anthropic client and checks two things: no pre-filled reply is sent, and the reply comes through as valid JSON.
+- **`HARNESS_LOG.md`:** holds the plan, the changes and the check results.
+
+**Verified**
+- `npx vitest run`: all 38 test files and 281 tests pass, including the new one.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified**
+- I couldn't show the new test failing on the old code, because running it against the old version wasn't approved.
+- I didn't call the real Anthropic API. That the model rejects pre-fill comes from the existing note in the route, not from something I saw happen.
+AGENT_RC=0

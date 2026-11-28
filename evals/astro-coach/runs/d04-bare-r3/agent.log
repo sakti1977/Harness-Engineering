@@ -1,0 +1,12 @@
+Fixed: long coaching replies spread over several lines now parse correctly. All 280 tests pass (`npx vitest run`) and `npx tsc --noEmit` is clean.
+
+**Cause:** `prepareJsonString` in `lib/claude-json.ts` cleans up the AI's reply before parsing it. It was turning every newline and tab into the two-character text `\n` or `\t`, including the line breaks and indentation between fields in a neatly formatted reply. A reply laid out over several lines therefore became invalid right after the opening `{`, and the app said it couldn't read it. A short reply on one line came through fine, which is why the same request sometimes worked.
+
+**Change:** I replaced that blanket substitution with a small scan that tracks whether it's inside a quoted text value, skipping escaped quotes such as `\"`. Newlines, tabs and carriage returns inside text values are still escaped so they parse. Line breaks and indentation between fields are left alone.
+
+Both places that parse these replies, `app/api/coach/reflect/route.ts` and `app/api/dasha/route.ts`, use this shared helper, so the one change covers both.
+
+I didn't add a new test file. The existing `lib/claude-json.test.ts` already has tests for exactly this case: multi-line formatted JSON, a newline inside a text value within formatted JSON, escaped quotes, and a stray tab or carriage return inside a value. They pass with the fix.
+
+The helper still finds the end of the reply by looking for the last `}`, so a reply followed by extra text that contains a `}` still fails. An existing test documents this, and I left it unchanged.
+AGENT_RC=0

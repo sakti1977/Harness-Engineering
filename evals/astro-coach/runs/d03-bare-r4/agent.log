@@ -1,0 +1,14 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed it: a phone that hasn't refreshed can no longer overwrite notes saved on another device. `npx vitest run` passes (283 tests) and `npx tsc --noEmit` is clean.
+
+**Cause:** The app and the `/api/sync` route already track a revision number and send the one the device last saw. But the database function that saves the data (`public.sync_push` in `supabase/migrations/009_atomic_sync_push.sql`) never compared it. Its check had been replaced with `PERFORM 1`, so the last device to save always won.
+
+**Fix** (in the migration):
+- **Check before saving:** after locking the user's row, the function compares the revision the device sent with the stored one. If they differ, it returns a conflict and writes nothing. A user with no saved row yet counts as revision 0. The route already turns a conflict into a 409 `SYNC_CONFLICT` response, so no app code needed to change.
+- **Check again while saving:** the update itself only goes through if the revision still matches. This covers two devices saving for the very first time at once, when there's no existing row to lock.
+- **Unchanged:** a forced save (`p_force`) still overwrites. Older clients that send no revision skip this check, though the route still applies its timestamp check to them.
+
+**Tested on the local Postgres:** after reloading the database, I replayed the report. The laptop saved (revision 2), then the phone tried to save using revision 1. The phone got a conflict and the laptop's notes were still there. After refreshing to revision 2 the phone saved normally, and forced saves and saves without a revision still worked. I didn't run the two-first-saves-at-once case against the real database.
+
+I also added `lib/sync-push-migration.test.ts`. It only checks that the migration file still contains the revision checks, so they can't be removed again unnoticed. It doesn't run the SQL.
+AGENT_RC=0

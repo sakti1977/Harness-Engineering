@@ -1,0 +1,11 @@
+I fixed the parsing bug in `lib/claude-json.ts`. Both checks pass: `npx vitest run` (38 files, 284 tests) and `npx tsc --noEmit`.
+
+**Cause:** Before parsing a reply, the app tried to escape stray newlines and tabs so the parser wouldn't reject them. But it escaped every newline and tab in the whole reply, including the line breaks and indentation between fields. Long replies usually come back laid out over several lines, so this turned the layout itself into invalid JSON (data format) and the app showed "could not read the reply". Short replies on a single line had no layout line breaks, which is why the same request sometimes worked.
+
+**Fix:**
+- I added a small helper that walks the text, tracks whether it is inside a quoted text value, and escapes raw newlines, carriage returns and tabs only there. It handles escaped quotes and backslashes correctly. The layout whitespace between fields is left alone, since the parser accepts it anyway.
+- The parser for list-shaped replies (used by the coaching plan habits route) had no escaping at all, so a line break inside a value would also break it. It now does the same control-character clean-up and string-only escaping.
+- I added `lib/claude-json.multiline.test.ts`, covering multi-line objects and lists inside code fences, Windows-style line endings, tabs inside values, and a value ending in a backslash.
+
+I didn't change any existing tests. One of them documents a separate known weakness: text after the reply that contains a stray `}` still breaks parsing. That test still passes, so that weakness remains.
+AGENT_RC=0

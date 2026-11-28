@@ -1,0 +1,15 @@
+I fixed the bug. The cause was the code that reads Claude's replies in `lib/claude-json.ts`. All 283 tests pass (38 files) and `npx tsc --noEmit` reports no errors.
+
+**What was wrong:** Long replies are usually laid out over several lines, and some text values inside them also contain raw line breaks. The reply format (JSON) doesn't allow raw line breaks inside text, so the code tries to escape them first. There were two bugs in that step:
+1. **Coaching plans:** the plan route (`app/api/coach/plan-habits`) reads its reply through `extractJsonArray`. That function did no escaping at all, so any plan with a line break inside a text value failed with "could not read the reply."
+2. **Other replies:** `prepareJsonString`, used by the reflect and dasha routes, escaped every line break and tab in the whole reply, not just the ones inside text. That broke the normal line breaks between fields, so a nicely laid-out reply failed to parse.
+
+Whether a reply contains these line breaks depends on how the model formats it each time, which is why the same request sometimes worked.
+
+**What I changed:**
+- **New helper:** `escapeControlCharsInStrings` walks the reply and escapes newlines, carriage returns and tabs only inside quoted text. It keeps track of escaped quotes (`\"`) so it knows where each text value really ends.
+- **Both readers use it:** `prepareJsonString` now uses the helper instead of the blanket replacement. `extractJsonArray` now uses it too, and also strips stray control characters the way the object reader already did.
+- **Tests:** I added `lib/claude-json-multiline.test.ts`. It covers a laid-out object and a habit-plan array with line breaks inside text, plus already-escaped line breaks.
+
+One limitation I left alone: the object reader still takes everything up to the last `}` in the reply, so extra text after the real reply that contains a `}` still breaks it. An existing test documents this on purpose, and it isn't what the report describes.
+AGENT_RC=0

@@ -1,0 +1,12 @@
+I fixed the age bug in `lib/astrology/prompts/validator.ts`. That's the only place in the app that calculates a user's age, and its output goes into the prompt that generates the validation questions. `npx vitest run` passes (38 files, 282 tests) and `npx tsc --noEmit` is clean.
+
+**The cause:** the code read the birth date (`"1990-07-30"`) with `new Date(...)`, which treats it as midnight UTC. It then read the month and day back in the server's local time. In US timezones that's still the previous evening, so the birthday was taken as one day early and the age was off on those boundary days. The existing regression test (`validator.test.ts`, labelled HARNESS-01) describes this exact bug.
+
+**The fix:** I now split the year, month and day straight out of the string and compare them with today's date, so the server's timezone can't shift the birthday. If the string isn't in `YYYY-MM-DD` form, the age line is left out of the prompt rather than guessed.
+
+**New test:** `lib/astrology/prompts/validator.tz.test.ts` runs the age calculation under `America/New_York` and `America/Los_Angeles`, on the birthday itself and on Jan 1.
+
+**Caveats:**
+- I couldn't confirm the new test fails on the old code, because the commands to run it against the old version needed approval and weren't run.
+- Tracing the old logic by hand, it makes US users a day **older** early, the day before their birthday, not younger as the report says. The new code gives the right age either way, but the report's wording doesn't quite match. If users keep seeing a younger age, look next at the server comparing against its own date (Railway runs in UTC) rather than the user's local date.
+AGENT_RC=0

@@ -1,0 +1,9 @@
+I fixed the "Synced but the profile is missing" bug. All 281 tests in `npx vitest run` pass, including the new one, and `npx tsc --noEmit` finds no type errors.
+
+**Cause:** `/api/sync` normally saves through a database function (`sync_push`, added in migration 009). Where that function isn't installed, the route falls back to an older direct write in `lib/sync-push.ts`. That fallback checked the result of the profile upsert but then threw the error away. So when the profile write failed, the route still returned `200 OK` and the app showed "Synced". Nothing had reached the cloud, so a new device pulled an empty profile.
+
+**What I changed:**
+- **`lib/sync-push.ts`:** the fallback now raises the profile write error (`if (profileError) throw profileError;`), before it touches observations. The route then returns a 500, and `useDataSync` shows a sync error instead of "Synced".
+- **`lib/sync-push-profile-error.test.ts` (new):** a regression test in which the fallback's profile write fails. It checks that `pushSync` throws and that no observation writes happen.
+
+The `sync_push` function itself already reports database errors correctly, so I didn't change any migrations.

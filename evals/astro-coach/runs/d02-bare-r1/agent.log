@@ -1,0 +1,10 @@
+I fixed the off-by-one age. The full test suite passes (38 files, 283 tests) and `npx tsc --noEmit` is clean.
+
+**Cause:** The age is worked out in `lib/astrology/prompts/validator.ts`, where it goes into the prompt for the coaching validation questions. The code read the birth date with `new Date("YYYY-MM-DD")`, which treats the date as midnight UTC. It then read the month and day back in local time. In timezones behind UTC, like the US, that moves the birthday one day earlier. So on the day before someone's birthday, the code thought the birthday had already come and gave the wrong age. That's why it only happened on some days and only for people west of UTC. The existing tests didn't catch it because they ran in the machine's own timezone.
+
+**What I changed:**
+- **`lib/astrology/prompts/validator.ts`:** the birth date string is now split into year, month and day directly and compared with today's local date, so there's no timezone conversion. `components/dasha/DashaTimeline.tsx` already avoids the problem the same way.
+- **New `lib/astrology/prompts/validator.tz.test.ts`:** runs the age check with the timezone set to `America/New_York` and covers the birthday itself, the day before, and Jan 1. By my reading of the old code, the "day before the birthday" case would fail on it. I didn't run the new test against the old code to confirm that, because the command that would have done it needed approval.
+
+I didn't change any existing test files.
+AGENT_RC=0

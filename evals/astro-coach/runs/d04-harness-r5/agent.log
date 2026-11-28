@@ -1,0 +1,17 @@
+I fixed the bug: multi-line coaching replies now parse. All tests and the type check pass.
+
+**Cause:** `prepareJsonString` in `lib/claude-json.ts` replaced every line break and tab in the reply with the two characters `\n` or `\t`, including the ones *between* fields. That's fine inside a text value, but a long reply laid out over several lines then becomes `{\n  "summaryObservations": …`, with a stray backslash outside any text, and the parser rejects it. Short replies on one line have no line breaks between fields, which is why the same request sometimes worked. The coaching route (`app/api/coach/reflect/route.ts`) and the dasha route both use this function.
+
+**Changes:**
+- **`lib/claude-json.ts`:** replaced that blanket replacement with a small scanner that tracks whether it is inside a text value. It escapes line breaks, carriage returns and tabs only there and leaves the layout between fields alone. Carriage returns inside text weren't handled at all before; now they are. Everything else in the function is unchanged, including how it finds the closing brace.
+- **`lib/claude-json.multiline.test.ts` (new):** tests a long, multi-line reply wrapped in a markdown code block whose text values contain line breaks (including Windows-style ones) and tabs. It also tests Windows line breaks between fields, and an escaped backslash just before a closing quote.
+- **`HARNESS_LOG.md`:** the plan and every command with its result.
+
+**Verified:**
+- `npx vitest run`: 38 test files, 283 tests, all passed.
+- `npx tsc --noEmit`: finished with no output and no errors.
+
+**Not verified:**
+- I didn't run the tests against the old code to watch them fail; the command to swap the old version back in wasn't approved. So it's reasoning, not observation, that the existing "pretty-printed" test and my new tests would fail without the fix.
+- I haven't reproduced the error in the running app with a real model reply. The diagnosis comes from reading the code and the description in the report.
+AGENT_RC=0

@@ -1,0 +1,26 @@
+diff --git a/astro-coach/lib/astrology/prompts/validator.ts b/astro-coach/lib/astrology/prompts/validator.ts
+index cf2f0e7..abaefeb 100644
+--- a/astro-coach/lib/astrology/prompts/validator.ts
++++ b/astro-coach/lib/astrology/prompts/validator.ts
+@@ -39,18 +39,10 @@ export function buildValidatorUserPrompt(chart: NatalChart, birthDate?: string):
+ 
+   let ageContext = "";
+   if (birthDate) {
+-    // HARNESS-01: parse the "YYYY-MM-DD" string manually rather than via
+-    // `new Date(birthDate)`. Date-only ISO strings are parsed as UTC
+-    // midnight; reading them back with local getters (getMonth/getDate) then
+-    // silently shifts the date by a day in any timezone behind UTC,
+-    // producing an intermittent off-by-one age — exactly the kind of bug
+-    // that undermines trust in age-gated question generation.
+-    const [birthYear, birthMonth, birthDay] = birthDate.split("-").map(Number);
++    const birth = new Date(birthDate);
+     const today = new Date();
+-    const hasHadBirthdayThisYear =
+-      today.getMonth() + 1 > birthMonth ||
+-      (today.getMonth() + 1 === birthMonth && today.getDate() >= birthDay);
+-    const ageYears = today.getFullYear() - birthYear - (hasHadBirthdayThisYear ? 0 : 1);
++    const ageYears = today.getFullYear() - birth.getFullYear() -
++      (today < new Date(today.getFullYear(), birth.getMonth(), birth.getDate()) ? 1 : 0);
+     ageContext = `\nPerson's current age: ${ageYears} years old (born ${birthDate})`;
+   }
+ 

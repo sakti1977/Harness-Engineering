@@ -1,0 +1,20 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed the bug: a phone that hasn't refreshed can no longer overwrite notes saved from another device. Tests and type checks pass (`npx vitest run`: 281 tests, `npx tsc --noEmit`: clean).
+
+**Cause:** Each save sends the version number the device last saw. The database function that does the saving (`public.sync_push` in `supabase/migrations/009_atomic_sync_push.sql`) read the current version but never compared the two. Its check had been replaced by a do-nothing statement (`PERFORM 1`), so every save went through and the last one won. The server route and the app already handle a rejected save properly, so the only problem was in the database.
+
+**Fix:** Before writing, `sync_push` now compares the device's version number with the stored one. The two pushes from one user are handled one at a time (the row is locked), so they can't both pass. If the number is out of date, it writes nothing and reports a conflict. The route turns that into a 409 "pull latest first" error, which the app already handles. Three cases still save normally:
+- deliberate forced saves (`p_force`);
+- older app versions that don't send a version number;
+- a user's first save, where there is no stored profile yet.
+
+**Checked against the local Postgres** (after resetting and reloading the stubs and the edited migration):
+- laptop saves at version 1 → succeeds, version becomes 2;
+- phone saves still thinking it's at version 1 → rejected as a conflict, and the laptop's notes are still stored;
+- the same phone save with force → succeeds;
+- a new user's first save → succeeds.
+
+**New test:** `lib/sync-push-migration.test.ts` reads the migration file and fails if the stale-version check is removed or moved after the write.
+
+Migration 009 was edited in place rather than added as a new migration, as the task's rules allowed. If 009 has already been applied to a real database, that database still has the broken function until the updated `CREATE OR REPLACE FUNCTION` is run there again.
+AGENT_RC=0

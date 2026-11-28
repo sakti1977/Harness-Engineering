@@ -1,0 +1,22 @@
+I fixed the bug: the app was showing "Synced" even when saving the profile to the cloud had failed.
+
+**Cause:** the server has a fallback way of saving, used when the newer database save function (migration 009) isn't installed. On that path, `pushSyncLegacy` in `lib/sync-push.ts` threw away the error from saving the profile (`void profileError`). So `/api/sync` still answered 200 OK, the app recorded a successful sync and showed "Synced", and the cloud had no profile for a new device to download.
+
+**Changes:**
+- **`lib/sync-push.ts`, fallback path:** a failed profile save now raises an error (`if (profileError) throw profileError;`) before anything else is written. The route then returns a 500 and the sync status shows an error instead of "Synced".
+- **`lib/sync-push.ts`, main path:** success is now reported only when the database save function confirms the write (`ok: true`). An empty or unexpected reply raises an error.
+- **`lib/sync-push-profile-error.test.ts` (new):** three tests:
+  - a failed profile save on the fallback path raises an error and stops before the coaching observations are written;
+  - a successful fallback save still reports success;
+  - a main-path reply with no confirmation raises an error.
+
+**Verified:**
+- `npx vitest run`: 38 test files and 283 tests passed. The new test file is one of the 38, since there are exactly 38 test files under `lib/` and `app/`.
+- `npx tsc --noEmit`: no output, no type errors.
+- The plan, changes and these results are recorded in `HARNESS_LOG.md`.
+
+**Not verified:**
+- I couldn't run only the sync tests on their own (`npx vitest run lib/sync-push`) because permission was denied. They are covered by the full run.
+- I'm assuming the fallback path is what runs in production, meaning migration 009 isn't applied there. That fits the report but I didn't check the live database. If the migration is applied, this change only adds the confirmation check on the main path, and the real cause would be somewhere else.
+- I didn't run the app or reproduce the bug end to end.
+AGENT_RC=0

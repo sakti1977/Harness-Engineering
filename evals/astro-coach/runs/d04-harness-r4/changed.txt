@@ -1,0 +1,2 @@
+A	astro-coach/HARNESS_LOG.md
+M	astro-coach/lib/claude-json.ts

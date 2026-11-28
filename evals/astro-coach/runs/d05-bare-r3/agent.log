@@ -1,0 +1,10 @@
+I fixed the dasha predictions error. Both required checks pass: `npx vitest run` (281 tests across 38 files) and `npx tsc --noEmit`.
+
+**Cause:** the server request that asks the AI model for a dasha prediction ended with a pre-filled assistant turn (the reply was started with `{` so the model would continue the JSON). Sonnet 5, the newer model the app now uses, rejects that kind of request outright. Every prediction call therefore failed, and the page showed "Dasha prediction failed". It fits "it worked before": the break came with the model upgrade. The dasha route's own comment already said this pre-fill had been removed, but `generateDashaPrediction` in `lib/claude.ts` still sent it.
+
+**Changes:**
+- **`lib/claude.ts`:** removed the pre-filled assistant turn from `generateDashaPrediction`, so the request now ends on the user's message. The function returns the model's text as-is instead of adding `{` in front of it. The instructions sent to the model already ask for bare JSON, and the route's `prepareJsonString` pulls the JSON object out of the reply. If a reply is cut off for length, the route's existing fallback still handles it rather than turning it into an error.
+- **`lib/claude-dasha-prefill.test.ts` (new):** a regression test with a mocked model client. It checks that the request contains no assistant turn and that the returned JSON parses.
+
+I didn't run the app or make a real model call. The fix is only confirmed by the mocked test and the type check.
+AGENT_RC=0

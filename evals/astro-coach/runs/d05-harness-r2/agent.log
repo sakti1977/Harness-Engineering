@@ -1,0 +1,17 @@
+I fixed the dasha predictions error and the full test suite and type check both pass. I couldn't call the real Claude API, though, so the claim that this is what users are hitting rests on the code, not a reproduction.
+
+**The bug:** when you open a dasha period, the app calls `/api/dasha`, which uses `generateDashaPrediction` in `lib/claude.ts`. That function was still ending its request with a pre-filled assistant message (`{ role: "assistant", content: "{" }`) to force the reply to start as JSON. The model it uses is `claude-sonnet-5`, and the comment in `app/api/dasha/route.ts:48-50` says newer Claude models reject that, and that it was supposed to have been removed. So the API call throws, the route returns a 500, and the timeline shows the error. "Worked before, stopped recently" fits a model upgrade. This was the only place in `lib/` or `app/` still doing it.
+
+**What I changed:**
+- **`lib/claude.ts`:** the request now ends with the user's message. The function returns the model's text as-is instead of adding `"{"` in front, and takes the first text block rather than assuming it's the first item. The route already strips stray text and code fences and pulls out the JSON before parsing, so nothing else needed to change.
+- **New test, `lib/claude.dasha-request.test.ts`:** fakes the Claude client and checks that no assistant message is sent, and that both pretty-printed and code-fenced replies parse.
+- **`HARNESS_LOG.md`:** the plan, plus each command run and its result.
+
+**Verified:**
+- `npx vitest run`: 38 test files, 283 tests, all passed. The new test file is one of the 38.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I haven't seen a real Claude API response to this request, either the rejection or the reply after the fix. The diagnosis comes from reading the code and the route's comment.
+- I haven't confirmed the new test fails without the fix. I tried to temporarily undo the fix and re-run the tests, but that command wasn't approved.
+AGENT_RC=0

@@ -1,0 +1,19 @@
+I fixed the bug: the app was mishandling line breaks in the AI's reply, so long replies spread over several lines failed to load. Tests and the type check pass.
+
+**Cause:** Replies come back as JSON (structured text). Before reading it, `prepareJsonString` in `lib/claude-json.ts` turned every line break and tab into an escape code, including the ones that are just spacing between fields. That breaks the JSON whenever the reply is laid out over several lines. One-line replies were fine, which is why the same request sometimes worked. Line breaks inside text values were handled correctly, but a stray carriage return there was left in and would also fail.
+
+**What I changed:**
+- **`lib/claude-json.ts`:** a small scanner now tracks whether it's inside a quoted value and only converts line breaks, carriage returns and tabs there. Spacing between fields is left alone. This also fixes the dasha prediction and chart-extraction features, which use the same function.
+- **`lib/claude-json.multiline.test.ts` (new):** tests for a long, indented, multi-line plan in a code block with Windows-style line endings, plus a value ending in a backslash, and a check that spacing between fields is unchanged.
+
+**Verified:**
+- `npx vitest run`: 38 test files, 283 tests, all passed.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I couldn't confirm the new tests fail on the old code, because the command to temporarily undo the fix (`git stash`) wasn't approved.
+- I didn't trace the exact "could not read the reply" message to the coaching screen. I'm assuming it comes from this function failing, since `app/api/coach/reflect/route.ts` and others use it.
+- One known weakness remains: if text after the reply contains a stray `}`, it still breaks. An existing test I'm not allowed to change locks that behaviour in.
+
+The plan and every command result are in `HARNESS_LOG.md`.
+AGENT_RC=0

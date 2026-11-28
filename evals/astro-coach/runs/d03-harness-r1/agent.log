@@ -1,0 +1,25 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed the bug in the database function that saves synced data. A save from a device that hasn't refreshed is now rejected, so it can no longer wipe out newer notes. The full test suite and type check both pass.
+
+**Cause:** the app keeps a revision number with each user's cloud copy. Each device sends the revision it last saw, and the app was already sending it correctly. But in migration 009 the save function `public.sync_push` (`supabase/migrations/009_atomic_sync_push.sql`) never compared that number with the stored one; there was a do-nothing `PERFORM 1;` where the check should be. So the phone's out-of-date save was accepted and replaced the laptop's notes.
+
+**What I changed:**
+1. **`009_atomic_sync_push.sql`:**
+   - If the device's revision doesn't match the stored one, the function now returns a conflict and writes nothing. A user with no saved data yet counts as revision 0, and a save with the existing `force` flag set skips the check.
+   - The API route already turns that conflict into an HTTP 409 "Cloud copy changed on another device" error, so no app code needed to change.
+   - I also added a per-user lock. The existing row lock does nothing on a user's very first save, because there is no row yet.
+2. **`lib/sync-push-migration.test.ts` (new):** a test that reads the migration file and checks the conflict check comes before any write, so it can't quietly disappear again. It doesn't run against a database.
+
+**Verified (each command and its result is in `HARNESS_LOG.md`):**
+- **Before the fix**, on the local Postgres: laptop saves at revision 1 and gets revision 2; the phone then saves still holding revision 1. The phone's save succeeded and the stored notes became "stale phone", so the bug is confirmed.
+- **After resetting the database and reloading the stubs and the edited migration:**
+  - The stale phone save returns `{"ok": false, "conflict": true, "revision": 2}`. The laptop's notes and its saved observation are kept, even though the phone was sending an empty observation list.
+  - A save after refreshing to revision 2 succeeds, a forced save succeeds, and a brand-new user saving at revision 0 succeeds.
+- `npx vitest run`: 38 files and 282 tests passed.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I haven't confirmed that the new test fails against the original migration. Running just that one test file needed approval, so I didn't run it.
+- I reasoned through the case of two devices making a user's first-ever save at the same moment, which the new lock is meant to handle, but didn't test it with real parallel connections.
+- I didn't check older clients that don't send a revision. They still go through the route's existing timestamp check, which I left unchanged.
+AGENT_RC=0

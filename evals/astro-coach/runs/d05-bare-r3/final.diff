@@ -1,0 +1,66 @@
+diff --git a/astro-coach/lib/claude-dasha-prefill.test.ts b/astro-coach/lib/claude-dasha-prefill.test.ts
+new file mode 100644
+index 0000000..8053ce0
+--- /dev/null
++++ b/astro-coach/lib/claude-dasha-prefill.test.ts
+@@ -0,0 +1,33 @@
++import { beforeEach, describe, expect, it, vi } from "vitest";
++
++const create = vi.fn();
++vi.mock("@anthropic-ai/sdk", () => ({
++  default: class {
++    messages = { create };
++  },
++}));
++vi.mock("@/lib/llm-usage", () => ({
++  recordLlmUsage: vi.fn(),
++  createStreamUsageTracker: vi.fn(),
++}));
++
++import { generateDashaPrediction } from "@/lib/claude";
++
++// Sonnet 5 rejects requests whose last message is an assistant prefill, which
++// broke dasha predictions. The request must end on the user turn.
++describe("generateDashaPrediction", () => {
++  beforeEach(() => create.mockReset());
++
++  it("sends no assistant prefill and returns the model's JSON text as-is", async () => {
++    create.mockResolvedValue({
++      content: [{ type: "text", text: '{"summary":"ok"}' }],
++      stop_reason: "end_turn",
++      usage: {},
++    });
++    const out = await generateDashaPrediction("prompt");
++    const req = create.mock.calls[0][0];
++    expect(req.messages.at(-1).role).toBe("user");
++    expect(req.messages.some((m: { role: string }) => m.role === "assistant")).toBe(false);
++    expect(JSON.parse(out)).toEqual({ summary: "ok" });
++  });
++});
+diff --git a/astro-coach/lib/claude.ts b/astro-coach/lib/claude.ts
+index 8e468b8..7be6850 100644
+--- a/astro-coach/lib/claude.ts
++++ b/astro-coach/lib/claude.ts
+@@ -186,15 +186,15 @@ export async function generateDashaPrediction(
+     max_tokens: MAX_TOKENS_DASHA,
+     thinking: NO_THINKING,
+     system: "You are a strict JSON-only API. Output EXACTLY one valid JSON object and nothing else. Do not add any explanation, greeting, or markdown. Do not wrap the JSON in code fences. The output must start with { and end with }.",
+-    messages: [
+-      { role: "user", content: prompt },
+-      { role: "assistant", content: "{" },
+-    ],
++    // No assistant prefill: Sonnet 5 rejects a trailing assistant turn with a
++    // 400, which surfaced as "Dasha prediction failed". The system prompt asks
++    // for bare JSON and the route's prepareJsonString extracts the object.
++    messages: [{ role: "user", content: prompt }],
+   });
+   recordLlmUsage("dasha", MODEL_PRIMARY, response.usage);
+-  const block = response.content[0];
+-  if (block.type !== "text") throw new Error("Unexpected response type");
+-  return "{" + block.text;
++  const block = response.content.find((b) => b.type === "text");
++  if (!block || block.type !== "text") throw new Error("Unexpected response type");
++  return block.text;
+ }
+ 
+ export async function generateHabits(prompt: string): Promise<string> {

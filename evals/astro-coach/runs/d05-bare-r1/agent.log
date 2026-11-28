@@ -1,0 +1,8 @@
+I fixed the bug: dasha predictions failed because the request to Claude still pre-filled the start of its answer with `{`. The current model (`claude-sonnet-5`) rejects requests that do that, so `/api/dasha` returned a 500 every time and the timeline showed the error. It likely broke when the model was upgraded. The route's own comment already says pre-filling had been removed for this reason, but this one function was missed. I haven't run the app or made a real API call; the new test checks the request shape against a mocked SDK.
+
+**What I changed:**
+- **`lib/claude.ts` (`generateDashaPrediction`)**: the request now ends with the user's prompt, with no pre-filled `{`. The function also no longer adds the `{` back onto the reply, and it takes the first text block of the response rather than assuming it comes first. Turning the reply into JSON is still handled by the existing `prepareJsonString` step in `app/api/dasha/route.ts`, which already pulls out the outermost JSON object.
+- **`lib/claude-dasha.test.ts` (new)**: a regression test with a mocked Anthropic SDK. It checks that no pre-filled reply is sent, that the last message is from the user, and that the returned text parses as JSON.
+
+**Checks:** `npx vitest run` passes (38 files, 281 tests) and `npx tsc --noEmit` reports no errors.
+AGENT_RC=0

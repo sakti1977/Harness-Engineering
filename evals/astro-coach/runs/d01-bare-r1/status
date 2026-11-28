@@ -1,0 +1,5 @@
+run=d01-bare-r1 defect=01 condition=bare n=1
+prepare_commit=e43ccd876dbbe909cfaae1724233f16255b1c109
+HELDOUT_RC=0
+existing_test_files_edited_or_deleted=0
+agent_rc=AGENT_RC=0

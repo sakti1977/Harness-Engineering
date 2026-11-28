@@ -1,0 +1,17 @@
+I fixed the dasha prediction error by changing the code. I couldn't test it against the real model API or in the running app, so I haven't seen it work end to end.
+
+**Cause:** `generateDashaPrediction` in `lib/claude.ts` pre-filled the start of the model's reply with `{`. The app's main model is now `claude-sonnet-5`, which rejects requests that do this. Every prediction request therefore failed, and the dasha route returned its 500 "Dasha prediction failed" error. That fits "it stopped recently": the model was upgraded, but this one call wasn't updated. A comment in `app/api/dasha/route.ts` even says the pre-fill had been removed, but the call still used it.
+
+**What I changed:**
+- **`lib/claude.ts`:** the request now sends only the prompt, and the function returns the model's text as-is. The system prompt already asks for bare JSON, and the route already pulls the JSON object out of the reply. I deliberately didn't use the stricter `jsonReplyText` helper. It turns a reply that was cut off at the length limit into an error, whereas the route's fallback can still use part of a cut-off reply.
+- **`lib/claude-no-prefill.test.ts` (new):** a test that fails if any request in `lib/claude.ts` pre-fills the model's reply again.
+- **`HARNESS_LOG.md`:** the plan and the log of each command and its result.
+
+**Verified:**
+- `npx vitest run`: all 282 tests in 38 files pass.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- That Sonnet 5 rejecting pre-fill is what users hit in production. I'm relying on the code comments, not on a log of a failed API call.
+- That the new test fails on the old code. Running that needed `git stash`, which wasn't approved. The old code contained exactly what the test checks for, so it should fail.
+AGENT_RC=0

@@ -1,0 +1,17 @@
+I fixed the parser that reads coaching replies, and the full test suite and type check both pass.
+
+**The cause:** `prepareJsonString` in `lib/claude-json.ts` cleans the model's reply before parsing it. It turned every line break and tab in the reply into the two characters `\n` (or `\t`), not just the ones inside text values. When a reply is laid out over several lines, that puts a `\n` between `{` and the first field, where it isn't allowed, so parsing fails. Short replies that come back on one line parse fine. That's why the same request sometimes works and sometimes doesn't.
+
+**The fix:** I replaced that blanket replace with a small function, `escapeControlCharsInStrings`. It reads the reply character by character, keeps track of whether it's inside a quoted value (handling `\"` correctly), and only escapes line breaks, carriage returns (`\r`) and tabs found there. Line breaks between fields are left alone. I didn't touch how the end of the reply is found (the last `}`) or the arrays parser.
+
+**Verified (commands run, results in `HARNESS_LOG.md`):**
+- `npx vitest run`: 37 test files and 280 tests passed. That includes the existing multi-line and carriage-return cases in `lib/claude-json.test.ts`.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I never saw the bug fail before the fix. Running the single test file was held for approval, so I didn't confirm that those existing tests failed on the old code. That they did is my reading of the code.
+- I didn't add a new test, because the existing ones already cover multi-line replies.
+- I didn't check which page or API route shows the "could not read" message. That this parser is the source of the report is my inference.
+- I didn't run the project's non-negotiables evaluator agent.
+- A known weakness is still there, and an existing test documents it: if text after the reply contains a stray `}`, parsing still breaks.
+AGENT_RC=0

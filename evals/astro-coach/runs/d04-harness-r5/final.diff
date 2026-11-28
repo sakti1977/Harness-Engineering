@@ -1,0 +1,144 @@
+diff --git a/astro-coach/HARNESS_LOG.md b/astro-coach/HARNESS_LOG.md
+new file mode 100644
+index 0000000..85d7f0f
+--- /dev/null
++++ b/astro-coach/HARNESS_LOG.md
+@@ -0,0 +1,26 @@
++# HARNESS_LOG — defect: coaching reply fails to parse
++
++## Plan
++- Symptom: "could not read the reply" intermittently, when reply is long/multi-line.
++- Files read: lib/claude-json.ts, lib/claude-json.test.ts; callers app/api/coach/reflect/route.ts,
++  app/api/dasha/route.ts.
++- Suspected root cause: `prepareJsonString` (lib/claude-json.ts:36) replaces EVERY bare `\n`/`\t`
++  with a literal `\\n`/`\\t`, including structural whitespace between tokens. Pretty-printed JSON
++  (`{\n  "a": ...`) becomes `{\n  "a"` with a literal backslash outside a string -> JSON.parse throws.
++  Single-line replies parse fine, hence "sometimes".
++  Also `\r` inside strings is never escaped.
++- Fix: replace the blind regex with a small string-aware scanner that escapes raw `\n`, `\r`, `\t`
++  only while inside a JSON string literal (tracking `\` escapes), leaving structural whitespace alone.
++  Keep the lastIndexOf("}") slicing as-is (existing KNOWN LIMITATION test asserts it).
++- Add a new test file lib/claude-json.multiline.test.ts with a realistic long multi-line coaching reply.
++- Verify: npx vitest run, npx tsc --noEmit.
++
++## Log
++- Change 1: lib/claude-json.ts — replaced blind `\n`/`\t` regex escape with string-aware
++  `escapeControlCharsInStrings` (escapes raw \n, \r, \t only inside string literals).
++- Change 2: added lib/claude-json.multiline.test.ts (long fenced pretty-printed reply with
++  multi-line/CRLF/tab string values; CRLF between tokens; escaped backslash before quote).
++- `npx vitest run` -> Test Files 38 passed (38), Tests 283 passed (283).
++- `npx tsc --noEmit` -> exit 0, no output.
++- NOT RUN: tests against the pre-fix code (git stash command needed approval and was not approved),
++  so "new/existing tests fail on old code" is reasoned, not observed.
+diff --git a/astro-coach/lib/claude-json.multiline.test.ts b/astro-coach/lib/claude-json.multiline.test.ts
+new file mode 100644
+index 0000000..73dbd70
+--- /dev/null
++++ b/astro-coach/lib/claude-json.multiline.test.ts
+@@ -0,0 +1,46 @@
++import { describe, it, expect } from "vitest";
++import { extractJsonObject, prepareJsonString } from "./claude-json";
++
++describe("extractJsonObject — long multi-line coaching replies", () => {
++  it("parses a long, fenced, pretty-printed reply with multi-line string values", () => {
++    const raw = [
++      "Here is your coaching plan:",
++      "```json",
++      "{",
++      '  "summaryObservations": [',
++      "    {",
++      '      "text": "You tend to postpone hard conversations.\nThis shows up at work\r\nand at home.",',
++      '      "category": "pattern"',
++      "    },",
++      "    {",
++      '      "text": "Morning routine:\n\t1. meditate\n\t2. journal",',
++      '      "category": "practice"',
++      "    }",
++      "  ],",
++      '\t"shouldTransitionToRecommending": true',
++      "}",
++      "```",
++    ].join("\n");
++
++    expect(extractJsonObject(raw)).toEqual({
++      summaryObservations: [
++        {
++          text: "You tend to postpone hard conversations.\nThis shows up at work\r\nand at home.",
++          category: "pattern",
++        },
++        { text: "Morning routine:\n\t1. meditate\n\t2. journal", category: "practice" },
++      ],
++      shouldTransitionToRecommending: true,
++    });
++  });
++
++  it("handles CRLF line endings between tokens", () => {
++    const raw = '{\r\n  "a": 1,\r\n  "b": "x"\r\n}';
++    expect(extractJsonObject(raw)).toEqual({ a: 1, b: "x" });
++  });
++
++  it("preserves an escaped backslash before a closing quote", () => {
++    const raw = '{\n  "path": "C:\\\\dir\\\\",\n  "n": 1\n}';
++    expect(JSON.parse(prepareJsonString(raw))).toEqual({ path: "C:\\dir\\", n: 1 });
++  });
++});
+diff --git a/astro-coach/lib/claude-json.ts b/astro-coach/lib/claude-json.ts
+index 15bf4e0..903e694 100644
+--- a/astro-coach/lib/claude-json.ts
++++ b/astro-coach/lib/claude-json.ts
+@@ -32,10 +32,52 @@ export function prepareJsonString(raw: string): string {
+   // Remove stray C0/C1 control characters while preserving \n \t \r
+   jsonStr = jsonStr.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, " ");
+ 
+-  // Escape bare (un-escaped) newlines and tabs so JSON.parse doesn't choke
+-  jsonStr = jsonStr.replace(/(?<!\\)\n/g, "\\n").replace(/(?<!\\)\t/g, "\\t");
++  // Escape raw newlines / CRs / tabs that appear *inside string literals* so
++  // JSON.parse doesn't choke. Whitespace between tokens (pretty-printed JSON)
++  // must be left untouched — escaping it produces invalid JSON.
++  return escapeControlCharsInStrings(jsonStr);
++}
++
++/**
++ * Walk the JSON text tracking whether we are inside a string literal, and
++ * escape raw \n, \r and \t only there. Structural whitespace is preserved.
++ */
++function escapeControlCharsInStrings(json: string): string {
++  let out = "";
++  let inString = false;
++  let escaped = false;
++
++  for (const ch of json) {
++    if (!inString) {
++      if (ch === '"') inString = true;
++      out += ch;
++      continue;
++    }
++
++    if (escaped) {
++      escaped = false;
++      out += ch;
++      continue;
++    }
++
++    if (ch === "\\") {
++      escaped = true;
++      out += ch;
++    } else if (ch === '"') {
++      inString = false;
++      out += ch;
++    } else if (ch === "\n") {
++      out += "\\n";
++    } else if (ch === "\r") {
++      out += "\\r";
++    } else if (ch === "\t") {
++      out += "\\t";
++    } else {
++      out += ch;
++    }
++  }
+ 
+-  return jsonStr;
++  return out;
+ }
+ 
+ /**

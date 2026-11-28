@@ -1,0 +1,8 @@
+I fixed the off-by-one age. It was in the code that tells the AI coach the person's age (`lib/astrology/prompts/validator.ts`). The full test suite (`npx vitest run`) passes, 38 files and 283 tests, and `npx tsc --noEmit` is clean.
+
+**Cause:** the birth date is stored as `"YYYY-MM-DD"`, and the code read it with `new Date(birthDate)`. JavaScript treats a date written that way as midnight UTC. The code then read the month and day back in the server's local time zone. In time zones behind UTC, which includes the whole US, midnight UTC is still the previous evening, so the birth date moved back a day. That made the age wrong around the birthday. Elsewhere it made no difference, which is why only some US users on some days noticed.
+
+**Fix:** the code now splits the date string into year, month and day and compares those numbers directly against today's local date, so time zones no longer affect the result. `components/dasha/DashaTimeline.tsx` already reads the birth year this way, and its other date maths is unaffected, so I left it alone.
+
+**Test:** I added `lib/astrology/prompts/validator.us-timezone.test.ts`. It sets the time zone to `America/New_York` and checks three cases: the day before a birthday, the birthday itself, and a Jan 1 birthday. I couldn't confirm that it fails against the old code, because running the old code needed a command that wasn't approved. Working through it by hand, the old code would fail the day-before case but pass the Jan 1 case by coincidence. I left existing tests unchanged.
+AGENT_RC=0

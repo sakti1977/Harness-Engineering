@@ -1,0 +1,10 @@
+The bug is fixed: a failed cloud save now shows as an error instead of "synced". `npx vitest run` passes (38 files, 281 tests) and `npx tsc --noEmit` is clean.
+
+**Cause:** this only affects databases where migration 009 (the one-step save function) isn't installed. In that case `/api/sync` falls back to an older save path in `lib/sync-push.ts`. That path saved the profile, then threw away any database error from that write (`void profileError;`). So the route told the browser the save worked, the browser recorded a successful sync, and the profile never reached the database. A new device then loaded an empty profile.
+
+**Changes:**
+- **`lib/sync-push.ts`:** a failed profile write now throws an error, like the saved-notes (observation) writes in the same function already did. It throws before touching saved notes, so a failed save doesn't change them either. The route turns the error into a 500 response, and the sync status shows the error instead of "synced."
+- **`lib/sync-push-profile-error.test.ts`** (new test file): a regression test that simulates the profile write failing in the fallback path. It checks that the save reports an error and that saved notes are left alone.
+
+I checked the main save path (migration 009) and the browser-side sync code; both already report errors correctly, so they needed no changes.
+AGENT_RC=0

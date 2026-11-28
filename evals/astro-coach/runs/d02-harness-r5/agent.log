@@ -1,0 +1,16 @@
+I fixed the age calculation in `lib/astrology/prompts/validator.ts`, which works out the age shown in the coaching prompt. The full test suite passes, but I couldn't confirm that my new test catches the old bug.
+
+**What was wrong:** the code turned the birth date (`"YYYY-MM-DD"`) into a date with `new Date(birthDate)`. That treats the date as midnight UTC. The code then read the month and day back in local time. Anywhere behind UTC, which includes all of the US, that lands on the evening before. So the birth date moved back a day, and on their birthday US users were told they were a year younger. That matches "on some days, for people in the US."
+
+**The fix:** the birth date is now read as plain year, month and day numbers and compared with today's local date, with no timezone conversion. `components/dasha/DashaTimeline.tsx` already handles birth dates the same way.
+
+**New test:** `lib/astrology/prompts/validator.tz.test.ts` runs the age check under New York, Los Angeles, Honolulu, UTC, India and UTC+14 time. It covers the birthday and the day before, Jan 1 and Dec 31 birthdays, and Feb 29 in a non-leap year. The existing test deliberately doesn't set a timezone, so it passes on a UTC machine even with the bug; that's why I added a separate file.
+
+**Verified (all logged in `HARNESS_LOG.md`):**
+- `npx vitest run` after the fix: 38 test files and 310 tests passed, including the new one.
+- `npx tsc --noEmit` before and after the fix: no errors.
+
+**Not verified:**
+- I couldn't watch the new test fail on the old code. Running just that file and temporarily undoing the fix with `git stash` both needed approval and weren't approved. I expect the birthday and Jan 1 cases to fail under the US timezones on the old code, but I haven't run that. The fix is still in place.
+- I only found this one place that calculates age (I searched `app/`, `lib/` and `components/`). If an age is also worked out somewhere else, such as the Python service, I haven't checked it.
+AGENT_RC=0

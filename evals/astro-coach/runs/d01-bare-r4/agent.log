@@ -1,0 +1,10 @@
+The bug is fixed. A failed profile save is now reported as an error, so the app no longer says "Synced" when nothing reached the cloud.
+
+**Cause:** in `lib/sync-push.ts`, the backup save path (used when the database's transactional `sync_push` function isn't installed yet, from migration 009) ignored the error from the profile write. `/api/sync` then returned success and the device showed "Synced", but the profile never got to Supabase. A new device then loaded an empty profile.
+
+**Fix:** that error is now thrown (`if (profileError) throw profileError;`). The API returns a 500, and the sync status shows an error instead of "Synced". Because it stops right there, a failed profile write also leaves the cloud's coaching observations untouched. The main save path (`sync_push`) was already correct, so I didn't change it.
+
+**Test:** I added `lib/sync-push.profile-error.test.ts`. It simulates a failed profile write on the backup path and checks that the save is rejected and nothing else is written.
+
+**Checks:** `npx tsc --noEmit` passes. On the first `npx vitest run`, one test failed: the `supervise_children` test, which checks that the app shuts down when the ephemeris process dies. It doesn't touch the sync code, and I didn't find out why it failed. I ran the suite twice more and both runs passed all 281 tests, so it looks intermittent.
+AGENT_RC=0

@@ -1,0 +1,10 @@
+I fixed the bug where long, multi-line coaching replies couldn't be read. `npx vitest run` passes (38 files, 282 tests) and `npx tsc --noEmit` reports no errors.
+
+**Cause:** the coaching reply goes through `extractJsonObject` in `lib/claude-json.ts`, which used by `app/api/coach/reflect/route.ts`. Before parsing, `prepareJsonString` replaced every line break and tab with an escaped `\n` or `\t`. That fixes line breaks inside text values, but it also changed the line breaks and indentation between fields. When the reply came back laid out over several lines, the result was invalid and the parse failed. A reply that came back on one line worked, which is why the same request sometimes succeeded.
+
+**Fix:** `prepareJsonString` now goes through the text character by character and keeps track of whether it is inside a quoted text value, including escaped quotes and backslashes. It only escapes line breaks, carriage returns and tabs inside those values, and leaves the layout between fields alone. The rest of the function, including how it finds the start and end of the JSON, is unchanged. That also fixes the dasha route, which uses the same function.
+
+**Tests:** I added `lib/claude-json.multiline.test.ts`. It covers a fenced, tab-indented reply with Windows-style line endings, a line break inside a value and escaped quotes. It also covers a value ending in an escaped backslash. The existing tests in `lib/claude-json.test.ts` already included the pretty-printed case and now pass.
+
+One rare case is still not handled: a backslash in the reply immediately followed by an actual line break. That would still fail to parse.
+AGENT_RC=0
