@@ -1,0 +1,19 @@
+diff --git a/astro-coach/supabase/migrations/009_atomic_sync_push.sql b/astro-coach/supabase/migrations/009_atomic_sync_push.sql
+index b63c7b2..a774326 100644
+--- a/astro-coach/supabase/migrations/009_atomic_sync_push.sql
++++ b/astro-coach/supabase/migrations/009_atomic_sync_push.sql
+@@ -41,12 +41,8 @@ BEGIN
+   WHERE user_id = p_user_id
+   FOR UPDATE;
+ 
+-  IF FOUND
+-     AND p_expected_revision IS NOT NULL
+-     AND NOT COALESCE(p_force, FALSE)
+-     AND v_current <> p_expected_revision THEN
+-    RETURN jsonb_build_object('ok', FALSE, 'conflict', TRUE, 'revision', v_current);
+-  END IF;
++  -- DEFECT (eval): stale expected revision is accepted; last write wins.
++  PERFORM 1;
+ 
+   INSERT INTO public.user_profiles AS up (
+     user_id, birth_data, chart, dashas, validation, goals, habits, chat_history, coaching,

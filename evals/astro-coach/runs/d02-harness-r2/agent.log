@@ -1,0 +1,15 @@
+I fixed the bug that puts the wrong age into the coaching prompt for US users. I reproduced it with a new test before fixing it, but it doesn't match the report exactly: what I reproduced makes people a year **older** a day early, not younger.
+
+**What changed:** `lib/astrology/prompts/validator.ts` (`buildValidatorUserPrompt`) worked out age by turning a birth date like `"1990-07-30"` into a date with `new Date(birthDate)`. JavaScript reads that as midnight UTC, and the code then reads it back in local time. In US timezones that lands on the day before, so the age changed on the wrong day. The fix reads the year, month and day straight from the string. If the string isn't in `YYYY-MM-DD` form, the age line is now left out of the prompt instead of being calculated from a bad date.
+
+**Verified** (commands and output are in `HARNESS_LOG.md`):
+- I added `lib/astrology/prompts/validator.timezone.test.ts`, which runs the age check in New York, Los Angeles, Honolulu, UTC and India time. Running it alone needed a permission you declined, so I ran the full suite.
+- **Before the fix,** `npx vitest run`: 6 tests failed, all in the three US timezones. The day before a birthday it gave 36 instead of 35. On 28 Feb it aged someone born on 29 Feb a year early. UTC and India passed.
+- **After the fix,** `npx vitest run`: all 38 files and 305 tests passed. `npx tsc --noEmit` finished with no errors.
+
+**Not verified:**
+- **Wrong direction:** the user says they're shown as a year younger. If the server runs on UTC, as Railway usually does, the parsing bug wouldn't trigger in production at all. A more likely remaining cause is that "today" is the server's date, not the user's: in some hours the server is already on a different calendar day than the user. Fixing that would mean the browser sending the user's local date to `/api/validate`. I didn't make that change.
+- **Other age calculations:** I searched `app/`, `lib/` and `components/` and found no others. `components/dasha/DashaTimeline.tsx` already reads the birth year straight from the string.
+
+The existing `validator.test.ts` says the string was already parsed manually, but the code didn't do it until now. Its tests passed anyway because they ran in whatever timezone the machine has, which is presumably not a US one.
+AGENT_RC=0

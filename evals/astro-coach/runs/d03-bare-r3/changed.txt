@@ -1,0 +1,2 @@
+A	astro-coach/lib/sync-push-migration.test.ts
+M	astro-coach/supabase/migrations/009_atomic_sync_push.sql

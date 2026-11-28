@@ -1,0 +1,33 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed it: a phone with an out-of-date copy can no longer save over newer notes from another device. It now gets a conflict back and the cloud copy is left alone.
+
+**Cause.** Each saved profile carries a revision number, and the app sends the revision it last saw when it saves. The database function that does the save (`public.sync_push` in `supabase/migrations/009_atomic_sync_push.sql`) locked the row but never compared those numbers. In their place was a do-nothing `PERFORM 1` line, so whichever device saved last won.
+
+**Changes:**
+1. **The missing check (migration 009).** If the device sends a revision and didn't ask to force the save, and that revision doesn't match the stored one, the function now returns `{"ok": false, "conflict": true, "revision": <current>}` before writing anything. A user with no saved profile yet counts as revision 0. The API route already turns that response into a 409 "Cloud copy changed on another device" error.
+2. **A per-user lock (also migration 009).** The existing row lock does nothing for a user's first save, because there's no row yet. Without this, two devices saving for the first time at once could both get through.
+3. **A regression test (`lib/sync-push-migration.test.ts`).** The unit tests can't reach a database, so it only checks the migration's text: the comparison exists and comes before any write, and the lock is taken before the row is read.
+
+**Verified** (all commands and outputs are in `HARNESS_LOG.md`):
+- **Your scenario, on the local `eval_race` database after reloading the edited migration:** the laptop saves at revision 1 and becomes revision 2. The phone then tries to save with revision 1 and gets a conflict; the laptop's notes and revision 2 are unchanged.
+- **Other cases on the same database:**
+  - A forced save goes through.
+  - A save from an older client that sends no revision goes through.
+  - A save with the current revision goes through.
+  - A stale revision for a user with no saved profile returns a conflict.
+- **Two devices saving at the same moment:** I ran two real database sessions, one holding its transaction open while the other saved with the same revision. This was tested for a user with no saved profile and for one with a profile. In both, the second save waited for the first to finish and then got a conflict.
+- `npx vitest run`: all 38 test files and 283 tests pass. The first run had one failure caused by my own new test, which I fixed.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I didn't confirm the new test fails on the original code. I expect it would, since the comparison it looks for wasn't there.
+- I didn't run the full app with two devices; the fix was checked at the database level only.
+- **Two remaining paths:**
+  - If migration 009 hasn't been applied, the server uses an older save path that ignores revisions entirely.
+  - Older clients that send no revision are still protected only by a timestamp comparison.
+
+  I left both as they were.
+- I didn't read the app-side code that handles the 409 response, so I can't say how the phone shows the conflict or prompts a refresh.
+
+The local database is left loaded with the fixed migration and my test rows (user IDs `3333…` and `4444…`).
+AGENT_RC=0

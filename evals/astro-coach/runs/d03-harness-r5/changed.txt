@@ -1,0 +1,3 @@
+A	astro-coach/HARNESS_LOG.md
+A	astro-coach/lib/sync-push.race.sql
+M	astro-coach/supabase/migrations/009_atomic_sync_push.sql

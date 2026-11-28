@@ -1,0 +1,18 @@
+I fixed the parser that reads coaching replies. The full test suite and type check pass. I haven't seen the tests fail on the old code, though, so I haven't proven this change is what fixes your report.
+
+**The cause:** `lib/claude-json.ts` cleans up the AI's JSON reply before reading it, and every coaching route uses it (`app/api/coach/plan-habits`, `coach/reflect`, `habits`, `dasha`, `validate`). Part of that cleanup turned every raw line break and tab into the two characters `\n` or `\t`. That's right inside a text value, but not for the line breaks that just lay the reply out over several lines. A reply like `{\n  "habits": ...` became `{\n  "habits"` with a literal `\n`, which is invalid. So replies that came back on one line loaded, and replies spread over several lines failed. That matches "works sometimes, fails when long and multi-line."
+
+**What I changed:**
+- **`lib/claude-json.ts`:** the cleanup now walks through the reply and keeps track of whether it is inside a quoted text value. It only converts line breaks, carriage returns and tabs inside those values, and leaves the layout whitespace between them alone.
+- **New test file `lib/claude-json.multiline.test.ts`:** covers a fenced, tab-indented plan with Windows-style line endings and surrounding prose, plus a backslash right before a closing quote.
+- **`HARNESS_LOG.md`:** created with the plan and every check I ran.
+
+**Verified:**
+- `npx vitest run`: 38 test files and 282 tests passed. That includes the existing multi-line and carriage-return tests in `lib/claude-json.test.ts`, which, from reading the code, the old version should fail.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I didn't run the tests against the original code. The baseline run and a temporary stash to rerun them without the fix both needed approval that wasn't granted. That the old code broke multi-line replies comes from reading it, not from a test run.
+- I didn't reproduce the failure in the running app with a real AI reply.
+- Replies can still fail to load if there's a stray `}` in text after the JSON. That's an older, separate problem that an existing test already documents, and I left it alone.
+AGENT_RC=0

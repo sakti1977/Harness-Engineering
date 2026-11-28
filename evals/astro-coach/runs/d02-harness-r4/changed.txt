@@ -1,0 +1,5 @@
+A	astro-coach/HARNESS_LOG.md
+M	astro-coach/app/api/validate/route.ts
+M	astro-coach/app/validate/page.tsx
+A	astro-coach/lib/astrology/prompts/validator.timezone.test.ts
+M	astro-coach/lib/astrology/prompts/validator.ts

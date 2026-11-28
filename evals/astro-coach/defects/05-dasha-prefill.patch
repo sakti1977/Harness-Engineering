@@ -1,0 +1,19 @@
+diff --git a/astro-coach/lib/claude.ts b/astro-coach/lib/claude.ts
+index a97d372..8e468b8 100644
+--- a/astro-coach/lib/claude.ts
++++ b/astro-coach/lib/claude.ts
+@@ -188,12 +188,13 @@ export async function generateDashaPrediction(
+     system: "You are a strict JSON-only API. Output EXACTLY one valid JSON object and nothing else. Do not add any explanation, greeting, or markdown. Do not wrap the JSON in code fences. The output must start with { and end with }.",
+     messages: [
+       { role: "user", content: prompt },
++      { role: "assistant", content: "{" },
+     ],
+   });
+   recordLlmUsage("dasha", MODEL_PRIMARY, response.usage);
+   const block = response.content[0];
+   if (block.type !== "text") throw new Error("Unexpected response type");
+-  return block.text;
++  return "{" + block.text;
+ }
+ 
+ export async function generateHabits(prompt: string): Promise<string> {

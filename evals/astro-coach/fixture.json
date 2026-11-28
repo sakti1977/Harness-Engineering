@@ -1,0 +1,130 @@
+{
+  "name": "astro-coach-fixture",
+  "status": "matrix complete: 4 defects x bare/harness x 5 repeats = 40 attempts; all 40 graded pass; discriminates nothing yet",
+  "source": {
+    "repo": "https://github.com/sakti1977/astro-coach",
+    "pinned_commit": "43c695a",
+    "product_subdir": "astro-coach",
+    "history_fetched": "depth 400 from origin/main"
+  },
+  "baseline_at_pin": {
+    "installed_with": "npm ci (Node 22.23.5, npm 10.9.9)",
+    "vitest": {
+      "test_files": 37,
+      "tests": 280,
+      "result": "all passed"
+    },
+    "tsc_noemit": "clean"
+  },
+  "defect_sites_at_pin": [
+    {
+      "jyotish_task_defect": 1,
+      "behavior": "save reports synced without a durable write",
+      "current_code": "app/api/sync/route.ts (POST) -> lib/sync-push.ts pushSync",
+      "existing_guard": "sync-push and route tests; product non-negotiable #1",
+      "fixing_commits_candidate": [
+        "4c37856",
+        "2231084"
+      ]
+    },
+    {
+      "jyotish_task_defect": 2,
+      "behavior": "age computed from date-only string parsed as UTC, off by one behind UTC",
+      "current_code": "lib/astrology/prompts/validator.ts (age line, around lines 40-55)",
+      "existing_guard": "lib/astrology/prompts/validator.test.ts, comment tagged HARNESS-01"
+    },
+    {
+      "jyotish_task_defect": 3,
+      "behavior": "coaching written against a superseded chart",
+      "current_code": "lib/sync-push.ts expectedRevision/force -> sync_push RPC (migration 009)",
+      "existing_guard": "not yet located in the product's tests",
+      "fixing_commits_candidate": [
+        "2231084",
+        "0683061"
+      ]
+    }
+  ],
+  "open_decisions": [
+    "Add defects from real fixing commits so the set is harder and larger (needs a choice of commits).",
+    "Define a dev/held-out split for defects."
+  ],
+  "not_done": [
+    "No defect has been injected yet.",
+    "No hidden checks written yet.",
+    "No split (dev vs held-out) defined yet."
+  ],
+  "defects": [
+    {
+      "jyotish_task_defect": 2,
+      "fixing_commit": "1fc5f00",
+      "patch": "evals/astro-coach/defects/02-age-utc-midnight.patch",
+      "method": "reverse only the validator.ts hunk; other hunks of 1fc5f00 (dasha, python tests) untouched",
+      "verified": "reverted code fails 1 of 6 tests under TZ=America/New_York and TZ=America/Los_Angeles; passes under UTC and Asia/Kolkata; fixed code passes all 6 under New York",
+      "grader_requirement": "pin TZ=America/New_York; the defect is invisible in UTC"
+    },
+    {
+      "jyotish_task_defect": 1,
+      "fixing_commit": "2231084 (legacy fallback in lib/sync-push.ts)",
+      "patch": "evals/astro-coach/defects/01-sync-swallowed-profile-error.patch",
+      "method": "in pushSyncLegacy, the profile upsert error is swallowed; takes effect when migration 009 is absent (fallback path)",
+      "verified": "product's sync-push and storage-supabase tests (11) still pass with the defect; hidden check defect-01 fails: pushSync resolves { ok: true } on a failed profile write",
+      "hidden_check": "evals/astro-coach/checks/defect-01-sync-profile-error.test.ts",
+      "product_gap": "no product test asserts that a failed profile upsert surfaces as an error"
+    },
+    {
+      "jyotish_task_defect": 3,
+      "fixing_commit": "2231084 (migration 009 sync_push conflict check)",
+      "patch": "evals/astro-coach/defects/03-revision-race.patch",
+      "method": "remove the stale-revision conflict check from sync_push() in migration 009; last write wins",
+      "verified": "against Postgres 16 with migration 009 applied: fixed sync_push returns conflict and keeps device 1's observation; defective version accepts the stale push and overwrites it. Product's sync-push and storage tests (11) still pass with the defect.",
+      "hidden_check": "evals/astro-coach/checks/defect-03-revision-race.sh (+ defect-03-stubs.sql, defect-03-scenario.sql)",
+      "product_gap": "the product's TypeScript tests mock the RPC, so no product test runs the SQL conflict path"
+    },
+    {
+      "jyotish_task_defect": 4,
+      "fixing_commit": "83c39a5",
+      "patch": "evals/astro-coach/defects/04-json-whitespace.patch",
+      "method": "reverse the code hunk in lib/claude-json.ts; the commit's own test is kept, so defect is caught by visible tests",
+      "verified": "baseline 16/16 pass; defect: 4 visible tests + held-out fail",
+      "hidden_check": "evals/astro-coach/checks/defect-04-json-whitespace.test.ts"
+    }
+  ],
+  "splits": {
+    "held_in": "what the agent sees: user reports (the Jyotish task's ISSUES text, reworded as bug reports) and the product's visible test suite (280 tests at the pin)",
+    "held_out": "hidden checks the agent never sees: defect-01 probe (sync profile error), defect-02 age under TZ=America/New_York, defect-03 SQL race script",
+    "limit": "three defects make three tasks; that is too few for the paper's split statistics. Split by information, and repeat runs; add more defects before drawing rate conclusions."
+  },
+  "stub": {
+    "anthropic": "evals/astro-coach/stubs/anthropic_stub.py",
+    "how": "run the stub, then export ANTHROPIC_BASE_URL=http://127.0.0.1:8787; the product's SDK (lib/claude.ts) honours it",
+    "verified": "SDK call returns the fixed reply through the stub"
+  },
+  "run_policy": {
+    "document": "evals/astro-coach/RUN_POLICY.md",
+    "workspace_script": "evals/astro-coach/prepare_run.sh <product-git-dir> <01|02|03|none> <out-dir>",
+    "workspace_guarantees": "pinned product tree, defect patch applied, single fresh commit (fixing commits unreachable), reports copied in, hidden checks absent",
+    "enforcement_gap": "Closed for agent runs: the agent process runs inside run_sandboxed.sh. Only the relay host can reach the API, and the key is injected there."
+  },
+  "checks_status": {
+    "defect-01": "written; sandbox-verified: passes on fixed, fails on defect",
+    "defect-02": "written; sandbox-verified under TZ=America/New_York: passes on fixed, fails on defect",
+    "defect-03": "written; sandbox-verified against Postgres 16 inside the sandbox: passes on fixed, fails on defect",
+    "defect-04": "written; verified on baseline (pass) and defect (fail)"
+  },
+  "sandbox_verification": {
+    "baseline_full_suite": "280/280 pass inside run_sandboxed.sh (whole repo mounted, app subdir as cwd)",
+    "defect-01_full_suite": "280/280 pass (defect invisible to product tests, as designed)",
+    "defect-01_hidden": "baseline pass; defect fails (resolves { ok: true })",
+    "defect-02_hidden_TZ_NewYork": "baseline 2/2 pass; defect fails (35 vs 36 birthday case)",
+    "defect-03_hidden_postgres": "baseline PASS (conflict true, o1 kept); defect FAIL (stale push accepted, o2 overwrites o1)",
+    "note": "defect-02 patch was regenerated as the reversal of 1fc5f00's validator.ts hunk; the earlier file was the forward fix and did not apply to the pin"
+  },
+  "results": {
+    "attempts": 40,
+    "graded_pass": 40,
+    "existing_tests_edited": 0,
+    "void": 0,
+    "note": "d04-harness-r3 (void: disk full) and d04-harness-r5 (stopped early: API credit) were rerun and pass"
+  },
+  "interpretation_note": "The reports in reports/ already state symptoms only, not causes. The ceiling is therefore not explained by leaked diagnoses. Likely causes: defects are one-line changes with specific tests, and the held-out checks target the same behaviour the report describes. Needs a harder set."
+}

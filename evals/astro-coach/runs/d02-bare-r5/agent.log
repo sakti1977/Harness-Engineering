@@ -1,0 +1,8 @@
+I fixed the bug. The age calculation now gives the correct age in US timezones, including on the person's birthday. All tests pass (`npx vitest run`: 38 files, 283 tests) and `npx tsc --noEmit` reports no errors.
+
+**Cause:** `buildValidatorUserPrompt` in `lib/astrology/prompts/validator.ts` builds the "Person's current age" line that goes into the coaching prompt. It turned the birth date into a date with `new Date(birthDate)`, which reads `"1990-07-30"` as midnight UTC. It then read the month and day back in local time. For anyone behind UTC, which includes the whole US, that gives the day before (Jul 29). So the birthday was effectively moved one day early, and the age came out a year off on the day before or on the birthday. That's why it only happened "on some days" and only for US users. The same mistake had already been fixed in `components/dasha/DashaTimeline.tsx` but not here.
+
+**Changes:**
+- **`lib/astrology/prompts/validator.ts`:** the code now reads the year, month and day straight from the `"YYYY-MM-DD"` text and compares them with today's local date. Timezone no longer affects the result. If the date can't be read, the age line is left out rather than showing a wrong number.
+- **New test, `lib/astrology/prompts/validator.tz.test.ts`:** it sets the timezone to `America/Los_Angeles` and checks three cases: on the birthday, the day before, and a Jan 1 birthday on Jan 1. The existing tests never caught this because they don't fix a timezone. I couldn't run the new test against the old code to watch it fail (the command to temporarily undo my change was declined). Working through the old logic by hand, the day-before case gives 36 instead of 35, so it should catch the bug.
+AGENT_RC=0

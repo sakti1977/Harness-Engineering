@@ -1,0 +1,20 @@
+The save showed "Synced" even when the profile never reached the server. I fixed it so a failed save now shows a sync error, and the full test suite and type-check both pass.
+
+**Cause:** the server has two ways to save. The main one (`sync_push`, from database migration 009) is fine. The fallback, used when that migration isn't applied, ignored the error when writing the profile (`void profileError;` in `lib/sync-push.ts`). So `/api/sync` answered "ok", the app recorded a successful sync and showed "Synced", but nothing was stored. A new device then loaded an empty profile.
+
+**Changes:**
+- `lib/sync-push.ts`: a failed profile write now raises an error (`if (profileError) throw profileError;`), before any coaching notes are touched. The save request then fails, the app shows the error, and "Synced" no longer appears.
+- New test `lib/sync-push-profile-error.test.ts`: on the fallback path, if the profile write fails, the save must fail and the coaching notes must not be touched.
+- `HARNESS_LOG.md`: the plan and every command run, with results.
+
+**Verified:**
+- `npx vitest run`: 38/38 test files and 281/281 tests pass.
+- `npx tsc --noEmit`: no errors.
+- With the old line put back temporarily, `npx vitest run` fails only the new test ("promise resolved { ok: true } instead of rejecting"), so the test catches this bug. I restored the fix and re-ran both checks; both pass.
+
+**Not verified:**
+- I didn't run the app or test against a real Supabase database, so I haven't seen the error message appear in the UI.
+- From reading the 009 migration, the main save path looks like it can't fail silently, but no test runs it against a real database.
+- I suspect production doesn't have migration 009 applied, since that's the only way to reach the fallback. I haven't checked Railway or Supabase. If it's missing, applying it would also stop the fallback being used.
+- I don't know why the profile write fails in production, and this change doesn't fix that. It only makes the failure visible. Checking the server logs for errors tagged `sync-push` should show the cause.
+AGENT_RC=0

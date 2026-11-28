@@ -1,0 +1,14 @@
+diff --git a/astro-coach/lib/sync-push.ts b/astro-coach/lib/sync-push.ts
+index 58af07c..763caca 100644
+--- a/astro-coach/lib/sync-push.ts
++++ b/astro-coach/lib/sync-push.ts
+@@ -69,7 +69,8 @@ async function pushSyncLegacy(admin: SupabaseClient, input: SyncPushInput): Prom
+   const { error: profileError } = await admin
+     .from("user_profiles")
+     .upsert({ user_id: userId, ...profileRow, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+-  if (profileError) throw profileError;
++  // DEFECT (eval): profile write error swallowed; caller reports success.
++  void profileError;
+ 
+   if (!observations) return;
+ 

@@ -1,0 +1,22 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed the bug: a phone that hasn't refreshed can no longer save over newer notes from the laptop. The phone's save is now rejected as a conflict.
+
+**Cause:** The app already remembers which version of the cloud data each device last loaded and sends that version number with every save. But the database function that does the save (`sync_push` in `supabase/migrations/009_atomic_sync_push.sql`) never compared it to the stored version — where the check should have been there was only a do-nothing `PERFORM 1`. So any save went through, and the last one won.
+
+**Fix:** After the function locks the user's row, it now checks the version. If force isn't set and the version the device sent doesn't match the stored one, it returns `{ok:false, conflict:true, revision:<current>}` and writes nothing. A user with no saved row yet counts as version 0. A forced save, or one that sends no version, behaves as before.
+
+I also added `lib/sync-push.race.sql`, a SQL script that replays the two-device scenario. Every step is recorded in `HARNESS_LOG.md`.
+
+**Verified:**
+- **Local database** (reset, reloaded with the stubs and the fixed migration, then ran `lib/sync-push.race.sql`):
+  - The laptop save with the current version succeeded (version 2).
+  - The stale phone save, still sending version 1, returned `conflict: true, revision: 2`.
+  - Afterwards the stored notes were still the laptop's (`{"n":"laptop"}`) and the laptop's observation was still there (count 1).
+  - Forced saves and saves that send no version still went through.
+- **`npx vitest run`:** all 280 tests passed (37 files).
+- **`npx tsc --noEmit`:** no errors.
+
+**Not verified:**
+- From reading the code, `app/api/sync/route.ts` already turns a `conflict` result into a "Cloud copy changed on another device" error response. I didn't run the route or the app, so I haven't seen how the phone's screen handles that rejection.
+- Production only gets the fix when this new version of migration 009 is applied there.
+AGENT_RC=0

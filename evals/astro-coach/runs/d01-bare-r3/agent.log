@@ -1,0 +1,10 @@
+I fixed the bug: the app could say "Synced" even when the profile was never saved to the cloud. All 38 test files (281 tests) pass with `npx vitest run`, and `npx tsc --noEmit` is clean.
+
+**Cause:** The fault is in `lib/sync-push.ts`, in the fallback save path the server uses when the newer database function (migration `009_atomic_sync_push.sql`) isn't installed. That path saves the profile first, and if the save failed, the error was thrown away. The `/api/sync` route then answered "ok", the device showed "Synced", and the birth details never reached the database. So a new device pulled down an empty profile.
+
+**Changes:**
+- **`lib/sync-push.ts`:** a failed profile save now raises an error. The route returns a 500, the device shows the error instead of "Synced", and the observations step is skipped.
+- **`lib/sync-push-profile-error.test.ts` (new):** a regression test that simulates a failed profile save on the fallback path. It checks that the sync now fails and that nothing else is written.
+
+When the database function is installed, saves go through it in one transaction and its errors already reached the user, so that path didn't need a change.
+AGENT_RC=0

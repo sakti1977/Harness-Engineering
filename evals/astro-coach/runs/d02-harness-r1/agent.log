@@ -1,0 +1,23 @@
+I fixed the bug. When the coaching prompt worked out a user's age, it misread the birth date as the day before in US timezones, so the age came out a year too low on the birthday itself.
+
+**Cause:** in `lib/astrology/prompts/validator.ts`, `buildValidatorUserPrompt` used `new Date(birthDate)`. A plain date like `"1990-07-30"` is read as midnight UTC. The code then reads the day and month back in local time, and in the US that is still the evening before (Jul 29). The existing `validator.test.ts` says this was already fixed by parsing the date by hand, but the code never was. Those tests run in UTC, where the problem doesn't happen, so they didn't catch it.
+
+**What I changed:**
+- **`validator.ts`:** added `ageOnDate(birthDate, today)`. It takes the year, month and day straight from the `YYYY-MM-DD` string and compares them with today's local date. The prompt now uses it, and leaves out the age line if the birth date can't be parsed.
+- **New test file `lib/astrology/prompts/validator.timezone.test.ts`:** switches the timezone to `America/Los_Angeles` for its tests. One test checks that the switch took effect (`new Date("1990-01-01").getDate()` gives 31). The others cover:
+  - the birthday itself;
+  - the day before the birthday;
+  - Jan 1 births on Jan 1;
+  - Feb 29 births;
+  - an unreadable birth date.
+- **`HARNESS_LOG.md`:** the plan, plus each command and its result.
+
+**Verified:**
+- `npx vitest run` → 38 files, 285 tests passed, including the new file.
+- `npx tsc --noEmit` → no errors.
+
+**Not verified:**
+- I didn't run the new test against the old code to show it fails there. Swapping the old file back in needed shell commands that required approval, so I skipped it. The check that the timezone switch worked passes, which strongly suggests the old code would fail, but I haven't run it.
+- I looked for other age calculations and found none. `components/dasha/DashaTimeline.tsx` already reads the birth year by hand.
+- "Today" still comes from the server's clock. If the server runs in UTC, a US user can see their age go up a few hours early on the evening before their birthday. That's a separate, smaller issue, and fixing it would mean passing in the user's timezone.
+AGENT_RC=0

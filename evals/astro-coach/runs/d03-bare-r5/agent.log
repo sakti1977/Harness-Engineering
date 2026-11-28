@@ -1,0 +1,16 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed it: a phone that hasn't refreshed can no longer overwrite notes saved on another device. `npx vitest run` passes (38 files, 282 tests) and `npx tsc --noEmit` is clean.
+
+**Cause:** the database save function `public.sync_push` (in `supabase/migrations/009_atomic_sync_push.sql`) is meant to reject a save when the device's copy is out of date. It locked the user's row but never actually ran that check (the spot held a `PERFORM 1;` placeholder), so the last device to save always won. The app code was already doing its part: it sends the version number it last saw and handles a rejection.
+
+**Fix** (all in the migration):
+- **Stale-save check:** before writing anything, the function compares the device's version number with the stored one. If they differ and the save isn't forced, it changes nothing and returns `{ok:false, conflict:true, revision:<current>}`. The app turns that into its existing "pull latest first" response. A user with no saved data yet counts as version 0.
+- **First-save lock:** the existing row lock does nothing for a user with no saved data yet, so two first saves could still race. A per-user lock now covers that case too.
+- Forced saves, and older clients that don't send a version number, behave as before.
+
+**Checked on the local Postgres** after reloading it with the edited migration: a laptop save went through at version 2, then a phone save still on version 1 was rejected. The laptop's notes and observations were still there afterwards. Forced saves, saves without a version number, and a brand-new user claiming the wrong version also behaved as expected.
+
+I added `lib/sync-push-migration.test.ts` to guard against this coming back. It only checks that the migration text still contains the version check and the lock, not that the function behaves correctly.
+
+The live database still has the old function, so the fix only takes effect once the edited migration is applied there. Re-running the migration file is enough, since it uses `CREATE OR REPLACE`.
+AGENT_RC=0

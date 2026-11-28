@@ -1,0 +1,17 @@
+I fixed the bug in the shared code that reads Claude's replies, `lib/claude-json.ts`. The full test suite and the type check both pass now.
+
+**Cause:** before parsing a reply, `prepareJsonString` turned every line break into the two characters `\n`, including the line breaks *between* fields. That's only correct inside a quoted text value. When Claude formats its reply over several lines, the cleaned-up text was broken right after the opening `{`, so parsing failed and the app showed "could not read the reply". Replies that came back on a single line still worked, which is why it only happened sometimes.
+
+**Fix:** a new helper, `escapeControlCharsInStrings`, walks through the reply and only escapes line breaks, carriage returns and tabs that sit inside quoted text. It tracks escaped quotes so it doesn't lose its place. The line breaks between fields are left as they are.
+
+**Verified (commands run, logged in `HARNESS_LOG.md`):**
+- Before the fix, `npx vitest run` had 4 failures, all in `lib/claude-json.test.ts`, with "Expected property name or '}' in JSON at position 1". That matches the cause above.
+- After the fix, `npx vitest run` passes: 37 test files, 280 tests.
+- `npx tsc --noEmit` finishes cleanly with no errors.
+- A search shows only two places use this code: `app/api/coach/reflect/route.ts` and `app/api/dasha/route.ts`, so both get the fix.
+
+**Not verified:**
+- I haven't reproduced it in the running app against a live Claude reply. I'm assuming the "coaching plan" request goes through one of those two routes.
+- One known weakness remains on purpose: the code finds the end of the reply by taking the last `}` in it, so a stray `}` in text after the JSON can still break parsing. An existing test (which I'm not allowed to change) checks for exactly that behaviour, and it isn't the cause of this report.
+- I didn't run the project's own checker against the non-negotiables (the `astro-coach-evaluator` agent); its test, `lib/non-negotiables.harness.test.ts`, did pass as part of the full suite.
+AGENT_RC=0

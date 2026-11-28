@@ -1,0 +1,7 @@
+{"ok": true, "revision": 1}
+device1|{"ok": true, "revision": 2}
+device2_stale|{"ok": false, "conflict": true, "revision": 2}
+final_observations|o1
+final_revision|2
+PASS
+HELDOUT_RC=0

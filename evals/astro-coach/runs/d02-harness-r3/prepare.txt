@@ -1,0 +1,3 @@
+workspace: /tmp/ws-d02-harness-r3
+commits: 1
+tree hash: 334bace3516f9857c3d9ad8ac7cbc0bde5cb49b7

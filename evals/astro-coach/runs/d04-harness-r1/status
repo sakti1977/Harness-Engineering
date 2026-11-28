@@ -1,0 +1,5 @@
+run=d04-harness-r1 defect=04 condition=harness n=1
+prepare_commit=ff3621e345a0b8cb13fa3bc4731e1dfd1af05a76
+HELDOUT_RC=0
+existing_test_files_edited_or_deleted=0
+agent_rc=AGENT_RC=0

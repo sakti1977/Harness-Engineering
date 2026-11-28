@@ -1,0 +1,21 @@
+The age bug is fixed: the age now comes out right in US timezones in every case I tested. One thing doesn't match the report, though. In my tests the old code made US users a year **older** on the day before their birthday, not younger. Plain date arithmetic can't make anyone too young, so the "younger" symptom must come from somewhere I didn't find.
+
+**Cause:** `buildValidatorUserPrompt` in `lib/astrology/prompts/validator.ts` worked out the age from the birth date using `new Date("YYYY-MM-DD")`. That reads the date as midnight UTC, and then the code read it back in local time. In US timezones, which are behind UTC, that moves the birth date one day earlier.
+
+**Changes:**
+- **`lib/astrology/prompts/validator.ts`:** the birth date is now read as plain year, month and day numbers (`parseYmd`), and the age is simple calendar maths (`ageOn`). Someone born on 29 Feb turns a year older on 1 Mar in non-leap years.
+- **Server vs. user date:** "today" used to be the server's date, which can be a different day from the user's. The `/validate` page (`app/validate/page.tsx`) now sends the user's local date. `app/api/validate/route.ts` passes it on, and it's only used if it's within one day of the server's UTC date; otherwise the server's date is used.
+- **New test file `lib/astrology/prompts/validator.timezone.test.ts`:** covers New York, Los Angeles, Honolulu, Kolkata and UTC, plus a UTC server with a US user's local date. No existing tests were changed.
+- **`HARNESS_LOG.md`:** has the plan and each command with its result.
+
+**Verified:**
+- `npx vitest run` before the fix: 6 of the new tests failed, all in the three US timezones (age 36 instead of 35 on the day before the birthday, and the same for a 29 Feb birth date on 28 Feb). Kolkata and UTC passed.
+- `npx vitest run` after the fix: all 312 tests in 38 files pass.
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I couldn't run the existing tests with a US timezone set from the command line (that needed approval here), so the new test file sets the timezone itself instead.
+- I'm assuming the production server runs in UTC; I didn't check.
+- This is the only age calculation I found in `app/`, `lib/` or `components/`. If the coaching chat also shows a too-young age, it's probably the AI model working one out from the birth date itself. That's a guess and needs a real example to confirm.
+- I haven't run the app or tested the `/validate` page in a browser.
+AGENT_RC=0

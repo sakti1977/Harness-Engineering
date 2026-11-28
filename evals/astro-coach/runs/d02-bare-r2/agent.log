@@ -1,0 +1,13 @@
+I fixed the off-by-one age. The full test suite (`npx vitest run`) passes, 38 files and 286 tests, and `npx tsc --noEmit` is clean.
+
+**Cause:** The only place the app works out a user's age is `buildValidatorUserPrompt` in `lib/astrology/prompts/validator.ts`, which puts "Person's current age: N" into the AI prompt. It turned the birth date (`"YYYY-MM-DD"`) into a date with `new Date(birthDate)`. JavaScript reads a date-only string as midnight UTC, and the code then read the month and day back in the server's local timezone. In US timezones that is still the previous evening, so the birthday was treated as one day earlier. Around birthdays, and Dec 31 / Jan 1 births, the age came out one year wrong.
+
+**Fix:**
+- **New `ageOn(birthDate, today)` function** in `validator.ts`. It reads the year, month and day straight out of the string and compares them to today's date, so timezones can't shift the birthday.
+- **Prompt builder updated** to use `ageOn`. If the birth date can't be parsed, the age line is now left out instead of showing a wrong number.
+- **New test file** `lib/astrology/prompts/validator-age-tz.test.ts`. It runs the birthday, day-before, Jan 1 and Dec 31 cases under New York, Los Angeles, Honolulu, UTC and Kolkata time. I didn't run it against the old code because that command needed approval, but working through the old logic for New York, the "day before the birthday" case would have failed.
+
+**Two things to know:**
+- **Direction of the error:** working through the old code, the shift made US users one year *older* the day before their birthday, not younger as the report says. This is the only age calculation in the app, and after the fix the result is the same in every timezone, so I think it's the bug they hit. The report may have the direction backwards.
+- **Not changed:** "today" is still the server's date, not the user's. Near midnight a user far from the server's timezone could still see their birthday counted a day early or late. Fixing that needs the user's current timezone, and the app only stores the timezone they were born in.
+AGENT_RC=0

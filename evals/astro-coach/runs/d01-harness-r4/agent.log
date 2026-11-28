@@ -1,0 +1,20 @@
+I fixed the bug: if saving the profile to the cloud fails, the app now shows a sync error instead of "Synced".
+
+**Cause:** Pressing save sends the profile to `/api/sync`, which calls `pushSync()` in `lib/sync-push.ts`. That first tries a database function, `sync_push`, added by migration 009. If that function isn't there, it falls back to an older direct write. In the older write, the result of saving the profile was ignored on purpose (`void profileError`). So when the profile failed to save, the route still answered `{ ok: true }`, the app recorded a successful sync, and the screen said "Synced". A new device then found no profile in the cloud.
+
+**What I changed:**
+- `lib/sync-push.ts`: `if (profileError) throw profileError;`. A failed profile save now fails the whole sync, so the route returns an error and the screen shows it. It also stops before touching the saved coaching notes, so nothing is half-saved.
+- New test `lib/sync-push-profile-error.test.ts`: when the profile save fails in the fallback path, `pushSync` must report the failure and leave the coaching notes alone. I didn't change any existing test files.
+
+**Verified (all recorded in `HARNESS_LOG.md`):**
+- `npx vitest run` with the fix: 38 test files and 281 tests passed.
+- With the old line put back temporarily, `npx vitest run`: 1 failed, 280 passed. The new test failed with `promise resolved "{ ok: true }" instead of rejecting`, which is the reported bug.
+- After restoring the fix, `npx vitest run` passed all 281 tests again.
+- `npx tsc --noEmit`: no errors.
+- I couldn't run vitest on individual files because that command needed approval, so every run was the full suite.
+
+**Not verified:**
+- I haven't checked whether migration 009 is applied in production. If it isn't, every sync takes the older path and the user would have hit this bug on every save.
+- I didn't run the app or check the newer `sync_push` database path against a real database; it's only covered by the existing tests.
+- With this fix the user sees an error instead of "Synced". If their saves are failing for a real reason (for example, a permissions or column problem), that cause still needs fixing. The error message should now point to it.
+AGENT_RC=0

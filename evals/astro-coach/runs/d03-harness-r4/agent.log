@@ -1,0 +1,21 @@
+postgres ready: psql -h /sandbox/pg -U postgres -d eval_race
+I fixed it: a phone with an out-of-date copy can no longer overwrite notes saved on another device. It now gets a "sync conflict" response and has to pull the latest data first.
+
+**Cause:** Each device remembers the revision number it last synced and sends it with every save. The database function that writes the save (`sync_push` in `supabase/migrations/009_atomic_sync_push.sql`) locked the row but never compared that number to the stored one. Where the check should have been, there was a placeholder (`PERFORM 1`). So whichever device saved last always won, and the phone also replaced the laptop's coaching notes with its own older list.
+
+**Change:** That function now rejects the save when the device's revision doesn't match the stored one (a brand-new user counts as revision 0). It returns a conflict before writing anything. Two cases still go through: a save with `force` set, and older app versions that don't send a revision (the existing timestamp check still covers those). The client and the API route already handled the conflict response, and the client doesn't automatically retry with `force`. I also added a test, `lib/sync-push-migration.test.ts`, that checks the SQL keeps this guard. The plan and every command I ran are in `HARNESS_LOG.md`.
+
+**Verified:**
+- I reset the local `eval_race` database and reloaded the stubs and the edited migration with no errors. Then I ran `psql … -f /tmp/sync_push_check.sql`, which replays the report:
+  - The laptop's save (revision 1) succeeded and became revision 2.
+  - The stale phone's save (still on revision 1) came back as a conflict.
+  - Afterwards the laptop's notes were still there: stored revision 2, one coaching note.
+  - A save from an older app version, and a forced save, both still go through.
+- `npx vitest run`: all 283 tests passed (38 files).
+- `npx tsc --noEmit`: no errors.
+
+**Not verified:**
+- I didn't run the full app across two browsers. The end-to-end flow is checked only by reading the code.
+- If production already applied migration 009, editing that file won't change the live database. It would need to be re-run there or shipped as a new migration (e.g. `010`).
+- Older app versions that don't send a revision still rely on the timestamp check, which can let two near-simultaneous saves both through.
+AGENT_RC=0

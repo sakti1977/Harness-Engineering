@@ -1,0 +1,20 @@
+I fixed the age bug in `lib/astrology/prompts/validator.ts`, and all tests and the type check pass. One mismatch with the report: when I reproduced it, the age came out a year too high the day before the birthday, not a year too low.
+
+**Cause:** the age that goes into the validation prompt was worked out with `new Date(birthDate)`. That reads a plain date like `"1990-07-30"` as midnight UTC. Read back on a server set to a US timezone, it becomes the day before (July 29), so the age changed a day early. The existing `validator.test.ts` says this was fixed before by parsing the string by hand, but that code was no longer there. This is the only place in the app (`app/`, `lib/`, `components/`) that calculates an age.
+
+**Changes:**
+- **Fix:** added an `ageInYears()` helper that reads year, month and day straight from the string and compares them with today's local date, with no timezone conversion. An invalid date now leaves the age line out of the prompt, where before it would have printed `NaN years old`.
+- **New test:** `lib/astrology/prompts/validator.us-timezone.test.ts` runs the same age checks under New York, Los Angeles, Honolulu, Kolkata and UTC. It sets the timezone inside the test, so it catches this bug whatever timezone the test machine uses. The existing tests passed anyway because the machine isn't on a US timezone.
+- **`HARNESS_LOG.md`:** the plan, plus every command and its result.
+
+**What I ran (all recorded in `HARNESS_LOG.md`):**
+- **Before the fix,** `npx vitest run`: 6 failures, all in the new test file and only in the three US timezones. The day before a July 30 birthday it gave 36 instead of 35, and on Feb 28 for a Feb 29 birthday it gave 26 instead of 25. UTC and Kolkata passed.
+- **After the fix,** `npx vitest run`: 38 files and 310 tests passed.
+- **`npx tsc --noEmit`:** no errors.
+- **Not run:** I couldn't run commands that set the timezone on the command line or that ran a single test file, because both needed approval. Setting the timezone inside the test file got around that.
+
+**Not checked:**
+- **Why "younger":** I only saw the age come out a year too high, never too low. The fix makes the result independent of the server's timezone in both directions, but I haven't confirmed the exact case the user hit.
+- **Server date vs. the user's date:** "today" is still the server's local date. If production runs on UTC, a US user in the evening may already be on tomorrow's date as far as the server is concerned. Fixing that would need the user's timezone sent from the browser, which I didn't change.
+- **Production timezone:** I didn't check what timezone production actually runs in.
+AGENT_RC=0

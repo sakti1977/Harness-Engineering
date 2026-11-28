@@ -1,0 +1,5 @@
+A	astro-coach/HARNESS_LOG.md
+M	astro-coach/app/page.tsx
+M	astro-coach/app/profile/page.tsx
+A	astro-coach/lib/sync-push.profile-error.test.ts
+M	astro-coach/lib/sync-push.ts

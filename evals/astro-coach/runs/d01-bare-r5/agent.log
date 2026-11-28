@@ -1,0 +1,10 @@
+I fixed it: when saving the profile to the cloud failed, the app still said "Synced".
+
+**Cause:** The error was in `lib/sync-push.ts`, in the backup save path used when the database's newer save function (migration 009) isn't installed. If writing the profile to `user_profiles` failed, the error was thrown away (`void profileError`). `/api/sync` then reported success and the screen said "Synced", but the profile never reached the cloud. That's why a new device found it empty.
+
+**Fix:**
+- **`lib/sync-push.ts`:** a failed profile write now throws (`if (profileError) throw profileError;`). The route returns a 500 error, the client shows a sync error instead of "Synced", and the save stops before it touches observations. The main save path (the `sync_push` database function) already reported its errors, so I didn't change it.
+- **New test, `lib/sync-push-profile-error.test.ts`:** checks that a failed profile write on the backup path rejects and doesn't touch observations.
+
+**Checks:** `npx vitest run` passed (38 files, 281 tests) and `npx tsc --noEmit` found no errors.
+AGENT_RC=0

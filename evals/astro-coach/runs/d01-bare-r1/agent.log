@@ -1,0 +1,10 @@
+I fixed it: when a profile save fails on the server, the app now shows a sync error instead of "Synced". All 281 tests pass (`npx vitest run`), and `npx tsc --noEmit` reports no errors.
+
+**Cause:** saving the profile normally goes through a database function added by migration 009. When that function isn't installed, the server falls back to an older save path (`pushSyncLegacy` in `lib/sync-push.ts`). That older path checked for errors when saving observations, but ignored an error when writing the profile itself. So if the profile write failed, `/api/sync` still answered `{ ok: true }`. The browser then showed "Synced", and a new device found an empty profile.
+
+**What I changed:**
+- **`lib/sync-push.ts`:** a failed profile write now raises an error. `/api/sync` returns a 500, the sync status shows an error, and nothing marks the data as synced. Raising before the observation step also means old observations aren't replaced after a failed profile save.
+- **`lib/sync-push-profile-error.test.ts`** (new): checks that a failed profile write on the older path is reported as a failure and that nothing else is written after it.
+
+This stops the false "Synced" message, but it won't save the profile if the underlying write keeps failing. It's worth checking whether migration 009 is applied in production, since the older path only runs when it isn't.
+AGENT_RC=0

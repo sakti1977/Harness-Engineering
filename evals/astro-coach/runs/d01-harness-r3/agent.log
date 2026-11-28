@@ -1,0 +1,19 @@
+I fixed it. The server was throwing away the error when saving the profile failed, so the app said "synced" even though nothing reached the account.
+
+**Cause:** `lib/sync-push.ts` has a backup save path that runs when the database's main save function isn't installed (migration 009). In that path, if saving the profile failed, the error was ignored (`void profileError;`). The `/api/sync` route therefore returned 200 `{ok: true}`, the app recorded a successful sync, and the screen showed "synced". A new device then downloaded an empty profile.
+
+**Changes:**
+1. `lib/sync-push.ts`: a failed profile save now throws an error, before observations are touched. The route returns 500 and the app records a sync error instead of success.
+2. New test `lib/sync-push.profile-error.test.ts`: checks that a failed profile save is reported as an error and that observations are left alone.
+3. `app/page.tsx` and `app/profile/page.tsx`: these status lines only checked the time of the last successful sync. An earlier successful download could leave "Copied to your account" or "Up to date with cloud" showing after a failed save. They now show the error first. (`components/SyncStatus.tsx` already did this.)
+
+**Verified (also recorded in `HARNESS_LOG.md`):**
+- `npx vitest run`: 38 test files and 281 tests passed, both after the server fix and after the screen changes.
+- `npx tsc --noEmit`: no errors.
+- Running only the sync tests (`npx vitest run lib/sync-push`) was blocked by a permission prompt here, so I ran the full suite instead.
+
+**Not verified:**
+- I didn't check that the new test fails on the old code.
+- I didn't test against a real Supabase database or in a browser.
+- I didn't confirm whether migration 009 is missing in production. If it is installed, saves don't use the backup path, and this bug may not be the user's cause. The `astro-coach-ops` skill has the migration state to check.
+AGENT_RC=0

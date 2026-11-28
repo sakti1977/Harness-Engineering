@@ -1,0 +1,3 @@
+A	astro-coach/HARNESS_LOG.md
+M	astro-coach/lib/astrology/prompts/validator.ts
+A	astro-coach/lib/astrology/prompts/validator.tz.test.ts

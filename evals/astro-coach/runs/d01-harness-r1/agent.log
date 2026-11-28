@@ -1,0 +1,17 @@
+I fixed it: when the cloud failed to save the profile, the server ignored the error and still told the browser the sync worked. It now reports the failure, so the app shows a sync error instead of "synced". The full test suite and the typecheck both pass.
+
+**Cause:** In `lib/sync-push.ts`, a backup save path (`pushSyncLegacy`) is used when the database's newer save function is missing. That path saved the profile and then threw away any error with `void profileError;`. So `/api/sync` returned 200, the browser marked the data as synced, and the next device pulled an empty profile.
+
+**Changes:**
+1. `lib/sync-push.ts`: replaced `void profileError;` with `if (profileError) throw profileError;`. A failed profile save now returns a 500 error and the app shows a sync error. The save also stops there, so coaching observations aren't changed after a failed profile write.
+2. New test file `lib/sync-push.profile-error.test.ts`: checks that a failed profile save is reported as an error, that observations are left alone, and that a successful save still returns `{ ok: true }`.
+3. `HARNESS_LOG.md`: the plan and every check result.
+
+**Verified:**
+- `npx vitest run`: 38 test files passed, 282 tests passed.
+- `npx tsc --noEmit`: finished with no errors.
+
+**Not verified:**
+- I couldn't run just the new test file on its own (the permission request was denied), so I haven't confirmed that it fails on the old code. It should, because the old code returned `{ ok: true }` where the test expects an error.
+- I'm assuming production is using this backup path, meaning migration `009_atomic_sync_push.sql` isn't applied there. The main path (the `sync_push` database function) already reports errors correctly. If migration 009 is applied in production, this user's problem has a different cause and needs more investigation.
+AGENT_RC=0

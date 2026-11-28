@@ -1,0 +1,80 @@
+diff --git a/astro-coach/HARNESS_LOG.md b/astro-coach/HARNESS_LOG.md
+new file mode 100644
+index 0000000..2b93bd6
+--- /dev/null
++++ b/astro-coach/HARNESS_LOG.md
+@@ -0,0 +1,21 @@
++# HARNESS_LOG
++
++## Plan
++- Symptom: coaching reply "could not read" intermittently, when reply is long/multi-line.
++- Read `lib/claude-json.ts`: `prepareJsonString` escapes EVERY bare `\n`/`\t` with a regex,
++  including structural whitespace between tokens (e.g. after `{`). Pretty-printed JSON then
++  becomes `{\n  "a"...` with a literal backslash-n outside any string → JSON.parse throws.
++  Compact single-line replies parse fine, which explains the intermittency.
++- Existing tests in `lib/claude-json.test.ts` already cover this (pretty-printed, bare \r in strings).
++- Fix: replace the regex with a small string-aware scanner that only escapes raw \n, \r, \t
++  while inside a JSON string literal (tracking `"` and backslash escapes). Keep
++  lastIndexOf("}") slicing unchanged (KNOWN LIMITATION test expects it).
++- Verify: `npx vitest run lib/claude-json.test.ts`, then full `npx vitest run` and `npx tsc --noEmit`.
++
++## Log
++- Attempted `npx vitest run lib/claude-json.test.ts` before and after the edit: blocked by the
++  permission prompt ("This command requires approval"), so the pre-fix failure was NOT observed.
++- Change: `lib/claude-json.ts` — replaced regex newline/tab escaping with string-aware
++  `escapeControlCharsInStrings` (escapes \n, \r, \t only inside string literals).
++- `npx vitest run` → Test Files 37 passed (37), Tests 280 passed (280).
++- `npx tsc --noEmit` → no output (exit 0).
+diff --git a/astro-coach/lib/claude-json.ts b/astro-coach/lib/claude-json.ts
+index 15bf4e0..dc8ce58 100644
+--- a/astro-coach/lib/claude-json.ts
++++ b/astro-coach/lib/claude-json.ts
+@@ -32,10 +32,45 @@ export function prepareJsonString(raw: string): string {
+   // Remove stray C0/C1 control characters while preserving \n \t \r
+   jsonStr = jsonStr.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, " ");
+ 
+-  // Escape bare (un-escaped) newlines and tabs so JSON.parse doesn't choke
+-  jsonStr = jsonStr.replace(/(?<!\\)\n/g, "\\n").replace(/(?<!\\)\t/g, "\\t");
++  // Escape raw newlines / carriage returns / tabs that appear *inside* string
++  // literals (invalid JSON). Whitespace between tokens is left alone —
++  // escaping it would turn pretty-printed JSON into `{\n  "a"...`, which
++  // JSON.parse rejects.
++  return escapeControlCharsInStrings(jsonStr);
++}
+ 
+-  return jsonStr;
++function escapeControlCharsInStrings(json: string): string {
++  let out = "";
++  let inString = false;
++  let escaped = false;
++  for (const ch of json) {
++    if (!inString) {
++      if (ch === '"') inString = true;
++      out += ch;
++      continue;
++    }
++    if (escaped) {
++      escaped = false;
++      out += ch;
++      continue;
++    }
++    if (ch === "\\") {
++      escaped = true;
++      out += ch;
++    } else if (ch === '"') {
++      inString = false;
++      out += ch;
++    } else if (ch === "\n") {
++      out += "\\n";
++    } else if (ch === "\r") {
++      out += "\\r";
++    } else if (ch === "\t") {
++      out += "\\t";
++    } else {
++      out += ch;
++    }
++  }
++  return out;
+ }
+ 
+ /**
